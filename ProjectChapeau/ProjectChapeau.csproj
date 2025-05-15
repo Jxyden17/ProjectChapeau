@@ -6,6 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Extensions\" />
+    <Folder Include="Repositories\Interfaces\" />
+    <Folder Include="Services\Interfaces\" />
+  </ItemGroup>
+
 
 
 </Project>
