@@ -10,16 +10,18 @@
         <div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
     }
 }
-<form action="/Employee/Login" method="post">
+<form asp-controller="Employee" asp-action="Login" method="post" class="mt-4">
 
-    <div class="form-group">
-        <label for="name">Name:</label>
-        <input type="text" id="UserName" name="UserName" class="form-control" placeholder="Your name" required value="@Model?.userName" />
+    <div class="mb-3">
+        <label for="UserName" class="form-label">Username</label>
+        <input type="text" id="UserName" name="UserName" class="form-control" placeholder="Your username" required value="@Model?.userName" />
     </div>
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="text" id="Password" name="Password" class="form-control" placeholder="Your password" required value="@Model?.password" />
+
+    <div class="mb-3">
+        <label for="Password" class="form-label">Password</label>
+        <input type="password" id="Password" name="Password" class="form-control" placeholder="Your password" required />
     </div>
-    <button type="submit" class="btn btn-primary">Send</button>
+
+    <button type="submit" class="btn btn-primary">Login</button>
 </form>
 

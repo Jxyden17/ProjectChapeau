@@ -11,40 +11,35 @@
         <div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
     }
 }
-<a href="/User/Create">Create New</a>
-<table class="table">
-    <thead class="thead-dark">
+<a href="/Employee/Create" class="btn btn-primary mb-3">Create New</a>
+<table class="table table-hover table-bordered align-middle">
+    <thead class="table-dark">
         <tr>
-            <th class="col">Id</th>
-            <th class="col">First Name</th>
-            <th class="col">Last Name</th>
-            <th class="col">User Name</th>
-            <th class="col">Is Active</th>
-            <th class="col">Role</th>
+            <th scope="col">ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Username</th>
+            <th scope="col">Active</th>
+            <th scope="col">Role</th>
+            <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @{
-            foreach (Employee employee in Model)
-            {
-                var rowStyle = "";
-                @if (employee == loggedInEmployee)
-                {
-                    rowStyle = "class=table-info";
-                }
-                <tr @rowStyle>
-                    <th scope="row">@employee.employeeId</th>
-                    <td>@employee.firstName</td>
-                    <td>@employee.lastName</td>
-                    <td>@employee.userName</td>
-                    <td>@employee.isActive</td>
-                    <td>@employee.role</td>
-                    <td>
-                        <a href="/Employee/Edit/@employee.employeeId">Edit</a>
-                        <a href="/Employee/Delete/@employee.employeeId">Delete</a>
-                    </td>
-                </tr>
-            }
+        @foreach (Employee employee in Model)
+        {
+
+            <tr class="">
+                <th scope="row">@employee.employeeId</th>
+                <td>@employee.firstName</td>
+                <td>@employee.lastName</td>
+                <td>@employee.userName</td>
+                <td>@(employee.isActive ? "Yes" : "No")</td>
+                <td>@employee.role</td>
+                <td>
+                    <a href="/Employee/Edit/@employee.employeeId" class="btn btn-sm btn-warning me-1">Edit</a>
+                    <a href="/Employee/Delete/@employee.employeeId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
         }
     </tbody>
 </table>
