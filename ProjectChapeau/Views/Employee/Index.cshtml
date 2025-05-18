@@ -1,0 +1,50 @@
+﻿@model List<ProjectChapeau.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employee Page";
+    Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
+}
+
+@{
+    if (TempData["ConfirmMessage"] != null)
+    {
+        <div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
+    }
+}
+<a href="/User/Create">Create New</a>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th class="col">Id</th>
+            <th class="col">First Name</th>
+            <th class="col">Last Name</th>
+            <th class="col">User Name</th>
+            <th class="col">Is Active</th>
+            <th class="col">Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (Employee employee in Model)
+            {
+                var rowStyle = "";
+                @if (employee == loggedInEmployee)
+                {
+                    rowStyle = "class=table-info";
+                }
+                <tr @rowStyle>
+                    <th scope="row">@employee.employeeId</th>
+                    <td>@employee.firstName</td>
+                    <td>@employee.lastName</td>
+                    <td>@employee.userName</td>
+                    <td>@employee.isActive</td>
+                    <td>@employee.role</td>
+                    <td>
+                        <a href="/Employee/Edit/@employee.employeeId">Edit</a>
+                        <a href="/Employee/Delete/@employee.employeeId">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

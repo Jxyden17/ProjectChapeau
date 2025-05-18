@@ -1,3 +1,8 @@
+using ProjectChapeau.Services.Interfaces;
+using ProjectChapeau.Services;
+using ProjectChapeau.Repositories.Interfaces;
+using ProjectChapeau.Repositories;
+
 namespace ProjectChapeau
 {
     public class Program
@@ -8,6 +13,16 @@ namespace ProjectChapeau
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSingleton<IPasswordService, PasswordService>();
+            builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
+            builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             var app = builder.Build();
 
@@ -23,6 +38,7 @@ namespace ProjectChapeau
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthorization();
 

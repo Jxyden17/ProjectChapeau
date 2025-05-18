@@ -9,9 +9,10 @@
         public string userName { get; set; }
         public string password { get; set; }
         public bool isActive { get; set; }
-        public string role { get; set; }
+        public int role { get; set; }
+        public string salt { get; set; }
 
-        public Employee(int employeeId, string firstName, string lastName, string userName, string password, bool isActive, string role)
+        public Employee(int employeeId, string firstName, string lastName, string userName, string password, bool isActive, int role, string salt)
         {
             this.employeeId = employeeId;
             this.firstName = firstName;
@@ -20,6 +21,9 @@
             this.password = password;
             this.isActive = isActive;
             this.role = role;
+            this.salt = salt;
         }
+
+        public Employee() { }
     }
 }
