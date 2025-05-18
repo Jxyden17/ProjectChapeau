@@ -58,7 +58,7 @@ namespace ProjectChapeau.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("LoggedInEmployee");
-            return RedirectToAction("Index", "Employee");
+            return RedirectToAction("Login", "Employee");
         }
 
         //Create
