@@ -32,15 +32,15 @@ namespace ProjectChapeau.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(Employee employeeModel)
+        public ActionResult Login(Login loginModel)
         {
-            Employee? Employee = _employeeService.GetUserByLoginCredentials(employeeModel.userName, employeeModel.password);
+            Employee? Employee = _employeeService.GetUserByLoginCredentials(loginModel.UserName, loginModel.Password);
             try
             {
                 if (Employee == null)
                 {
                     ViewBag.ErrorMessage = "Bad Username/Password Combo";
-                    return View(employeeModel);
+                    return View(loginModel);
                 }
                 else
                 {
@@ -52,7 +52,7 @@ namespace ProjectChapeau.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return View(employeeModel);
+                return View(loginModel);
             }
         }
         public IActionResult Logout()

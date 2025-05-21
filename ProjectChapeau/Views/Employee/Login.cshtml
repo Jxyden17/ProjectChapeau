@@ -1,4 +1,4 @@
-﻿@model ProjectChapeau.Models.Employee 
+﻿@model ProjectChapeau.Models.Login
 @{
     ViewData["Title"] = "Login";
 }
@@ -14,7 +14,7 @@
 
     <div class="mb-3">
         <label for="UserName" class="form-label">Username</label>
-        <input type="text" id="UserName" name="UserName" class="form-control" placeholder="Your username" required value="@Model?.userName" />
+        <input type="text" id="UserName" name="UserName" class="form-control" placeholder="Your username" required value="@Model?.UserName" />
     </div>
 
     <div class="mb-3">

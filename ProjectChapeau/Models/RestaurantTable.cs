@@ -2,13 +2,17 @@
 {
     public class RestaurantTable
     {
-        public int tableId {  get; set; }
-        public bool seatingStatus { get; set; }
+        public int TableNumber {  get; set; }
+        public bool IsOccupied { get; set; }
 
-        public RestaurantTable(int tableId, bool seatingStatus)
+        public RestaurantTable(int tableNumber, bool isOccupied)
         {
-            this.tableId = tableId;
-            this.seatingStatus = seatingStatus;
+            this.TableNumber = tableNumber;
+            this.IsOccupied = isOccupied;
+        }
+
+        public RestaurantTable()
+        {
         }
     }
 }

@@ -33,7 +33,7 @@ namespace ProjectChapeau.Repositories
                 command.Parameters.AddWithValue("@Password", employee.password);
                 command.Parameters.AddWithValue("@Salt", employee.salt);
                 command.Parameters.AddWithValue("@IsActive", employee.isActive);
-                command.Parameters.AddWithValue("@Role", employee.role);
+                command.Parameters.AddWithValue("@Role", employee.roleName);
 
                 command.Connection.Open();
                 employee.employeeId = Convert.ToInt32(command.ExecuteScalar());
@@ -54,7 +54,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT employee_number, firstname, lastname, username, password, salt, is_active, role FROM Employees";
+                string query = "SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, r.role_name FROM Employees e JOIN Role r ON e.role = r.role_number;";
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Connection.Open();
@@ -80,7 +80,7 @@ namespace ProjectChapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT employee_number, firstname, lastname, username, password, salt, is_active, role FROM employees WHERE username = @Username";
+                string query = "SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, r.role_name FROM Employees e JOIN Role r ON e.role = r.role_number WHERE e.username = @Username;";
                 SqlCommand cmd = new SqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@Username", username);
 
@@ -118,7 +118,7 @@ namespace ProjectChapeau.Repositories
             string password = (string)reader["password"];
             string salt = (string)reader["salt"];
             bool isActive= (bool)reader["is_active"];
-            int role = (int)reader["role"];
+            string role = (string)reader["role_name"];
 
             return new Employee(id, firstname ,lastname,username , password , isActive, role, salt);
         }
