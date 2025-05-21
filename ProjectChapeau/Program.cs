@@ -1,3 +1,6 @@
+using ProjectChapeau.Repositories;
+using ProjectChapeau.Repositories.Interfaces;
+
 namespace ProjectChapeau
 {
     public class Program
@@ -8,6 +11,8 @@ namespace ProjectChapeau
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
 
             var app = builder.Build();
 

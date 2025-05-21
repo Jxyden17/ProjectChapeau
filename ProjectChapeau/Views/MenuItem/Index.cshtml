@@ -1,0 +1,28 @@
+﻿@model List<ProjectChapeau.Models.MenuItem>
+
+@{
+	ViewData["Title"] = "MenuItem";
+}
+
+<div class="text-center">
+	<h1 class="display-4">MenuItem</h1>
+</div>
+<table class="table table-dark table-hover">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Price</th>
+		</tr>
+	</thead>
+	<tbody>
+		@{
+			foreach (var menuItem in Model)
+			{
+				<tr>
+					<td>@menuItem.ItemName</td>
+					<td>@menuItem.Price</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
