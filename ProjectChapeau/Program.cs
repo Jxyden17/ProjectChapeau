@@ -14,8 +14,15 @@ namespace ProjectChapeau
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSingleton<IPasswordService, PasswordService>();
+
             builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
             builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+
+            builder.Services.AddSingleton<ITableService, TableService>();
+            builder.Services.AddSingleton<ITableRepository, TableRepository>();
+
+            builder.Services.AddSingleton<IRoleService, RoleService>();
+            builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 
             builder.Services.AddSession(options =>
             {

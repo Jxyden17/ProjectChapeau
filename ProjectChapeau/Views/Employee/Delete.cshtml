@@ -1,0 +1,40 @@
+﻿@model ProjectChapeau.Models.Employee
+
+@{
+    ViewData["Title"] = "Delete Employee";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<partial name="_ErrorMessage" />
+
+<form asp-controller="Employee" asp-action="Delete" method="post">
+    <input type="hidden" name="employeeId" value="@Model?.employeeId" />
+
+    <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" id="firstName" name="firstName" class="form-control" value="@Model?.firstName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" id="lastName" name="lastName" class="form-control" value="@Model?.lastName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label for="userName" class="form-label">UserName</label>
+        <input type="text" id="userName" name="userName" class="form-control" value="@Model?.userName" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label for="roleName" class="form-label">Current Role</label>
+        <input type="text" id="roleName" name="role.roleName" class="form-control" value="@Model?.role.roleName" readonly />
+    </div>
+
+    <div class="alert alert-warning" role="alert">
+        Are you sure you want to delete this user?
+    </div>
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="/Employee/Index" class="btn btn-secondary ms-2">Back to List</a>
+</form>

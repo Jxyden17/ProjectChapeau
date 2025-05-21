@@ -4,12 +4,8 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-@{
-    if (ViewBag.ErrorMessage != null)
-    {
-        <div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
-    }
-}
+<partial name="_ErrorMessage" />
+
 <form asp-controller="Employee" asp-action="Login" method="post" class="mt-4">
 
     <div class="mb-3">

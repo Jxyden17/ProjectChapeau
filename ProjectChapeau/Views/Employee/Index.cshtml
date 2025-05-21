@@ -5,12 +5,8 @@
     Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
 }
 
-@{
-    if (TempData["ConfirmMessage"] != null)
-    {
-        <div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
-    }
-}
+<partial name="_ConfirmMessage" />
+
 <a href="/Employee/Create" class="btn btn-primary mb-3">Create New</a>
 <table class="table table-hover table-bordered align-middle">
     <thead class="table-dark">
@@ -34,7 +30,7 @@
                 <td>@employee.lastName</td>
                 <td>@employee.userName</td>
                 <td>@(employee.isActive ? "Yes" : "No")</td>
-                <td>@employee.roleName</td>
+                <td>@employee.role.roleName</td>
                 <td>
                     <a href="/Employee/Edit/@employee.employeeId" class="btn btn-sm btn-warning me-1">Edit</a>
                     <a href="/Employee/Delete/@employee.employeeId" class="btn btn-sm btn-danger">Delete</a>

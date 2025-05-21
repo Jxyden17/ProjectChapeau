@@ -33,7 +33,7 @@ namespace ProjectChapeau.Repositories
                 command.Parameters.AddWithValue("@Password", employee.password);
                 command.Parameters.AddWithValue("@Salt", employee.salt);
                 command.Parameters.AddWithValue("@IsActive", employee.isActive);
-                command.Parameters.AddWithValue("@Role", employee.roleName);
+                command.Parameters.AddWithValue("@Role", employee.role.roleId);
 
                 command.Connection.Open();
                 employee.employeeId = Convert.ToInt32(command.ExecuteScalar());
@@ -41,11 +41,41 @@ namespace ProjectChapeau.Repositories
         }
         public void Update(Employee employee)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
+                               "WHERE employee_number = @Id";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@Id", employee.employeeId);
+                command.Parameters.AddWithValue("@FirstName", employee.firstName);
+                command.Parameters.AddWithValue("@LastName", employee.lastName);
+                command.Parameters.AddWithValue("@Username", employee.userName);
+                command.Parameters.AddWithValue("@Password", employee.password);
+                command.Parameters.AddWithValue("@Salt", employee.salt);
+                command.Parameters.AddWithValue("@IsActive", employee.isActive);
+                command.Parameters.AddWithValue("@Role", employee.role.roleId);
+
+                command.Connection.Open();
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                    throw new Exception("No records updated!");
+            }
         }
         public void Delete(Employee employee)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"DELETE FROM Employees WHERE employee_number = @Id";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@Id", employee.employeeId);
+
+                command.Connection.Open();
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                    throw new Exception("No records deleted!");
+            }
         }
 
         public List<Employee> GetAll()
@@ -54,7 +84,9 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, r.role_name FROM Employees e JOIN Role r ON e.role = r.role_number;";
+                string query = @"SELECT e.employee_number,  e.firstname,  e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
+                        FROM Employees e 
+                        JOIN Role r ON e.role = r.role_number;";
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Connection.Open();
@@ -73,19 +105,42 @@ namespace ProjectChapeau.Repositories
 
         public Employee? GetById(int UserId)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT e.employee_number,  e.firstname,  e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
+                        FROM Employees e 
+                        JOIN Role r ON e.role = r.role_number
+                        WHERE e.employee_number = @UserId;";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@UserId", UserId);
+
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        Employee employee = ReadEmployee(reader);
+                        return employee;
+                    }
+                }
+            }
+            return null;
         }
 
         public Employee? GetByLoginCredentials(string username, string password)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, r.role_name FROM Employees e JOIN Role r ON e.role = r.role_number WHERE e.username = @Username;";
+                string query = @"SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
+                FROM Employees e 
+                JOIN Role r ON e.role = r.role_number 
+                WHERE e.username = @Username;";
                 SqlCommand cmd = new SqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@Username", username);
 
                 connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
+                SqlDataReader reader = cmd.ExecuteReader(); 
 
                 if (reader.Read())
                 {
@@ -117,10 +172,14 @@ namespace ProjectChapeau.Repositories
             string username = (string)reader["username"];
             string password = (string)reader["password"];
             string salt = (string)reader["salt"];
-            bool isActive= (bool)reader["is_active"];
-            string role = (string)reader["role_name"];
+            bool isActive = (bool)reader["is_active"];
+            Role employeeRole = new Role
+            {
+                roleId = (int)reader["role_number"],
+                roleName = (string)reader["role_name"]
+            };
 
-            return new Employee(id, firstname ,lastname,username , password , isActive, role, salt);
+            return new Employee(id, firstname ,lastname,username , password , isActive, employeeRole, salt);
         }
 
         public bool UserNameExists(string userName)

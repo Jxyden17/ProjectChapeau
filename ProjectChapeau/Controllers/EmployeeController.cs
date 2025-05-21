@@ -2,19 +2,22 @@
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Services.Interfaces;
-using ProjectChapeau.Views.Employee;
+using ProjectChapeau.Views.ViewModel;
 
 namespace ProjectChapeau.Controllers
 {
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
+        private readonly IRoleService _roleService;
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(IEmployeeService employeeService, IRoleService roleService) 
         {
             _employeeService = employeeService;
+            _roleService = roleService;
         }
 
+        //index
         public IActionResult Index()
         {
 
@@ -26,6 +29,8 @@ namespace ProjectChapeau.Controllers
             return View(employees);
         }
 
+
+        //login&logout
         public IActionResult Login()
         {
             return View();
@@ -34,7 +39,7 @@ namespace ProjectChapeau.Controllers
         [HttpPost]
         public ActionResult Login(Login loginModel)
         {
-            Employee? Employee = _employeeService.GetUserByLoginCredentials(loginModel.UserName, loginModel.Password);
+            Employee? Employee = _employeeService.GetEmployeeByLoginCredentials(loginModel.UserName, loginModel.Password);
             try
             {
                 if (Employee == null)
@@ -63,12 +68,78 @@ namespace ProjectChapeau.Controllers
 
         //Create
         [HttpPost]
-        public ActionResult Create(Employee employee)
+        public ActionResult Create(EmployeeRoleModel employeeRoleModel)
         {
             try
             {
-                _employeeService.AddEmployee(employee);
+                
+                _employeeService.AddEmployee(employeeRoleModel.employee);
                 TempData["ConfirmMessage"] = "User added succesfully";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+               
+                ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
+                employeeRoleModel.employee = new Employee();
+                employeeRoleModel.Roles = _roleService.GetAllRoles();
+                return View(employeeRoleModel);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Create()
+        {
+            Employee employee = new Employee();
+            List<Role> Roles = _roleService.GetAllRoles();
+            EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
+
+            return View(viewModel);
+        }
+        
+
+        //Edit
+        [HttpPost]
+        public ActionResult Edit(EmployeeRoleModel employeeRoleModel)
+        {
+            try
+            {
+                _employeeService.UpdateEmployee(employeeRoleModel.employee);
+                TempData["ConfirmMessage"] = "Your employee has been edited succesfully";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
+                employeeRoleModel.employee = new Employee();
+                employeeRoleModel.Roles = _roleService.GetAllRoles();
+                return View(employeeRoleModel);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Employee? employee = _employeeService.GetById((int)id);
+            List<Role> Roles = _roleService.GetAllRoles();
+            EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
+            return View(viewModel);
+
+        }
+
+        //Delete
+        [HttpPost]
+        public ActionResult Delete(Employee employee)
+        {
+            try
+            {
+                _employeeService.DeleteEmployee(employee);
+                TempData["ConfirmMessage"] = "Your user has been deleted succesfully";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -79,9 +150,15 @@ namespace ProjectChapeau.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Delete(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Employee? employee = _employeeService.GetById((int)id);
+            return View(employee);
         }
     }
 }
