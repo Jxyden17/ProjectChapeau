@@ -4,23 +4,33 @@
 
 @foreach (RestaurantTable table in Model.restaurantTables)
 {
-    Order latestOrder = Model.Orders.Where(o => o.tableId.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
+    Order latestOrder = Model.Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
 
     string cardColor = "bg-success text-white";
     string statusText = "Available";
 
-    if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
+    if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed )
     {
-        cardColor = "bg-warning text-dark";
-        statusText = $"Order {latestOrder.orderStatus}";
+        if (latestOrder.table.IsOccupied == true)
+        {
+            cardColor = "bg-danger text-dark";
+            statusText = $"Order {latestOrder.orderStatus}";
+        }
+        else
+        {
+            cardColor = "bg-warning text-dark";
+            statusText = $"Order {latestOrder.orderStatus}";
+        }
     }
 
     <div class="col-md-3 mb-4">
+        <a href="/Tables/Edit/@table.TableNumber" style="text-decoration:none;">
         <div class="card h-100 shadow-sm border-0 @cardColor">
             <div class="card-body text-center">
                 <h5 class="card-title">Table @table.TableNumber</h5>
                 <p class="card-text">Status: <strong>@statusText</strong></p>
             </div>
         </div>
+        </a>
     </div>
 }

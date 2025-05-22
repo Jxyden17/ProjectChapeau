@@ -26,7 +26,7 @@ namespace ProjectChapeau.Repositories
                 o.payment_status,
                 e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number,
                 r.role_name,
-                rt.table_number
+                rt.table_number, rt.is_occupied
                 FROM Orders o
                 JOIN Employees e ON o.employee_number = e.employee_number
                 JOIN Role r ON e.role = r.role_number
@@ -87,8 +87,9 @@ namespace ProjectChapeau.Repositories
         private RestaurantTable ReadTables(SqlDataReader reader)
         {
             int id = (int)reader["table_number"];
+            bool IsOccupoed = (bool)reader["is_occupied"];
 
-            return new RestaurantTable(id);
+            return new RestaurantTable(id, IsOccupoed);
         }
     }
 }

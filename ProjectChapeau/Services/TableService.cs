@@ -17,5 +17,15 @@ namespace ProjectChapeau.Services
         {
             return _tableRepository.GetAllTables();
         }
+
+        public RestaurantTable GetTableById(int id)
+        {
+            return _tableRepository.GetById(id);
+        }
+
+        public void UpdateTable(RestaurantTable table)
+        {
+            _tableRepository.UpdateTable(table);
+        }
     }
 }

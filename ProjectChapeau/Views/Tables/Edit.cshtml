@@ -1,0 +1,31 @@
+﻿@model ProjectChapeau.Models.RestaurantTable
+
+@{
+    ViewData["Title"] = "Edit Table Information";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<partial name="_ErrorMessage" />
+
+<form asp-controller="Tables" asp-action="Edit" method="post" class="w-50 mx-auto">
+    <input type="hidden" name="TableNumber" value="@Model?.TableNumber" />
+
+    <div class="mb-4">
+        <label class="form-label d-block fw-semibold mb-2">Is Table Occupied?</label>
+
+        <div class="btn-group" role="group" aria-label="Is Table Occupied">
+            <input type="radio" class="btn-check" name="isOccupied" id="IsOccupiedFalse" autocomplete="off" value="False" @(Model?.IsOccupied == false ? "checked" : "") />
+            <label class="btn btn-outline-danger" for="IsOccupiedFalse">False</label>
+
+            <input type="radio" class="btn-check" name="isOccupied" id="IsOccupiedTrue" autocomplete="off" value="True" @(Model?.IsOccupied == true ? "checked" : "") />
+            <label class="btn btn-outline-success" for="IsOccupiedTrue">True</label>
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-center gap-3">
+        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+        <a href="/Tables/Index" class="btn btn-secondary px-4">Back to Tables</a>
+    </div>
+</form>

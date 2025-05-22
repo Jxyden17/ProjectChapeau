@@ -3,6 +3,7 @@ using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Views.ViewModel;
+using ProjectChapeau.Services;
 
 namespace ProjectChapeau.Controllers
 {
@@ -36,10 +37,42 @@ namespace ProjectChapeau.Controllers
         }
 
 
-            [HttpGet]
+        [HttpGet]
         public ActionResult Create()
         {
             return View();
         }
+
+
+        //edit
+        [HttpPost]
+        public IActionResult Edit(RestaurantTable table)
+        {
+            try
+            {
+                _tableService.UpdateTable(table);
+                TempData["ConfirmMessage"] = "Your employee has been edited succesfully";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
+                return View(table);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            RestaurantTable table =  _tableService.GetTableById((int)id);
+            return View(table);
+
+        }
+
     }
 }
