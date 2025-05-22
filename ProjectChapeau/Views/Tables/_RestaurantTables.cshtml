@@ -6,26 +6,20 @@
 {
     Order latestOrder = Model.Orders.Where(o => o.tableId.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
 
-    bool isOccupied = latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed;
+    string cardColor = "bg-success text-white";
+    string statusText = "Available";
 
-    string cardColor = table.IsOccupied ? "bg-danger text-white" : "bg-success text-white";
-    string statusText = table.IsOccupied ? "Occupied" : "Available";
+    if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
+    {
+        cardColor = "bg-warning text-dark";
+        statusText = $"Order {latestOrder.orderStatus}";
+    }
 
-    <div class="col">
+    <div class="col-md-3 mb-4">
         <div class="card h-100 shadow-sm border-0 @cardColor">
-            <div class="card-body d-flex flex-column justify-content-center text-center">
+            <div class="card-body text-center">
                 <h5 class="card-title">Table @table.TableNumber</h5>
-                <p class="card-text mb-3">Status: <strong>@statusText</strong></p>
-                @if (latestOrder != null)
-                {
-                    <p class="card-text">Last Order #: <strong>@latestOrder.orderId</strong></p>
-                    <p class="card-text">Order Status: <strong>@latestOrder.orderStatus</strong></p>
-                }
-                else
-                {
-                    <p class="card-text text-muted">No orders yet</p>
-                }
-
+                <p class="card-text">Status: <strong>@statusText</strong></p>
             </div>
         </div>
     </div>

@@ -18,7 +18,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT table_number, is_occupied FROM RESTAURANT_TABLE";
+                string query = "SELECT table_number FROM RESTAURANT_TABLE";
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Connection.Open();
@@ -37,9 +37,8 @@ namespace ProjectChapeau.Repositories
         public RestaurantTable ReadTables(SqlDataReader reader)
         {
             int id = (int)reader["table_number"];
-            bool IsOccupoed = (bool)reader["is_occupied"];
 
-            return new RestaurantTable(id, IsOccupoed);
+            return new RestaurantTable(id);
         }
     }
 }
