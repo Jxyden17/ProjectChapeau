@@ -164,7 +164,7 @@ namespace ProjectChapeau.Repositories
             return null;
         }
 
-        public Employee ReadEmployee(SqlDataReader reader)
+        private Employee ReadEmployee(SqlDataReader reader)
         {
             int id = (int)reader["employee_number"];
             string firstname = (string)reader["firstname"];
