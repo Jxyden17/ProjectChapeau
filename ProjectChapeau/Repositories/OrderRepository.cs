@@ -41,7 +41,7 @@ namespace ProjectChapeau.Repositories
                     Employee employee = ReadEmployee(reader);
                     RestaurantTable restaurantTable = ReadTables(reader);
 
-                    OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_stauts"].ToString());
+                    OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
                     paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
 
                     Order order = new Order(

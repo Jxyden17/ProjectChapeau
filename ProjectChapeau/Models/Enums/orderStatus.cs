@@ -3,6 +3,7 @@
     public enum OrderStatus
     {
         Preparing,
+        Served,
         InProgress,
         Completed
     }

@@ -24,6 +24,9 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<IRoleService, RoleService>();
             builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 
+            builder.Services.AddSingleton<IOrderService, OrderService>();
+            builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
