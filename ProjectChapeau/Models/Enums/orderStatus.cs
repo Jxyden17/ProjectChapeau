@@ -2,9 +2,9 @@
 {
     public enum OrderStatus
     {
-        Preparing,
-        Served,
-        InProgress,
+        Ordered,
+        BeingPrepared,
+        ReadyToBeServed,
         Completed
     }
 }
