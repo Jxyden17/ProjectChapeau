@@ -13,10 +13,15 @@ namespace ProjectChapeau.Controllers
             _menuItemRepository = menuItemRepository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int? menuId, int? categoryId)
         {
-            List<MenuItem> menuItem = _menuItemRepository.GetAllMenuItems();
-            return View(menuItem);
+            var menuItems = _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
+            return View(menuItems);
+
+
         }
+
+
     }
+
 }

@@ -7,6 +7,26 @@
 <div class="text-center">
 	<h1 class="display-4">MenuItem</h1>
 </div>
+
+<form method="get">
+	<label for="menuId">Card (Menu):</label>
+	<select name="menuId" id="menuId">
+		<option value="">All</option>
+		<option value="1">Lunch Menu</option>
+		<option value="2">Dinner Menu</option>
+		<option value="3">Drink Menu</option>
+	</select>
+
+	<label for="categoryId">Category:</label>
+	<select name="categoryId" id="categoryId">
+		<option value="">All</option>
+		<option value="1">Starters</option>
+		<option value="2">Mains</option>
+		<option value="3">Desserts</option>
+	</select>
+
+	<button type="submit">filter</button>
+</form>
 <table class="table table-dark table-hover">
 	<thead>
 		<tr>
