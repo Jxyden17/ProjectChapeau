@@ -30,5 +30,9 @@ namespace ProjectChapeau.Services
         {
             return _menuItemsRepository.GetMenuItemsByMenu(menuId);
         }
+        public MenuItem? GetMenuItemById(int menuItemId)
+        {
+            return _menuItemsRepository.GetMenuItemById(menuItemId);
+        }
     }
 }

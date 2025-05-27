@@ -14,11 +14,11 @@ namespace ProjectChapeau.Repositories
             _connectionString = configuration.GetConnectionString("ProjectDatabase");
         }
 
-        private MenuItem ReadMenuItem(SqlDataReader reader)
+        private static MenuItem ReadMenuItem(SqlDataReader reader)
         {
             int menuItemId = (int)reader["menu_item_id"];
             // Shortened if-else statement (condition ? true-statement : false-statement)
-            Category? category = reader["category_id"] == DBNull.Value ? null : new Category((int)reader["category_id"], (string)reader["category_name"]);
+            Category? category = reader["category_id"] == DBNull.Value || reader["category_name"] == DBNull.Value ? null : new Category((int)reader["category_id"], (string)reader["category_name"]);
             string itemName = (string)reader["item_name"];
             string? itemDescription = reader["item_description"] == DBNull.Value ? null : (string)reader["item_description"];
             bool? isAlcoholic = reader["is_alcoholic"] == DBNull.Value ? null : (bool)reader["is_alcoholic"];
@@ -33,7 +33,7 @@ namespace ProjectChapeau.Repositories
 
         public List<MenuItem> GetAllMenuItems()
         {
-            List<MenuItem> menuItems = new();
+            List<MenuItem> menuItems = [];
 
             //1. Create an SQL connection with a connection string
             using (SqlConnection connection = new(_connectionString))
@@ -64,7 +64,7 @@ namespace ProjectChapeau.Repositories
 
         public List<MenuItem> GetMenuItemsByMenu(int menuId)
         {
-            List<MenuItem> menuItems = new();
+            List<MenuItem> menuItems = [];
 
             //1. Create an SQL connection with a connection string
             using (SqlConnection connection = new(_connectionString))
@@ -96,6 +96,37 @@ namespace ProjectChapeau.Repositories
                 reader.Close();
             }
             return menuItems;
+        }
+        public MenuItem? GetMenuItemById(int menuItemId)
+        {
+            MenuItem? menuItem = null;
+
+            // 1. Create an SQL connection with a connection string
+            using (SqlConnection connection = new(_connectionString))
+            {
+                // 2. Create an SQL command with a query
+                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM Menu_Item AS MI
+                                 INNER JOIN Category AS C ON C.category_id = MI.category_id
+                                 WHERE MI.menu_item_id = @MenuItemId;";
+                SqlCommand command = new(query, connection);
+
+                // Add parameters to prevent SQL injection
+                command.Parameters.AddWithValue("@MenuItemId", menuItemId);
+
+                // 3. Open the SQL connection
+                command.Connection.Open();
+
+                // 4. Execute SQL command
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    menuItem = ReadMenuItem(reader);
+                }
+                reader.Close();
+            }
+            return menuItem;
         }
     }
 }
