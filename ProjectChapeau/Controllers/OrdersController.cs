@@ -19,9 +19,9 @@ namespace ProjectChapeau.Controllers
         }
         public IActionResult Menu()
         {
-            Menu lunchMenu = new(1, "Lunch Menu", _menuItemsService.GetMenuItemsByMenu("Lunch Menu"));
-            Menu dinnerMenu = new(2, "Dinner Menu", _menuItemsService.GetMenuItemsByMenu("Dinner Menu"));
-            Menu drinkMenu = new(3, "Drink Menu", _menuItemsService.GetMenuItemsByMenu("Drink Menu"));
+            Menu lunchMenu = new(1, "Lunch Menu", _menuItemsService.GetMenuItemsByMenu(1));
+            Menu dinnerMenu = new(2, "Dinner Menu", _menuItemsService.GetMenuItemsByMenu(2));
+            Menu drinkMenu = new(3, "Drink Menu", _menuItemsService.GetMenuItemsByMenu(3));
             List<Menu> menus =
             [
                 lunchMenu,

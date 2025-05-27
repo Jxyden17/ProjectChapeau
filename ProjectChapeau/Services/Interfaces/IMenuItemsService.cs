@@ -5,6 +5,6 @@ namespace ProjectChapeau.Services.Interfaces
     public interface IMenuItemsService
     {
         List<MenuItem> GetAllMenuItems();
-        List<MenuItem> GetMenuItemsByMenu(string menuName);
+        List<MenuItem> GetMenuItemsByMenu(int menuId);
     }
 }

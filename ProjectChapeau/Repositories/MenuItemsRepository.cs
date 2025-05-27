@@ -62,7 +62,7 @@ namespace ProjectChapeau.Repositories
             return menuItems;
         }
 
-        public List<MenuItem> GetMenuItemsByMenu(string menuName)
+        public List<MenuItem> GetMenuItemsByMenu(int menuId)
         {
             List<MenuItem> menuItems = new();
 
@@ -75,12 +75,12 @@ namespace ProjectChapeau.Repositories
                                  INNER JOIN Menu AS M ON M.menu_id = MCI.menu_id
                                  INNER JOIN Menu_Item AS MI ON MI.menu_item_id = MCI.menu_item_id
                                  INNER JOIN Category AS C ON C.category_id = MI.category_id
-                                 WHERE M.menu_name LIKE @MenuName
+                                 WHERE MCI.menu_id LIKE @MenuId
                                  ORDER BY MI.category_id;";
                 SqlCommand command = new(query, connection);
 
                 // Add parameters to prevent SQL injection
-                command.Parameters.AddWithValue("@MenuName", menuName);
+                command.Parameters.AddWithValue("@MenuId", menuId);
 
                 // 3. Open the SQL connection
                 command.Connection.Open();
