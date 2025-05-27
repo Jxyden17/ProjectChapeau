@@ -1,9 +1,11 @@
 ﻿@model MenuItem
 
-<div class="card h-100">
-  <img src="/img/menu-item/@Model.ImageURL" class="card-img-top" alt="@Model.ItemName" style="height: 200px; object-fit: cover;">
-  <div class="card-body">
-    <h5 class="card-title">@Model.ItemName</h5>
-    <p class="card-text">&euro;@Model.Price - @Model.Stock left in stock</p>
-  </div>
-</div>
+<a href="/Orders/MenuItem/@Model.MenuItemId" class="text-decoration-none text-black">
+    <div class="card h-100">
+        <img src="/img/menu-item/@Model.ImageURL" class="card-img-top" alt="@Model.ItemName" style="height: 200px; object-fit: cover;">
+        <div class="card-body">
+            <h5 class="card-title">@Model.ItemName</h5>
+            <p class="card-text">&euro;@Model.Price - @Model.Stock left in stock</p>
+        </div>
+    </div>
+</a>
