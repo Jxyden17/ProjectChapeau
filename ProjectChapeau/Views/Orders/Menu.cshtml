@@ -6,14 +6,18 @@
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-    @{
-        foreach (Menu menu in @Model)
-        {
-            <h2>@menu.MenuName</h2>
-            foreach (MenuItem menuItem in menu.MenuItems)
-            {
-                <partial name="_MenuItemCard" model="menuItem"/>
-            }
-        }
+    @foreach (Menu menu in @Model)
+    {
+        <h2>@menu.MenuName</h2>
+        <div class="container">
+            <div class="row">
+                @foreach (MenuItem menuItem in menu.MenuItems)
+                {
+                    <div class="col-md-3 mb-3">
+                        <partial name="_MenuItemCard" model="menuItem" />
+                    </div>
+                }
+            </div>
+        </div>
     }
 </div>
