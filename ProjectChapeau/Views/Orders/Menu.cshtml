@@ -12,13 +12,7 @@
             <h2>@menu.MenuName</h2>
             foreach (MenuItem menuItem in menu.MenuItems)
             {
-            <div class="card">
-              <img src="/img/menu-item/steak-tartare.jpg" class="card-img-top" alt="...">
-              <div class="card-body">
-                <h5 class="card-title">@menuItem.ItemName</h5>
-                <p class="card-text">&euro;@menuItem.Price - @menuItem.Stock left in stock</p>
-              </div>
-            </div>
+                <partial name="_MenuItemCard" model="menuItem"/>
             }
         }
     }

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ProjectChapeau.Models
+﻿namespace ProjectChapeau.Models
 {
     public class MenuItem
     {
