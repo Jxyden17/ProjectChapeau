@@ -1,0 +1,23 @@
+﻿@model ProjectChapeau.Models.Login
+@{
+    ViewData["Title"] = "Login";
+}
+<h1>@ViewData["Title"]</h1>
+
+<partial name="_ErrorMessage" />
+
+<form asp-controller="Employee" asp-action="Login" method="post" class="mt-4">
+
+    <div class="mb-3">
+        <label for="UserName" class="form-label">Username</label>
+        <input type="text" id="UserName" name="UserName" class="form-control" placeholder="Your username" required value="@Model?.UserName" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Password" class="form-label">Password</label>
+        <input type="password" id="Password" name="Password" class="form-control" placeholder="Your password" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+

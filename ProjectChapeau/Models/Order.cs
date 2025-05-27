@@ -1,24 +1,27 @@
-﻿namespace ProjectChapeau.Models
+
+﻿using ProjectChapeau.Models.Enums;
+
+namespace ProjectChapeau.Models
+
 {
     public class Order
     {
         public int orderId { get; set; }
-        public string employeeNumber { get; set; }  
-        public int tableNumber { get; set; }
-        public DateTime dateTime { get; set; }
-        public string orderStatus { get; set; }
-        public string paymentStatus { get; set; }
 
-        public Order(int orderId, string employeeNumber, DateTime dateTime, string orderStatus, string paymentStatus, int tableNumber)
+        public Employee employee { get; set; }
+        public RestaurantTable table { get; set; }
+        public DateTime datetime { get; set; }
+        public OrderStatus orderStatus{ get; set; }
+        public paymentStatus paymentStatus { get; set; }
+
+        public Order(int orderId, Employee employee, RestaurantTable table, DateTime datetime, OrderStatus orderStatus, paymentStatus paymentStatus)
         {
             this.orderId = orderId;
-            this.employeeNumber = employeeNumber;
-            this.dateTime = dateTime;
+            this.employee = employee;
+            this.table = table;
+            this.datetime = datetime;
             this.orderStatus = orderStatus;
             this.paymentStatus = paymentStatus;
-            this.tableNumber = tableNumber;
         }
-
-        public Order() { }
     }
 }

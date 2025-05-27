@@ -1,0 +1,59 @@
+﻿@model ProjectChapeau.Views.ViewModel.EmployeeRoleModel
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<partial name="_ErrorMessage" />
+
+<form asp-controller="Employee" asp-action="Edit" method="post">
+    <input type="hidden" name="employeeId" value="@Model?.employee.employeeId" />
+
+    <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" id="firstName" name="employee.firstName" class="form-control" required value="@Model?.employee.firstName" />
+    </div>
+
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" id="lastName" name="employee.lastName" class="form-control" required value="@Model?.employee.lastName" />
+    </div>
+
+    <div class="mb-3">
+        <label for="userName" class="form-label">Username</label>
+        <input type="text" id="userName" name="employee.userName" class="form-control" required value="@Model?.employee.userName" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="employee.password" class="form-control" required value="@Model?.employee.password" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label d-block">Is User Active?</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="employee.IsActive" id="IsActiveTrue" value="True" @(Model?.employee.isActive == true ? "checked" : "") />
+            <label class="form-check-label" for="IsActiveTrue">True</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="employee.IsActive" id="IsActiveFalse" value="False" @(Model?.employee.isActive == false ? "checked" : "") />
+            <label class="form-check-label" for="IsActiveFalse">False</label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="Role" class="form-label">Role</label>
+        <select id="Role" name="employee.role.roleId" class="form-select" required>
+            <option value="">-- Select Role --</option>
+            @foreach (Role role in Model.Roles)
+            {
+                <option value="@role.roleId">@role.roleName</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="/Employee/Index" class="btn btn-secondary ms-2">Back to List</a>
+</form>

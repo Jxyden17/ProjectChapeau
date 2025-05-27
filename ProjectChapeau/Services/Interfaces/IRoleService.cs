@@ -2,10 +2,8 @@
 
 namespace ProjectChapeau.Services.Interfaces
 {
-    public interface IOrderService
+    public interface IRoleService
     {
-        List<Order> GetAllOrders();
-
-
+        List<Role> GetAllRoles();
     }
 }
