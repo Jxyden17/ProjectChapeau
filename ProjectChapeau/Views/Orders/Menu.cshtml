@@ -13,7 +13,7 @@
             <div class="row">
                 @foreach (MenuItem menuItem in menu.MenuItems)
                 {
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-3 mb-3" id="@menuItem.MenuItemId">
                         <partial name="_MenuItemCard" model="menuItem" />
                     </div>
                 }
