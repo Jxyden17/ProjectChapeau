@@ -16,7 +16,7 @@
         {
             "Steak tartare with truffle mayonnaise" => "steak-tartare.jpg",
             "Pheasant pâté with Monégasque onions" => "pheasant-pate.webp",
-            "Provençal fish soup with rouille, aged cheese and croutons" => "provencal-fish-soup-aged-cheese",
+            "Provençal fish soup with rouille, aged cheese and croutons" => "provencal-fish-soup-aged-cheese.jpg",
             "Stewed venison with red cabbage" => "stewed-venison.jpg",
             "Pan-fried cod with curry sabayon" => "pan-fried-cod.jpg",
             "Linguini with mushroom sauce" => "linguini-mushroom.jpg",
