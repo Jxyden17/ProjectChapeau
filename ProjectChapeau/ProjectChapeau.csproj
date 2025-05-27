@@ -8,8 +8,12 @@
 
   <ItemGroup>
     <Folder Include="Models\Extensions\" />
-    <Folder Include="Repositories\Interfaces\" />
-    <Folder Include="Services\Interfaces\" />
+    <Folder Include="Models\ViewModel\" />
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
   </ItemGroup>
 
 
