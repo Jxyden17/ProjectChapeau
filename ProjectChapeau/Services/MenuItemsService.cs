@@ -13,9 +13,18 @@ namespace ProjectChapeau.Services
         {
             _menuItemsRepository = menuItemsRepository;
         }
-        public List<MenuItem> GetAllMenuItems()
+        public List<Menu> GetAllMenuItems()
         {
-            return _menuItemsRepository.GetAllMenuItems();
+            Menu lunchMenu = new(1, "Lunch Menu", GetMenuItemsByMenu(1));
+            Menu dinnerMenu = new(2, "Dinner Menu", GetMenuItemsByMenu(2));
+            Menu drinkMenu = new(3, "Drink Menu", GetMenuItemsByMenu(3));
+            List<Menu> menus =
+            [
+                lunchMenu,
+                dinnerMenu,
+                drinkMenu
+            ];
+            return menus;
         }
         public List<MenuItem> GetMenuItemsByMenu(int menuId)
         {
