@@ -21,6 +21,52 @@ namespace ProjectChapeau.Controllers
 
         }
 
+        [HttpGet]
+        public ActionResult AddMenuItem()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AddMenuItem(MenuItem menuItem)
+        {
+            try
+            {
+                _menuItemRepository.AddMenuItem(menuItem);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(menuItem);
+            }
+        }
+
+        public ActionResult Edit()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Edit(MenuItem menuItem)
+        {
+            try
+            {
+                _menuItemRepository.AddMenuItem(menuItem);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(menuItem);
+            }
+        }
+
+        public IActionResult Deactivate(int id)
+        {
+            _menuItemRepository.DeactivateMenuItem(id);
+            return RedirectToAction("Index");
+        }
+
 
     }
 

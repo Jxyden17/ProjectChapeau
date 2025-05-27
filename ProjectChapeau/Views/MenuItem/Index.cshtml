@@ -27,11 +27,13 @@
 
 	<button type="submit">filter</button>
 </form>
+<a href="/MenuItem/Add">Add</a>
 <table class="table table-dark table-hover">
 	<thead>
 		<tr>
 			<th>Name</th>
 			<th>Price</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -41,6 +43,10 @@
 				<tr>
 					<td>@menuItem.ItemName</td>
 					<td>@menuItem.Price</td>
+					<td>
+					<a href="/MenuItem/Edit/@menuItem.MenuItemId">Edit</a>
+					<a href="/MenuItem/Deactivate/@menuItem.MenuItemId">Deactivate</a>
+					</td>
 				</tr>
 			}
 		}

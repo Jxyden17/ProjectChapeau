@@ -9,9 +9,9 @@ namespace ProjectChapeau.Models
 		//public string ItemDescription { get; set; }
         //public bool IsAlcoholic { get; set; }
         public decimal Price { get; set; }
-        //public int Stock {  get; set; }
+        public int Stock {  get; set; }
         //public int PrepTime { get; set; }
-        //public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public int CategoryId { get; set; }
         public int MenuId { get; set; }
@@ -21,11 +21,12 @@ namespace ProjectChapeau.Models
 		{
 		}
 
-        public MenuItem(int menuItemId, string item_name, decimal price, int categoryId, int menuId)
+        public MenuItem(int menuItemId, string item_name, decimal price, int stock, int categoryId, int menuId)
 		{
 			MenuItemId = menuItemId;
 			ItemName = item_name;
 			Price = price;
+			Stock = stock;
 			CategoryId = categoryId;
 			MenuId = menuId;
 		}
