@@ -3,7 +3,6 @@ using ProjectChapeau.Services;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
 
-
 namespace ProjectChapeau
 {
     public class Program
@@ -40,6 +39,8 @@ namespace ProjectChapeau
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+
+            builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
 
             var app = builder.Build();
 
