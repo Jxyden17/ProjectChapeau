@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using ProjectChapeau.Models;
+using ProjectChapeau.Models.ViewModel;
 
 namespace ProjectChapeau.Controllers
 {

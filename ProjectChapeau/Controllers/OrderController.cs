@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
-using ProjectChapeau.Views.ViewModel;
+using ProjectChapeau.Models.ViewModel;
 
 namespace ProjectChapeau.Controllers
 {
@@ -11,7 +11,7 @@ namespace ProjectChapeau.Controllers
         public IActionResult Index()
         {
             // Placeholder redirect
-            return RedirectToAction("Menu", "Orders");
+            return View();
         }
         public OrderController(IMenuItemService menuItemsService)
         {
