@@ -8,23 +8,16 @@ namespace ProjectChapeau.Services
     {
 
         private readonly IOrderRepository _orderRepository;
-        private readonly IOrderItemRepository _orderItemRepository;
 
-        public OrderService(IOrderRepository orderRepository, IOrderItemRepository orderItemRepository)
+        public OrderService(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
-            _orderItemRepository = orderItemRepository;
         }
 
         public List<Order> GetAllOrders()
         {
-            List<Order> orders = _orderRepository.GetAllOrders();
 
-            foreach (Order order in orders)
-            {
-                order.orderItems = _orderItemRepository.GetAllOrderItemsById(order.orderId);
-            }
-            return orders;
+            return _orderRepository.GetAllOrders();
         }
         public List<Order> GetRunningOrders()
         {
