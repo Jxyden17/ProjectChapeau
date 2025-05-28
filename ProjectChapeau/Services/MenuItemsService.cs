@@ -7,9 +7,9 @@ namespace ProjectChapeau.Services
 {
     public class MenuItemsService : IMenuItemsService
     {
-        private readonly IMenuItemsRepository _menuItemsRepository;
+        private readonly IMenuItemRepository _menuItemsRepository;
 
-        public MenuItemsService(IMenuItemsRepository menuItemsRepository)
+        public MenuItemsService(IMenuItemRepository menuItemsRepository)
         {
             _menuItemsRepository = menuItemsRepository;
         }
