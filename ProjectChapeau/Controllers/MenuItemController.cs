@@ -15,7 +15,8 @@ namespace ProjectChapeau.Controllers
 
         public IActionResult Index(int? menuId, int? categoryId)
         {
-            var menuItems = _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
+            //var menuItems = _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
+            var menuItems = _menuItemRepository.GetAllMenuItems();
             return View(menuItems);
 
 
@@ -59,6 +60,7 @@ namespace ProjectChapeau.Controllers
             }
             catch (Exception ex)
             {
+                ViewData["ErrorMessage"] = ex.Message;
                 return View(menuItem);
             }
         }

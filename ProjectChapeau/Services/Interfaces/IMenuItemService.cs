@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProjectChapeau.Models;
 
 namespace ProjectChapeau.Services.Interfaces
 {
-	public class IMenuItemService : Controller
-	{
-		public IActionResult Index()
-		{
-			return View();
-		}
-	}
+    public interface IMenuItemService
+    {
+        List<Menu> GetAllMenuItems();
+        List<MenuItem> GetMenuItemsByMenu(int menuId);
+        List<MenuItem> GetMenuItemsWithoutDefinedMenu();
+        MenuItem? GetMenuItemById(int menuItemId);
+    }
 }
