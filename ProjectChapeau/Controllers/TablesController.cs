@@ -47,9 +47,18 @@ namespace ProjectChapeau.Controllers
         {
             try
             {
-                _tableService.UpdateTable(table);
-                TempData["ConfirmMessage"] = "Your employee has been edited succesfully";
-                return RedirectToAction("Index");
+                List<Order> Orders =  _orderService.GetAllOrders();
+                Order? latestOrder = GetLatestOrder(Orders, table);
+                if (latestOrder == null)
+                {
+                    _tableService.UpdateTable(table);
+                    TempData["ConfirmMessage"] = "Your table has been edited succesfully";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    throw new Exception("Table has an active order set order status to completed first!");
+                }
             }
             catch (Exception ex)
             {
@@ -77,7 +86,8 @@ namespace ProjectChapeau.Controllers
 
             foreach (RestaurantTable table in restaurantTables)
             {
-                Order? latestOrder = Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
+
+                Order? latestOrder = GetLatestOrder(Orders, table);    
 
                 string cardColor = "bg-success text-white";
                 string statusText = "Available";
@@ -107,6 +117,12 @@ namespace ProjectChapeau.Controllers
                 
             }
             return tableOrders;
+        }
+
+        public Order? GetLatestOrder(List<Order> orders, RestaurantTable table)
+        {
+            Order? latestOrder = orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
+            return latestOrder;
         }
 
     }
