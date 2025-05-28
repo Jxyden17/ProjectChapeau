@@ -3,7 +3,6 @@ using ProjectChapeau.Services;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
 
-
 namespace ProjectChapeau
 {
     public class Program
@@ -11,12 +10,6 @@ namespace ProjectChapeau
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Inject Repositories
-            builder.Services.AddSingleton<IMenuItemsRepository, MenuItemsRepository>();
-
-            // Inject Services
-            builder.Services.AddSingleton<IMenuItemsService, MenuItemsService>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -33,6 +26,9 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
+
+            builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+            builder.Services.AddSingleton<IMenuItemsService, MenuItemsService>();
 
             builder.Services.AddSession(options =>
             {
