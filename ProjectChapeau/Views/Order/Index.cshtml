@@ -22,7 +22,7 @@
     <tbody>
         @foreach (var order in Model)
         {
-            var waitingTime = DateTime.Now - order.datetime;
+            TimeSpan waitingTime = DateTime.Now - order.datetime;
 
             <tr>
                 <td>@order.table.TableNumber</td>

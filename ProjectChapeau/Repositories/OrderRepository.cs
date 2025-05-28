@@ -2,6 +2,7 @@
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Repositories.Interfaces;
+using ProjectChapeau.Services;
 
 namespace ProjectChapeau.Repositories
 {
@@ -40,7 +41,7 @@ namespace ProjectChapeau.Repositories
                 {
                     Employee employee = ReadEmployee(reader);
                     RestaurantTable restaurantTable = ReadTables(reader);
-
+                    List<OrderItem> OrderItems = new List<OrderItem>();
                     OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
                     paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
 
@@ -48,6 +49,7 @@ namespace ProjectChapeau.Repositories
                         (int)reader["order_id"],
                         employee,
                         restaurantTable,
+                        OrderItems,
                         (DateTime)reader["order_datetime"],
                         orderStatus,
                         paymentStatus
@@ -84,6 +86,7 @@ namespace ProjectChapeau.Repositories
                 JOIN Employees e ON o.employee_number = e.employee_number
                 JOIN Role r ON e.role = r.role_number
                 JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number
+    
                 WHERE o.order_status = 'BeingPrepared'
                 ORDER BY o.order_datetime ASC;";
                 SqlCommand command = new SqlCommand(query, connection);
@@ -95,7 +98,7 @@ namespace ProjectChapeau.Repositories
                 {
                     Employee employee = ReadEmployee(reader);
                     RestaurantTable restaurantTable = ReadTables(reader);
-
+                    List<OrderItem> OrderItems = new List<OrderItem>();
                     OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
                     paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
 
@@ -103,6 +106,7 @@ namespace ProjectChapeau.Repositories
                         (int)reader["order_id"],
                         employee,
                         restaurantTable,
+                        OrderItems,
                         (DateTime)reader["order_datetime"],
                         orderStatus,
                         paymentStatus

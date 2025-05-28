@@ -199,8 +199,8 @@ namespace ProjectChapeau.Repositories
 				command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
 				command.Parameters.AddWithValue("@price", menuItem.Price);
 				command.Parameters.AddWithValue("@stock", menuItem.Stock);
-				command.Parameters.AddWithValue("@category_id", menuItem.CategoryId);
-				command.Parameters.AddWithValue("@menu_id", menuItem.MenuId);
+				//command.Parameters.AddWithValue("@category_id", menuItem.CategoryId);
+				//command.Parameters.AddWithValue("@menu_id", menuItem.MenuId);
 				command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
 
                 connection.Open(); 
