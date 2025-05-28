@@ -34,7 +34,10 @@ namespace ProjectChapeau.Controllers
             {
                 return NotFound($"Menu item with ID {id} does not exist");
             }
-            return View(menuItem);
+
+            MenuItemOverviewViewModel menuItemOverviewViewModel = new(menuItem);
+
+            return View(menuItemOverviewViewModel);
         }
     }
 }
