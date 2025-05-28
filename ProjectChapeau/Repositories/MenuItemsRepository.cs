@@ -39,7 +39,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = new(_connectionString))
             {
                 // 2. Create an SQL command with a query
-                string query = @"SELECT MCI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MCI.menu_item_id, MI.*, C.category_name
                                  FROM Menu_Contains_Item AS MCI
                                  INNER JOIN Menu_Item AS MI ON MI.menu_item_id = MCI.menu_item_id
                                  INNER JOIN Category AS C ON C.category_id = MI.category_id
@@ -70,7 +70,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = new(_connectionString))
             {
                 // 2. Create an SQL command with a query
-                string query = @"SELECT MCI.menu_id, MCI.menu_item_id, M.menu_name, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MCI.menu_id, M.menu_name, MI.*, C.category_name
                                  FROM Menu_Contains_Item AS MCI
                                  INNER JOIN Menu AS M ON M.menu_id = MCI.menu_id
                                  INNER JOIN Menu_Item AS MI ON MI.menu_item_id = MCI.menu_item_id
@@ -97,6 +97,37 @@ namespace ProjectChapeau.Repositories
             }
             return menuItems;
         }
+        public List<MenuItem> GetMenuItemsWithoutDefinedMenu()
+        {
+            List<MenuItem> menuItems = [];
+
+            //1. Create an SQL connection with a connection string
+            using (SqlConnection connection = new(_connectionString))
+            {
+                // 2. Create an SQL command with a query
+                string query = @"SELECT MI.*, C.category_name
+                                 FROM Menu_Item AS MI
+                                 LEFT JOIN Menu_Contains_Item AS MCI ON MCI.menu_item_id = MI.menu_item_id
+                                 LEFT JOIN Category AS C ON C.category_id = MI.category_id
+                                 WHERE MCI.menu_item_id IS NULL
+                                 ORDER BY MI.category_id;";
+                SqlCommand command = new(query, connection);
+
+                // 3. Open the SQL connection
+                command.Connection.Open();
+
+                // 4. Execute SQL command
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    MenuItem menuItem = ReadMenuItem(reader);
+                    menuItems.Add(menuItem);
+                }
+                reader.Close();
+            }
+            return menuItems;
+        }
         public MenuItem? GetMenuItemById(int menuItemId)
         {
             MenuItem? menuItem = null;
@@ -105,7 +136,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = new(_connectionString))
             {
                 // 2. Create an SQL command with a query
-                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MI.*, C.category_name
                                  FROM Menu_Item AS MI
                                  LEFT JOIN Category AS C ON C.category_id = MI.category_id
                                  WHERE MI.menu_item_id = @MenuItemId;";

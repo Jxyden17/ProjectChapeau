@@ -6,6 +6,7 @@ namespace ProjectChapeau.Services.Interfaces
     {
         List<Menu> GetAllMenuItems();
         List<MenuItem> GetMenuItemsByMenu(int menuId);
+        List<MenuItem> GetMenuItemsWithoutDefinedMenu();
         MenuItem? GetMenuItemById(int menuItemId);
     }
 }
