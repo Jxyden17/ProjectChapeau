@@ -107,7 +107,7 @@ namespace ProjectChapeau.Repositories
                 // 2. Create an SQL command with a query
                 string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
                                  FROM Menu_Item AS MI
-                                 INNER JOIN Category AS C ON C.category_id = MI.category_id
+                                 LEFT JOIN Category AS C ON C.category_id = MI.category_id
                                  WHERE MI.menu_item_id = @MenuItemId;";
                 SqlCommand command = new(query, connection);
 
