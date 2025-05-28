@@ -1,4 +1,5 @@
-﻿@model ProjectChapeau.Models.RestaurantTable
+﻿@using ProjectChapeau.Models.Enums
+@model ProjectChapeau.Models.ViewModel.TableEditViewModel
 
 @{
     ViewData["Title"] = "Edit Table Information";
@@ -9,19 +10,41 @@
 <partial name="_ErrorMessage" />
 
 <form asp-controller="Tables" asp-action="Edit" method="post" class="w-50 mx-auto">
-    <input type="hidden" name="TableNumber" value="@Model?.TableNumber" />
+    <input type="hidden" name="TableNumber" value="@Model?.table.TableNumber" />
 
     <div class="mb-4">
         <label class="form-label d-block fw-semibold mb-2">Is Table Occupied?</label>
 
         <div class="btn-group" role="group" aria-label="Is Table Occupied">
-            <input type="radio" class="btn-check" name="isOccupied" id="IsOccupiedFalse" autocomplete="off" value="False" @(Model?.IsOccupied == false ? "checked" : "") />
+            <input type="radio" class="btn-check" name="table.isOccupied" id="IsOccupiedFalse" autocomplete="off" value="False" @(Model?.table.IsOccupied == false ? "checked" : "") />
             <label class="btn btn-outline-danger" for="IsOccupiedFalse">False</label>
 
-            <input type="radio" class="btn-check" name="isOccupied" id="IsOccupiedTrue" autocomplete="off" value="True" @(Model?.IsOccupied == true ? "checked" : "") />
+            <input type="radio" class="btn-check" name="table.isOccupied" id="IsOccupiedTrue" autocomplete="off" value="True" @(Model?.table.IsOccupied == true ? "checked" : "") />
             <label class="btn btn-outline-success" for="IsOccupiedTrue">True</label>
         </div>
 
+    </div>
+    <div class="mb-4">
+        <label class="form-label d-block fw-semibold mb-2">Order Status</label>
+        <div class="btn-group" role="group" aria-label="Order Status">
+            @{
+                if(Model?.order == null || Model?.order.orderStatus == OrderStatus.Completed)
+                {
+                    <p>No Active order please make one first</p>
+                }
+                else
+                {
+                    foreach (OrderStatus status in Model.orderStatusOptions)
+                    {
+                        string statusValue = status.ToString();
+                        string isChecked = Model?.order.orderStatus == status ? "checked" : "";
+
+                        <input type="radio" class="btn-check" name="order.orderStatus" id="OrderStatus_@statusValue" autocomplete="off" value="@statusValue" @isChecked />
+                        <label class="btn btn-outline-primary" for="OrderStatus_@statusValue">@statusValue</label>
+                    }
+                }
+            }
+        </div>
     </div>
 
     <div class="d-flex justify-content-center gap-3">

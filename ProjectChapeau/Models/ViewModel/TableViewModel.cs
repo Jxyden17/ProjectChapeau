@@ -1,19 +1,19 @@
-﻿namespace ProjectChapeau.Models
+﻿namespace ProjectChapeau.Models.ViewModel
 {
-    public class TableOrder
+    public class TableViewModel
     {
         public int tableId { get; set; }
         public string status { get; set; }
         public string cardColor { get; set; }
 
-        public TableOrder(int tableId, string status, string cardColor)
+        public TableViewModel(int tableId, string status, string cardColor)
         {
             this.tableId = tableId;
             this.status = status;
             this.cardColor = cardColor;
         }
 
-        public TableOrder()
+        public TableViewModel()
         {
         }
     }

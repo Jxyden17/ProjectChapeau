@@ -28,7 +28,7 @@ namespace ProjectChapeau.Controllers
             List<RestaurantTable> restaurantTables = _tableService.GetAllTables();
             List<Order> Orders = _orderService.GetAllOrders();
 
-            List<TableOrder> tableOrders = GetTableOrders(restaurantTables, Orders);
+            List<TableViewModel> tableOrders = GetTableOrders(restaurantTables, Orders);
 
             return View(tableOrders);
         }
@@ -43,15 +43,21 @@ namespace ProjectChapeau.Controllers
 
         //edit
         [HttpPost]
-        public IActionResult Edit(RestaurantTable table)
+        public IActionResult Edit(TableEditViewModel tableEditViewModel)
         {
             try
             {
                 List<Order> Orders =  _orderService.GetAllOrders();
-                Order? latestOrder = GetLatestOrder(Orders, table);
+                Order? latestOrder = GetLatestOrder(Orders, tableEditViewModel.table);
+                
+                if (tableEditViewModel.order != null)
+                {
+                    _orderService.UpdateOrderStatus(latestOrder);
+                }
                 if (latestOrder == null)
                 {
-                    _tableService.UpdateTable(table);
+                    _tableService.UpdateTableStatus(tableEditViewModel.table);
+                     
                     TempData["ConfirmMessage"] = "Your table has been edited succesfully";
                     return RedirectToAction("Index");
                 }
@@ -59,11 +65,12 @@ namespace ProjectChapeau.Controllers
                 {
                     throw new Exception("Table has an active order set order status to completed first!");
                 }
+                
             }
             catch (Exception ex)
             {
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
-                return View(table);
+                return View(tableEditViewModel);
             }
         }
 
@@ -76,13 +83,20 @@ namespace ProjectChapeau.Controllers
             }
 
             RestaurantTable table =  _tableService.GetTableById((int)id);
-            return View(table);
+            List<Order> orders = _orderService.GetAllOrders();
+            Order? latestOrder = GetLatestOrder(orders, table);
+
+            IEnumerable<OrderStatus> orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
+
+            TableEditViewModel tableEditViewModel = new TableEditViewModel(table, latestOrder, orderStatusOptions);
+
+            return View(tableEditViewModel);
 
         }
 
-        public List<TableOrder> GetTableOrders(List<RestaurantTable> restaurantTables, List<Order> Orders)
+        public List<TableViewModel> GetTableOrders(List<RestaurantTable> restaurantTables, List<Order> Orders)
         {
-            List<TableOrder> tableOrders = new List<TableOrder>();
+            List<TableViewModel> tableOrders = new List<TableViewModel>();
 
             foreach (RestaurantTable table in restaurantTables)
             {
@@ -104,14 +118,8 @@ namespace ProjectChapeau.Controllers
                     cardColor = "bg-warning text-dark";
                     statusText = "Occupied";
                 }
-                else
-                {
-                    // Table is free and no active order
-                    cardColor = "bg-success text-white";
-                    statusText = "Available";
-                }
 
-                TableOrder tableOrder = new TableOrder(table.TableNumber, statusText, cardColor);
+                TableViewModel tableOrder = new TableViewModel(table.TableNumber, statusText, cardColor);
                 tableOrders.Add(tableOrder);
 
                 

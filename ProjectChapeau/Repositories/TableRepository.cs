@@ -57,7 +57,7 @@ namespace ProjectChapeau.Repositories
             return null;
         }
 
-        public void UpdateTable(RestaurantTable table)
+        public void UpdateTableStatus(RestaurantTable table)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

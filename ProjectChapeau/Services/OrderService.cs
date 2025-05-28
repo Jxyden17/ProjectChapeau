@@ -23,5 +23,10 @@ namespace ProjectChapeau.Services
         {
             return _orderRepository.GetRunningOrders();
         }
+
+        public void UpdateOrderStatus(Order order)
+        {
+            _orderRepository.UpdateOrderStatus(order);
+        }
     }
 }

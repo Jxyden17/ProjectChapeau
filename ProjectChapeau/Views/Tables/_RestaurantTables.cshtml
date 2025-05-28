@@ -1,9 +1,10 @@
-﻿@model List<ProjectChapeau.Models.TableOrder>
+﻿@using ProjectChapeau.Models.ViewModel;
+@model List<TableViewModel>
 
 
 <div class="container py-4">
     <div class="row g-4 justify-content-center">
-        @foreach (TableOrder tableOrder in Model)
+        @foreach (TableViewModel tableOrder in Model)
         {
             <div class="col-12 col-md-6 d-flex justify-content-center">
                 <a href="/Tables/Edit/@tableOrder.tableId" style="text-decoration: none; width:100%;">
@@ -26,3 +27,4 @@
 
 
 
+                         
