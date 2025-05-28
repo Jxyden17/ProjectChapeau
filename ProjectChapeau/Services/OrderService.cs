@@ -18,5 +18,9 @@ namespace ProjectChapeau.Services
         {
            return _orderRepository.GetAllOrders();
         }
+        public List<Order> GetRunningOrders()
+        {
+            return _orderRepository.GetRunningOrders();
+        }
     }
 }

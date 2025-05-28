@@ -16,8 +16,6 @@
             this.comment = comment;
             this.orderLineStatus = orderLineStatus;
         }
-
-        public OrderItem() { }
     }
 }
     

@@ -19,7 +19,7 @@ namespace ProjectChapeau.Models
         {
             this.orderId = orderId;
             this.employee = employee;
-            this.table = table;
+            this.table = table; 
             this.orderItems = orderItems;
             this.datetime = datetime;
             this.orderStatus = orderStatus;
