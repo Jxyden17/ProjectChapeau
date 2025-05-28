@@ -8,7 +8,7 @@ namespace ProjectChapeau.Repositories
 {
     public class MenuItemRepository : ConnectionDatabase, IMenuItemRepository
     {
-        public MenuItemRepository(IConfiguration configuration) : base(configuration) 
+        public MenuItemRepository(IConfiguration configuration) : base(configuration)
         { }
         private static MenuItem ReadMenuItem(SqlDataReader reader)
         {
@@ -156,70 +156,70 @@ namespace ProjectChapeau.Repositories
         }
 
         public List<MenuItem> GetCategory(int categoryId)
-		{
-			List<MenuItem> category = new();
+        {
+            List<MenuItem> category = new();
 
             //1. Create an SQL connection with a connection string
             using (SqlConnection connection = new(_connectionString))
-			{
+            {
                 // 2. Create an SQL command with a query
                 string query = @"SELECT M.item_name, M.price, M.stock, m.is_active
                                  FROM Category AS C
                                  JOIN Menu_Item AS M
                                      ON M.category_id = C.category_id
                                  WHERE C.category_id = @CategoryId;";
-				SqlCommand command = new(query, connection);
+                SqlCommand command = new(query, connection);
 
-				command.Parameters.AddWithValue("@CategoryId", categoryId);
+                command.Parameters.AddWithValue("@CategoryId", categoryId);
 
-				// 3. Open the SQL connection
-				command.Connection.Open();
+                // 3. Open the SQL connection
+                command.Connection.Open();
 
-				// 4. Execute SQL command
-				SqlDataReader reader = command.ExecuteReader();
+                // 4. Execute SQL command
+                SqlDataReader reader = command.ExecuteReader();
 
-				while (reader.Read())
-				{
-					MenuItem menuItem = ReadMenuItem(reader);
-					category.Add(menuItem);
-				}
-				reader.Close();
-			}
-			return category;
-		}
+                while (reader.Read())
+                {
+                    MenuItem menuItem = ReadMenuItem(reader);
+                    category.Add(menuItem);
+                }
+                reader.Close();
+            }
+            return category;
+        }
 
-		public List<MenuItem> GetMenu(int menuId)
-		{
-			List<MenuItem> menu = new();
+        public List<MenuItem> GetMenu(int menuId)
+        {
+            List<MenuItem> menu = new();
 
-			//1. Create an SQL connection with a connection string
-			using (SqlConnection connection = new(_connectionString))
-			{
-				// 2. Create an SQL command with a query
-				string query = @"SELECT M.item_name, M.price, m.stock
+            //1. Create an SQL connection with a connection string
+            using (SqlConnection connection = new(_connectionString))
+            {
+                // 2. Create an SQL command with a query
+                string query = @"SELECT M.item_name, M.price, m.stock
                                  FROM Menu AS M
                                  JOIN Menu_Item AS MI
                                      ON MI.menu_id = M.menu_id
                                  WHERE M.menu_id = @MenuId;";
-				SqlCommand command = new(query, connection);
+                SqlCommand command = new(query, connection);
 
-				command.Parameters.AddWithValue("@MenuId", menuId);
+                command.Parameters.AddWithValue("@MenuId", menuId);
 
-				// 3. Open the SQL connection
-				command.Connection.Open();
+                // 3. Open the SQL connection
+                command.Connection.Open();
 
-				// 4. Execute SQL command
-				SqlDataReader reader = command.ExecuteReader();
+                // 4. Execute SQL command
+                SqlDataReader reader = command.ExecuteReader();
 
-				while (reader.Read())
-				{
-					MenuItem menuItem = ReadMenuItem(reader);
-					menu.Add(menuItem);
-				}
-				reader.Close();
-			}
-			return menu;
-		}
+                while (reader.Read())
+                {
+                    MenuItem menuItem = ReadMenuItem(reader);
+                    menu.Add(menuItem);
+                }
+                reader.Close();
+            }
+            return menu;
+        }
 
         /*public List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId)
         {
@@ -259,19 +259,19 @@ namespace ProjectChapeau.Repositories
                 SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
-				command.Parameters.AddWithValue("@price", menuItem.Price);
-				command.Parameters.AddWithValue("@stock", menuItem.Stock);
-				command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
+                command.Parameters.AddWithValue("@price", menuItem.Price);
+                command.Parameters.AddWithValue("@stock", menuItem.Stock);
+                command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
 
 
-				connection.Open();
+                connection.Open();
                 command.ExecuteNonQuery();
-			}
+            }
         }
 
-		public void UpdateMenuItem(MenuItem menuItem)
-		{
-            using (SqlConnection connection = new (_connectionString))
+        public void UpdateMenuItem(MenuItem menuItem)
+        {
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"UPDATE Menu_Item
                                  SET item_name = @item_name, price = @price, stock = @stock
@@ -279,30 +279,30 @@ namespace ProjectChapeau.Repositories
 
                 SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@menu_item_id", menuItem.MenuItemId);
-				command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
-				command.Parameters.AddWithValue("@price", menuItem.Price);
-				command.Parameters.AddWithValue("@stock", menuItem.Stock);
-				command.Parameters.AddWithValue("@category_id", menuItem.Category.CategoryId);
-				command.Parameters.AddWithValue("@menu_id", menuItem.Category.CategoryName);
-				command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
-
-                connection.Open(); 
-                command.ExecuteNonQuery();
-			}
-		}
-
-		public void DeactivateMenuItem(int menuItemId)
-		{
-			using (SqlConnection connection = new(_connectionString))
-            {
-                string query = "UPDATE Menu_Item SET is_active = 0 WHERE menu_item_id = @menu_item_id";
-                SqlCommand command = new(query, connection);
-
-                command.Parameters.AddWithValue("@menu_item_id",menuItemId);
+                command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
+                command.Parameters.AddWithValue("@price", menuItem.Price);
+                command.Parameters.AddWithValue("@stock", menuItem.Stock);
+                command.Parameters.AddWithValue("@category_id", menuItem.Category.CategoryId);
+                command.Parameters.AddWithValue("@menu_id", menuItem.Category.CategoryName);
+                command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
 
                 connection.Open();
                 command.ExecuteNonQuery();
             }
-		}
-	}
+        }
+
+        public void DeactivateMenuItem(int menuItemId)
+        {
+            using (SqlConnection connection = new(_connectionString))
+            {
+                string query = "UPDATE Menu_Item SET is_active = 0 WHERE menu_item_id = @menu_item_id";
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@menu_item_id", menuItemId);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+    }
 }

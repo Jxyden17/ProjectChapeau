@@ -60,6 +60,7 @@ namespace ProjectChapeau.Controllers
             }
             catch (Exception ex)
             {
+                ViewData["ErrorMessage"] = ex.Message;
                 return View(menuItem);
             }
         }

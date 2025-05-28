@@ -1,6 +1,6 @@
 ﻿using ProjectChapeau.Models;
 
-namespace ProjectChapeau.Views.ViewModel
+namespace ProjectChapeau.Models.ViewModel
 {
     public class MenusOverviewViewModel
     {
