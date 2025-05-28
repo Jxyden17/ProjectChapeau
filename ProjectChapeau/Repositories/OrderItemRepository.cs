@@ -1,6 +1,10 @@
-﻿namespace ProjectChapeau.Repositories
+﻿using ProjectChapeau.Repositories.Interfaces;
+
+namespace ProjectChapeau.Repositories
 {
-    public class OrderItemRepository
+    public class OrderItemRepository : IOrderItemRepository
     {
+
+
     }
 }

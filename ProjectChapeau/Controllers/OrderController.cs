@@ -3,20 +3,29 @@ using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
 
+
 namespace ProjectChapeau.Controllers
 {
     public class OrderController : Controller
     {
+
         private readonly IMenuItemService _menuItemsService;
-        public IActionResult Index()
-        {
-            // Placeholder redirect
-            return View();
-        }
-        public OrderController(IMenuItemService menuItemsService)
+        
+        private readonly IOrderService _orderService;
+        
+        public OrderController(IMenuItemService menuItemsService, IOrderService orderService)
         {
             _menuItemsService = menuItemsService;
+            _orderService = orderService;
         }
+       
+            public IActionResult Index()
+        {
+            List<Order> runningOrders = _orderService.GetRunningOrders();
+            return View(runningOrders);
+
+        }
+
         public IActionResult Menu()
         {
             MenusOverviewViewModel menusOverviewViewModel = new(_menuItemsService.GetAllMenuItems());
@@ -35,6 +44,7 @@ namespace ProjectChapeau.Controllers
                 return NotFound($"Menu item with ID {id} does not exist");
             }
             return View(menuItem);
-        }
+
+   
     }
 }
