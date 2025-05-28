@@ -1,6 +1,15 @@
-﻿namespace ProjectChapeau.Repositories.Interfaces
+﻿using ProjectChapeau.Models;
+
+namespace ProjectChapeau.Repositories.Interfaces
 {
-    public interface IEmployeeInterface
+    public interface IEmployeeRepository
     {
+        void Add(Employee employee);
+        void Update(Employee employee);
+        void Delete(Employee employee);
+        List<Employee> GetAll();
+        Employee? GetById(int UserId);
+        Employee? GetByLoginCredentials(string username, string password);
+        bool UserNameExists(string userName);
     }
 }
