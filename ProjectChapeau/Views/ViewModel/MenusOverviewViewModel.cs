@@ -4,12 +4,12 @@ namespace ProjectChapeau.Views.ViewModel
 {
     public class MenusOverviewViewModel
     {
-        public List<Menu>? Menus { get; set; }
+        public IEnumerable<Menu>? Menus { get; set; }
 
         public MenusOverviewViewModel()
         {
         }
-        public MenusOverviewViewModel(List<Menu>? menus)
+        public MenusOverviewViewModel(IEnumerable<Menu>? menus)
         {
             Menus = menus;
         }
