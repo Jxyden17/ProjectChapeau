@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
+using ProjectChapeau.Views.ViewModel;
 
 namespace ProjectChapeau.Controllers
 {
@@ -19,8 +20,8 @@ namespace ProjectChapeau.Controllers
         }
         public IActionResult Menu()
         {
-            List<Menu> menus = _menuItemsService.GetAllMenuItems();
-            return View(menus);
+            MenusOverviewViewModel menusOverviewViewModel = new(_menuItemsService.GetAllMenuItems());
+            return View(menusOverviewViewModel);
         }
         public IActionResult MenuItem(int? id)
         {

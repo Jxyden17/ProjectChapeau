@@ -1,4 +1,4 @@
-﻿@model List<ProjectChapeau.Models.Menu>
+﻿@model ProjectChapeau.Views.ViewModel.MenusOverviewViewModel
 
 @{
     ViewData["Title"] = "Menu Overview";
@@ -6,7 +6,7 @@
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-    @foreach (Menu menu in @Model)
+    @foreach (Menu menu in Model.Menus)
     {
         <h2>@menu.MenuName</h2>
         <div class="container">
