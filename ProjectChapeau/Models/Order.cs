@@ -10,7 +10,7 @@ namespace ProjectChapeau.Models
 
         public Employee employee { get; set; }
         public RestaurantTable table { get; set; }
-        public List<OrderItem> OrderItems { get; set; }
+        public List<OrderItem>? orderItems { get; set; }
         public DateTime datetime { get; set; }
         public OrderStatus orderStatus{ get; set; }
         public paymentStatus paymentStatus { get; set; }
@@ -19,11 +19,15 @@ namespace ProjectChapeau.Models
         {
             this.orderId = orderId;
             this.employee = employee;
-            this.table = table;
-            OrderItems = orderItems;
+            this.table = table; 
+            this.orderItems = orderItems;
             this.datetime = datetime;
             this.orderStatus = orderStatus;
             this.paymentStatus = paymentStatus;
+        }
+
+        public Order()
+        {
         }
     }
 }

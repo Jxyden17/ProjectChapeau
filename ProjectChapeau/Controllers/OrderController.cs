@@ -2,7 +2,9 @@
 using ProjectChapeau.Models;
 using ProjectChapeau.Services;
 using ProjectChapeau.Services.Interfaces;
-using ProjectChapeau.Views.ViewModel;
+
+
+
 namespace ProjectChapeau.Controllers
 {
     public class OrderController : Controller
@@ -11,19 +13,20 @@ namespace ProjectChapeau.Controllers
         private readonly IMenuItemService _menuItemsService;
 
         private readonly IOrderService _orderService;
+        
         public OrderController(IMenuItemService menuItemsService, IOrderService orderService)
         {
             _menuItemsService = menuItemsService;
             _orderService = orderService;
         }
-
-        public IActionResult Index()
+       
+            public IActionResult Index()
         {
             List<Order> runningOrders = _orderService.GetRunningOrders();
             return View(runningOrders);
 
         }
-        
+       
         public IActionResult Menu()
         {
             MenusOverviewViewModel menusOverviewViewModel = new(_menuItemsService.GetAllMenuItems());
