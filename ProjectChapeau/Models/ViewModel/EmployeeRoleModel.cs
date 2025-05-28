@@ -1,7 +1,7 @@
 ﻿using ProjectChapeau.Models;
 using System.Collections.Generic;
 
-namespace ProjectChapeau.Views.ViewModel
+namespace ProjectChapeau.Models.ViewModel
 {
     public class EmployeeRoleModel
     {
