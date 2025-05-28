@@ -9,7 +9,6 @@
   <ItemGroup>
 
     <Folder Include="Models\Extensions\" />
-    <Folder Include="Models\ViewModel\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
