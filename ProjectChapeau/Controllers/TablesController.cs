@@ -4,6 +4,7 @@ using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
 using ProjectChapeau.Services;
+using ProjectChapeau.Models.Enums;
 
 namespace ProjectChapeau.Controllers
 {
@@ -27,13 +28,39 @@ namespace ProjectChapeau.Controllers
             List<RestaurantTable> restaurantTables = _tableService.GetAllTables();
             List<Order> Orders = _orderService.GetAllOrders();
 
-            TableOrderModel tableOrderModel = new TableOrderModel
-            {
-                restaurantTables = restaurantTables,
-                Orders = Orders
-            };
+            List<TableOrder> tableOrders =  new List<TableOrder>();
 
-            return View(tableOrderModel);
+            foreach (RestaurantTable table in restaurantTables)
+            {
+                Order? latestOrder = Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
+
+                string cardColor = "bg-success text-white";
+                string statusText = "Available";
+
+                if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
+                {
+                    // Active order exists
+                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
+                    statusText = $"Order {latestOrder.orderStatus}";
+                }
+                else if (table.IsOccupied)
+                {
+                    // No active order, but table is still occupied
+                    cardColor = "bg-warning text-dark";
+                    statusText = "Occupied";
+                }
+                else
+                {
+                    // Table is free and no active order
+                    cardColor = "bg-success text-white";
+                    statusText = "Available";
+                }
+
+                TableOrder tableOrder = new TableOrder(table.TableNumber, statusText, cardColor);
+                tableOrders.Add(tableOrder);
+            }
+
+            return View(tableOrders);
         }
 
 

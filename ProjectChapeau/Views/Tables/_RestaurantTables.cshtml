@@ -1,42 +1,13 @@
-﻿@using ProjectChapeau.Models.Enums
-@model ProjectChapeau.Models.ViewModel.TableOrderModel
+﻿@model List<ProjectChapeau.Models.TableOrder>
 
-@foreach (RestaurantTable table in Model.restaurantTables)
+@foreach (TableOrder tableOrder in Model)
 {
-    Order latestOrder = Model.Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
-
-    string cardColor = "bg-success text-white";
-    string statusText = "Available";
-
-
-    if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed )
-    {
-        if (latestOrder.table.IsOccupied == true)
-        {
-            // Rood: Bezet + actieve order
-            cardColor = "bg-danger text-dark";
-            statusText = $"Order {latestOrder.orderStatus}";
-        }
-        else
-        {
-            // Geel: Niet bezet + actieve order
-            cardColor = "bg-warning text-dark";
-            statusText = $"Order {latestOrder.orderStatus}";
-        }
-    }
-    else if ((latestOrder == null || latestOrder.orderStatus == OrderStatus.Completed) && table.IsOccupied)
-    {
-        // Geel: Bezet + laatste order afgerond of 
-        cardColor = "bg-warning text-dark";
-        statusText = "Occupied";
-    }
-
     <div class="col-md-3 mb-4">
-        <a href="/Tables/Edit/@table.TableNumber" style="text-decoration:none;">
-        <div class="card h-100 shadow-sm border-0 @cardColor">
+        <a href="/Tables/Edit/@tableOrder.tableId" style="text-decoration:none;">
+        <div class="card h-100 shadow-sm border-0 @tableOrder.cardColor">
             <div class="card-body text-center">
-                <h5 class="card-title">Table @table.TableNumber</h5>
-                <p class="card-text">Status: <strong>@statusText</strong></p>
+                <h5 class="card-title">Table @tableOrder.tableId</h5>
+                <p class="card-text">Status: <strong>@tableOrder.status</strong></p>
             </div>
         </div>
         </a>
