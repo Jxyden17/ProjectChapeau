@@ -1,5 +1,7 @@
-using ProjectChapeau.Repositories;
+using ProjectChapeau.Services.Interfaces;
+using ProjectChapeau.Services;
 using ProjectChapeau.Repositories.Interfaces;
+using ProjectChapeau.Repositories;
 
 namespace ProjectChapeau
 {
@@ -9,8 +11,34 @@ namespace ProjectChapeau
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Inject Repositories
+            builder.Services.AddSingleton<IMenuItemsRepository, MenuItemsRepository>();
+
+            // Inject Services
+            builder.Services.AddSingleton<IMenuItemsService, MenuItemsService>();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSingleton<IPasswordService, PasswordService>();
+
+            builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
+            builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+
+            builder.Services.AddSingleton<ITableService, TableService>();
+            builder.Services.AddSingleton<ITableRepository, TableRepository>();
+
+            builder.Services.AddSingleton<IRoleService, RoleService>();
+            builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
+
+            builder.Services.AddSingleton<IOrderService, OrderService>();
+            builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
 
@@ -28,6 +56,7 @@ namespace ProjectChapeau
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthorization();
 
