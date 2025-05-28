@@ -11,12 +11,6 @@ namespace ProjectChapeau
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Inject Repositories
-            builder.Services.AddSingleton<IMenuItemsRepository, MenuItemsRepository>();
-
-            // Inject Services
-            builder.Services.AddSingleton<IMenuItemsService, MenuItemsService>();
-
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSingleton<IPasswordService, PasswordService>();
@@ -33,14 +27,15 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 
+            builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+            builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-
-            builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
 
             var app = builder.Build();
 
