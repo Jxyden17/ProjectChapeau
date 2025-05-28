@@ -6,9 +6,9 @@ namespace ProjectChapeau.Controllers
 {
     public class OrdersController : Controller
     {
-        private readonly IMenuItemsService _menuItemsService;
+        private readonly IMenuItemService _menuItemsService;
 
-        public OrdersController(IMenuItemsService menuItemsService)
+        public OrdersController(IMenuItemService menuItemsService)
         {
             _menuItemsService = menuItemsService;
         }
