@@ -10,7 +10,7 @@ namespace ProjectChapeau.Repositories.Interfaces
         List<MenuItem> GetMenuItemsWithoutDefinedMenu();
         MenuItem? GetMenuItemById(int menuItemId);
         List<MenuItem> GetCategory(int categoryId);
-		List<MenuItem> GetMenu(int menuId);
+        List<MenuItem> GetMenu(int menuId);
 
 		//List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId);
 
