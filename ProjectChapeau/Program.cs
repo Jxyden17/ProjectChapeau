@@ -28,7 +28,7 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
-            builder.Services.AddSingleton<IMenuItemsService, MenuItemsService>();
+            builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
 
             builder.Services.AddSession(options =>
             {
