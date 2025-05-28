@@ -28,37 +28,7 @@ namespace ProjectChapeau.Controllers
             List<RestaurantTable> restaurantTables = _tableService.GetAllTables();
             List<Order> Orders = _orderService.GetAllOrders();
 
-            List<TableOrder> tableOrders =  new List<TableOrder>();
-
-            foreach (RestaurantTable table in restaurantTables)
-            {
-                Order? latestOrder = Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
-
-                string cardColor = "bg-success text-white";
-                string statusText = "Available";
-
-                if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
-                {
-                    // Active order exists
-                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
-                    statusText = $"Order {latestOrder.orderStatus}";
-                }
-                else if (table.IsOccupied)
-                {
-                    // No active order, but table is still occupied
-                    cardColor = "bg-warning text-dark";
-                    statusText = "Occupied";
-                }
-                else
-                {
-                    // Table is free and no active order
-                    cardColor = "bg-success text-white";
-                    statusText = "Available";
-                }
-
-                TableOrder tableOrder = new TableOrder(table.TableNumber, statusText, cardColor);
-                tableOrders.Add(tableOrder);
-            }
+            List<TableOrder> tableOrders = GetTableOrders(restaurantTables, Orders);
 
             return View(tableOrders);
         }
@@ -99,6 +69,44 @@ namespace ProjectChapeau.Controllers
             RestaurantTable table =  _tableService.GetTableById((int)id);
             return View(table);
 
+        }
+
+        public List<TableOrder> GetTableOrders(List<RestaurantTable> restaurantTables, List<Order> Orders)
+        {
+            List<TableOrder> tableOrders = new List<TableOrder>();
+
+            foreach (RestaurantTable table in restaurantTables)
+            {
+                Order? latestOrder = Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
+
+                string cardColor = "bg-success text-white";
+                string statusText = "Available";
+
+                if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
+                {
+                    // Active order exists
+                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
+                    statusText = $"Order {latestOrder.orderStatus}";
+                }
+                else if (table.IsOccupied)
+                {
+                    // No active order, but table is still occupied
+                    cardColor = "bg-warning text-dark";
+                    statusText = "Occupied";
+                }
+                else
+                {
+                    // Table is free and no active order
+                    cardColor = "bg-success text-white";
+                    statusText = "Available";
+                }
+
+                TableOrder tableOrder = new TableOrder(table.TableNumber, statusText, cardColor);
+                tableOrders.Add(tableOrder);
+
+                
+            }
+            return tableOrders;
         }
 
     }
