@@ -1,0 +1,29 @@
+﻿@model ProjectChapeau.Views.ViewModel.MenusOverviewViewModel
+
+@{
+    ViewData["Title"] = "Menu Overview";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    @if (Model.Menus != null)
+    {
+        foreach (Menu menu in Model.Menus)
+        {
+            <h2>@menu.MenuName</h2>
+            <div class="container">
+                <div class="row">
+                    @if (menu.MenuItems != null)
+                    {
+                        foreach (MenuItem menuItem in menu.MenuItems)
+                        {
+                            <div class="col-md-3 mb-3" id="@menuItem.MenuItemId">
+                                <partial name="_MenuItemCard" model="menuItem" />
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
