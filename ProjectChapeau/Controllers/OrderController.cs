@@ -1,21 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
+
 using ProjectChapeau.Views.ViewModel;
+
 
 namespace ProjectChapeau.Controllers
 {
     public class OrderController : Controller
     {
+
         private readonly IMenuItemService _menuItemsService;
-        public IActionResult Index()
+        
+        private readonly IOrderService _orderService;
+       
+            public IActionResult Index()
         {
-            // Placeholder redirect
-            return RedirectToAction("Menu", "Orders");
+            List<Order> runningOrders = _orderService.GetRunningOrders();
+            return View(runningOrders);
+
         }
         public OrderController(IMenuItemService menuItemsService)
         {
             _menuItemsService = menuItemsService;
+        }
+         public OrderController(IOrderService orderService)
+        {
+            _orderService = orderService;
         }
         public IActionResult Menu()
         {
@@ -35,6 +46,7 @@ namespace ProjectChapeau.Controllers
                 return NotFound($"Menu item with ID {id} does not exist");
             }
             return View(menuItem);
-        }
+
+   
     }
 }
