@@ -18,7 +18,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT item_name, price, stock, is_active FROM Menu_Item ORDER BY item_name";
+                string query = "SELECT item_name, price, stock FROM Menu_Item ORDER BY item_name";
                 SqlCommand command = new SqlCommand(query, connection);
 
                 connection.Open();
@@ -170,18 +170,18 @@ namespace ProjectChapeau.Repositories
         {
             using (SqlConnection connection = new(_connectionString))
             {
-                string query = @"INSERT INTO Menu_Item (item_name, price, stock, category_id)
-                                 VALUES (@item_name, @price, @stock, @category_id);";
+                string query = @"INSERT INTO Menu_Item (item_name, price, stock, is_active)
+                                 VALUES (@item_name, @price, @stock, @is_active);";
 
                 SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
 				command.Parameters.AddWithValue("@price", menuItem.Price);
 				command.Parameters.AddWithValue("@stock", menuItem.Stock);
-				command.Parameters.AddWithValue("@category_id", menuItem.CategoryId);
+				command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
 
 
-                connection.Open();
+				connection.Open();
                 command.ExecuteNonQuery();
 			}
         }
@@ -191,8 +191,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = new (_connectionString))
             {
                 string query = @"UPDATE Menu_Item
-                                 SET item_name = @item_name, price = @price, stock = @stock,
-                                  category_id = @category_id, menu_id = @menu_id, is_active = @is_active
+                                 SET item_name = @item_name, price = @price, stock = @stock
                                  WHERE menu_tem_id = @menu_item_id";
 
                 SqlCommand command = new(query, connection);

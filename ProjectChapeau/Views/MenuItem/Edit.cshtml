@@ -6,7 +6,9 @@
 
 <h2>Edit Menu Item</h2>
 
-<form action="/MenuItem/AddMenuItem" method="POST">
+<form action="/MenuItem/Edit" method="POST">
+	<input hidden type="number" name="MenuItemId" value="@Model?.MenuItemId" />
+
 	<div class="form-group py-2">
 		<label for="ItemName">Item Name:</label>
 		<input type="text" id="ItemName" name="ItemName" class="form-control" required value="@Model?.ItemName" />

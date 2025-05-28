@@ -22,13 +22,13 @@ namespace ProjectChapeau.Controllers
         }
 
         [HttpGet]
-        public ActionResult AddMenuItem()
+        public ActionResult Add()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult AddMenuItem(MenuItem menuItem)
+        public ActionResult Add(MenuItem menuItem)
         {
             try
             {
@@ -38,12 +38,14 @@ namespace ProjectChapeau.Controllers
             }
             catch (Exception ex)
             {
-                return View(menuItem);
+				ViewData["ErrorMessage"] = ex.Message;
+				return View(menuItem);
             }
         }
 
-        public ActionResult Edit()
+        public ActionResult Edit(int menuItemId)
         {
+            MenuItem? menuItem = _menuItemRepository.GetMenuItemById((int)menuItemId);
             return View();
         }
 
@@ -52,7 +54,7 @@ namespace ProjectChapeau.Controllers
         {
             try
             {
-                _menuItemRepository.AddMenuItem(menuItem);
+                _menuItemRepository.UpdateMenuItem(menuItem);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
