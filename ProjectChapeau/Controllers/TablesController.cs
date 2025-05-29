@@ -49,27 +49,67 @@ namespace ProjectChapeau.Controllers
             {
                 List<Order> Orders =  _orderService.GetAllOrders();
                 Order? latestOrder = GetLatestOrder(Orders, tableEditViewModel.table);
-                
-                if (tableEditViewModel.order != null)
+
+                // Scenario 1: No active order for the table
+                if (latestOrder == null || latestOrder.orderStatus == OrderStatus.Completed)
                 {
-                    _orderService.UpdateOrderStatus(latestOrder);
-                }
-                if (latestOrder == null)
-                {
+                    // Update the table status (occupied/free)
                     _tableService.UpdateTableStatus(tableEditViewModel.table);
-                     
-                    TempData["ConfirmMessage"] = "Your table has been edited succesfully";
+
+                    TempData["ConfirmMessage"] = "Your table has been edited successfully.";
                     return RedirectToAction("Index");
                 }
-                else
+
+                if (tableEditViewModel.order == null)
                 {
-                    throw new Exception("Table has an active order set order status to completed first!");
+                    return ReturnWithError("Table has an active order. Set the order status to Completed before editing the table.");
+
                 }
-                
+
+                OrderStatus requestedStatus = tableEditViewModel.order.orderStatus;
+                OrderStatus currentStatus = latestOrder.orderStatus;
+
+                // Only allow ReadyToBeServed -> Served transition
+                if (requestedStatus == OrderStatus.Served && currentStatus != OrderStatus.ReadyToBeServed)
+                {
+                    return ReturnWithError("You can only set the status to Served if the current order status is ReadyToBeServed.");
+                }
+
+                // Only allow changing from ReadyToBeServed to Served (block all other changes if running)
+                if (currentStatus == OrderStatus.ReadyToBeServed && requestedStatus != OrderStatus.Served)
+                {
+                    return ReturnWithError("You can only change 'ReadyToBeServed' orders to 'Served'.");
+                }
+
+                // Only update if the status is actually changing
+                if (requestedStatus == currentStatus)
+                {
+                    return ReturnWithError("No changes detected in order status.");
+                }
+
+                // All checks passed, update order
+                latestOrder.orderStatus = requestedStatus;
+                _orderService.UpdateOrderStatus(latestOrder);
+
+                TempData["ConfirmMessage"] = "Order status updated successfully.";
+                return RedirectToAction("Index");
+
+
             }
             catch (Exception ex)
             {
+                
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
+
+                tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
+
+                return View(tableEditViewModel);
+            }
+
+            IActionResult ReturnWithError(string message)
+            {
+                ViewBag.ErrorMessage = message;
+                tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
                 return View(tableEditViewModel);
             }
         }
@@ -132,6 +172,8 @@ namespace ProjectChapeau.Controllers
             Order? latestOrder = orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
             return latestOrder;
         }
+
+        
 
     }
 }
