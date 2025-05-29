@@ -295,5 +295,19 @@ namespace ProjectChapeau.Repositories
                 command.ExecuteNonQuery();
             }
 		}
+
+        public void ActivateMenuItem(int menuItemId)
+        {
+            using (SqlConnection connection = new(_connectionString))
+            {
+                string query = "UPDATE Menu_Item SET is_active = 1 WHERE menu_item_id = @menu_item_id";
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@menu_item_id", menuItemId);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
 	}
 }

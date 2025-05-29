@@ -71,7 +71,11 @@ namespace ProjectChapeau.Controllers
             return RedirectToAction("Index");
         }
 
-
+        public IActionResult Activate(int id)
+        {
+            _menuItemRepository.ActivateMenuItem(id);
+            return RedirectToAction("Index");
+        }
     }
 
 }

@@ -17,5 +17,6 @@ namespace ProjectChapeau.Repositories.Interfaces
         void AddMenuItem(MenuItem menuItem);
         void UpdateMenuItem(MenuItem menuItem);
         void DeactivateMenuItem(int menuItemId);
+        void ActivateMenuItem(int menuItemId);
     }
 }
