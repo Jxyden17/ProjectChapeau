@@ -46,8 +46,15 @@
 					<td>@menuItem.Price</td>
 					<td>@menuItem.Stock</td>
 					<td>
-					<a href="/MenuItem/Edit/@menuItem.MenuItemId">Edit</a>
-					<a href="/MenuItem/Deactivate/@menuItem.MenuItemId">Deactivate</a>
+						@if (menuItem.IsActive)
+						{
+							<a href="/MenuItem/Edit/@menuItem.MenuItemId">Edit</a>
+							<a href="/MenuItem/Deactivate/@menuItem.MenuItemId">Deactivate</a>
+						}
+						else
+						{
+							<a href="/MenuItem/Activate/@menuItem.MenuItemId">Activate</a>
+						}
 					</td>
 				</tr>
 			}
