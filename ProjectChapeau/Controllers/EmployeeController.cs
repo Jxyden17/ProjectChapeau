@@ -160,5 +160,17 @@ namespace ProjectChapeau.Controllers
             Employee? employee = _employeeService.GetById((int)id);
             return View(employee);
         }
+
+        public IActionResult Deactivate(int id)
+        {
+            _employeeService.DeactivateEmployee(id);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Activate(int id)
+        {
+            _employeeService.ActivateEmployee(id);
+            return RedirectToAction("Index");
+        }
     }
 }
