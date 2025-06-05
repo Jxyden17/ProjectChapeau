@@ -1,4 +1,5 @@
-﻿using ProjectChapeau.Models;
+﻿using AspNetCoreGeneratedDocument;
+using ProjectChapeau.Models;
 using ProjectChapeau.Repositories;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Services.Interfaces;
@@ -39,6 +40,41 @@ namespace ProjectChapeau.Services
         public MenuItem? GetMenuItemById(int menuItemId)
         {
             return _menuItemsRepository.GetMenuItemById(menuItemId);
+        }
+
+        public List<MenuItem> GetCategory(int categoryId)
+        {
+            return _menuItemsRepository.GetCategory(categoryId);
+        }
+
+        public List<MenuItem> GetMenu(int menuId)
+        {
+            return _menuItemsRepository.GetMenu(menuId);
+        }
+
+        public List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId)
+        {
+            return _menuItemsRepository.GetFilteredMenuItems(menuId, categoryId);
+        }
+
+        public void AddMenuItem(MenuItem menuItem)
+        {
+            _menuItemsRepository.AddMenuItem(menuItem);
+        }
+
+        public void UpdateMenuItem(MenuItem menuItem)
+        {
+            _menuItemsRepository.UpdateMenuItem(menuItem);
+        }
+
+        public void DeactivateMenuItem(int menuItemId)
+        {
+            _menuItemsRepository.DeactivateMenuItem(menuItemId);
+        }
+
+        public void ActivateMenuItem(int menuItemId)
+        {
+            _menuItemsRepository.ActivateMenuItem(menuItemId);
         }
     }
 }
