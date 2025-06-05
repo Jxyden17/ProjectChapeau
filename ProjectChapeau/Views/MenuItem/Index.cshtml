@@ -44,7 +44,10 @@
 				<tr>
 					<td>@menuItem.ItemName</td>
 					<td>@menuItem.Price</td>
-					<td>@menuItem.Stock</td>
+					<td>
+						@menuItem.Stock
+						<partial name="_StockMessage" model="menuItem"/>
+					</td>
 					<td>
 						@if (menuItem.IsActive)
 						{

@@ -9,5 +9,15 @@ namespace ProjectChapeau.Services.Interfaces
         List<MenuItem> GetMenuItemsByMenu(int menuId);
         List<MenuItem> GetMenuItemsWithoutDefinedMenu();
         MenuItem? GetMenuItemById(int menuItemId);
+
+        List<MenuItem> GetCategory(int categoryId);
+        List<MenuItem> GetMenu(int menuId);
+
+        List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId);
+
+        void AddMenuItem(MenuItem menuItem);
+        void UpdateMenuItem(MenuItem menuItem);
+        void DeactivateMenuItem(int menuItemId);
+        void ActivateMenuItem(int menuItemId);
     }
 }
