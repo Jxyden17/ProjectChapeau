@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using ProjectChapeau.Models;
 using ProjectChapeau.Repositories.Interfaces;
+using ProjectChapeau.Repositories;
 using ProjectChapeau.Services.Interfaces;
 
 namespace ProjectChapeau.Repositories

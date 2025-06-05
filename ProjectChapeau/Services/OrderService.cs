@@ -16,7 +16,17 @@ namespace ProjectChapeau.Services
 
         public List<Order> GetAllOrders()
         {
-           return _orderRepository.GetAllOrders();
+
+            return _orderRepository.GetAllOrders();
+        }
+        public List<Order> GetRunningOrders()
+        {
+            return _orderRepository.GetRunningOrders();
+        }
+
+        public void UpdateOrderStatus(Order order)
+        {
+            _orderRepository.UpdateOrderStatus(order);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace ProjectChapeau.Repositories.Interfaces
 
         RestaurantTable GetById(int id);
 
-        void UpdateTable(RestaurantTable table);
+        void UpdateTableStatus(RestaurantTable table);
     }
 }

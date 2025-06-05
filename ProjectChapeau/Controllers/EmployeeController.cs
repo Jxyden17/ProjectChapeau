@@ -2,7 +2,7 @@
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Services.Interfaces;
-using ProjectChapeau.Views.ViewModel;
+using ProjectChapeau.Models.ViewModel;
 
 namespace ProjectChapeau.Controllers
 {

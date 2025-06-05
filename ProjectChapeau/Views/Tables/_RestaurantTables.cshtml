@@ -1,45 +1,30 @@
-﻿@using ProjectChapeau.Models.Enums
-@model ProjectChapeau.Views.ViewModel.TableOrderModel
+﻿@using ProjectChapeau.Models.ViewModel;
+@model List<TableViewModel>
 
 
-@foreach (RestaurantTable table in Model.restaurantTables)
-{
-    Order latestOrder = Model.Orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
-
-    string cardColor = "bg-success text-white";
-    string statusText = "Available";
-
-
-    if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed )
-    {
-        if (latestOrder.table.IsOccupied == true)
+<div class="container py-4">
+    <div class="row g-4 justify-content-center">
+        @foreach (TableViewModel tableOrder in Model)
         {
-            // Rood: Bezet + actieve order
-            cardColor = "bg-danger text-dark";
-            statusText = $"Order {latestOrder.orderStatus}";
-        }
-        else
-        {
-            // Geel: Niet bezet + actieve order
-            cardColor = "bg-warning text-dark";
-            statusText = $"Order {latestOrder.orderStatus}";
-        }
-    }
-    else if ((latestOrder == null || latestOrder.orderStatus == OrderStatus.Completed) && table.IsOccupied)
-    {
-        // Geel: Bezet + laatste order afgerond of 
-        cardColor = "bg-warning text-dark";
-        statusText = "Occupied";
-    }
-
-    <div class="col-md-3 mb-4">
-        <a href="/Tables/Edit/@table.TableNumber" style="text-decoration:none;">
-        <div class="card h-100 shadow-sm border-0 @cardColor">
-            <div class="card-body text-center">
-                <h5 class="card-title">Table @table.TableNumber</h5>
-                <p class="card-text">Status: <strong>@statusText</strong></p>
+            <div class="col-12 col-md-6 d-flex justify-content-center">
+                <a href="/Tables/Edit/@tableOrder.tableId" style="text-decoration: none; width:100%;">
+                    <div class="card shadow rounded-3 border-0 @tableOrder.cardColor d-flex flex-column justify-content-center align-items-center text-center"
+                         style="min-height: 200px; max-width: 320px; margin: 0 auto;">
+                        <i class="bi bi-clock-history fs-2 mb-2" style="color: #222;"></i>
+                        <div class="fs-4 mb-1">Table: @tableOrder.tableId</div>
+                        <div class="fs-6 text-break">
+                            Status:
+                            <span class="fw-semibold">
+                                    <span class="fw-bold">@tableOrder.status</span>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-        </a>
+        }
     </div>
-}
+</div>
+
+
+
+                         

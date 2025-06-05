@@ -1,0 +1,17 @@
+﻿@model ProjectChapeau.Models.ViewModel.MenuItemOverviewViewModel;
+
+@{
+    MenuItem? menuItem = Model.MenuItem;
+    ViewData["Title"] = $"{@Model?.MenuItem?.ItemName}";
+}
+<h1>@menuItem?.ItemName</h1>
+<h2>&euro;@menuItem?.Price - @menuItem?.Stock left in stock</h2>
+@if (menuItem?.Category != null)
+{
+    <p>Category - @menuItem?.Category.CategoryName</p>
+}
+<p>@menuItem?.ItemDescription</p>
+<img src="/img/menu-item/@menuItem?.ImageURL" class="img-fluid rounded" alt="@menuItem?.ItemName"/>
+<a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-primary">
+    Return to Menus
+</a>
