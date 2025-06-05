@@ -123,6 +123,24 @@ namespace ProjectChapeau.Repositories
             return orders;
         }
 
+        public void UpdateOrderStatus(Order order)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Orders SET order_status = @OrderStatus " +
+                               "WHERE order_id = @OrderId";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@OrderId", order.orderId);
+                command.Parameters.AddWithValue("@OrderStatus", order.orderStatus.ToString());
+
+                command.Connection.Open();
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                    throw new Exception("No records updated!");
+            }
+        }
+
         private Employee ReadEmployee(SqlDataReader reader)
         {
             int id = (int)reader["employee_number"];

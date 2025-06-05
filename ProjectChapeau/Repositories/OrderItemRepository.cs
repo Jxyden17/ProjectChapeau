@@ -26,7 +26,7 @@ namespace ProjectChapeau.Repositories
                             order_line_status,
                             comment,
                             amount
-                         FROM OrderItem
+                         FROM order_item
                          WHERE order_id = @OrderId";
 
                 SqlCommand command = new SqlCommand(query, connection);

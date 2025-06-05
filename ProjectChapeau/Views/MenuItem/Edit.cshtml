@@ -2,7 +2,9 @@
 
 @{
 	ViewData["Title"] = "Edit Menu Item";
+	string? errorMessage = (string)ViewData["ErrorMessage"];
 }
+<h4>@errorMessage</h4>
 
 <h2>Edit Menu Item</h2>
 
@@ -23,7 +25,6 @@
 		<label for="Stock">Stock:</label>
 		<input type="number" id="Stock" name="Stock" class="form-control" required value="@Model?.Stock" />
 	</div>
-
 	<button type="submit" class="btn btn-primary">Edit</button>
 </form>
 

@@ -1,0 +1,16 @@
+﻿@model MenuItem
+
+@{
+	if(Model.Stock == 0)
+	{
+		<div class="alert alert-danger" role="alert">
+			Item out of stock!
+		</div>
+	}
+	else if(Model.Stock <= 10)
+	{
+		<div class="alert alert-warning" role="alert">
+			Item almost out of stock!
+		</div>
+	}
+}

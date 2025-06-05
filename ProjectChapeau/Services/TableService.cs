@@ -23,9 +23,9 @@ namespace ProjectChapeau.Services
             return _tableRepository.GetById(id);
         }
 
-        public void UpdateTable(RestaurantTable table)
+        public void UpdateTableStatus(RestaurantTable table)
         {
-            _tableRepository.UpdateTable(table);
+            _tableRepository.UpdateTableStatus(table);
         }
     }
 }

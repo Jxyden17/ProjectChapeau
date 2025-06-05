@@ -11,6 +11,6 @@ namespace ProjectChapeau.Repositories.Interfaces
 
         List<Order> GetRunningOrders();
 
-
+        void UpdateOrderStatus(Order order);
     }
 }

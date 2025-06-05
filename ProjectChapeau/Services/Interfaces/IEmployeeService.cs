@@ -11,5 +11,8 @@ namespace ProjectChapeau.Services.Interfaces
         void UpdateEmployee(Employee employee);
 
         void DeleteEmployee(Employee employee);
+
+        void DeactivateEmployee(int employeeId);
+        void ActivateEmployee(int employeeId);
     }
 }

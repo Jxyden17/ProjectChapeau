@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
-using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
+using ProjectChapeau.Services;
+using ProjectChapeau.Services.Interfaces;
+
 
 
 namespace ProjectChapeau.Controllers
@@ -10,7 +12,7 @@ namespace ProjectChapeau.Controllers
     {
 
         private readonly IMenuItemService _menuItemsService;
-        
+
         private readonly IOrderService _orderService;
         
         public OrderController(IMenuItemService menuItemsService, IOrderService orderService)
@@ -25,7 +27,7 @@ namespace ProjectChapeau.Controllers
             return View(runningOrders);
 
         }
-
+       
         public IActionResult Menu()
         {
             MenusOverviewViewModel menusOverviewViewModel = new(_menuItemsService.GetAllMenuItems());

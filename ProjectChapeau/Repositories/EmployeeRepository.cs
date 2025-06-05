@@ -199,5 +199,33 @@ namespace ProjectChapeau.Repositories
                 return count > 0;
             }
         }
+
+        public void Deactivate(int employeeId)
+        {
+            using (SqlConnection connection = new(_connectionString))
+            {
+                string query = "UPDATE Employees SET is_active = 0 WHERE employee_number = @employee_number";
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@employee_number", employeeId);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void Activate(int employeeId)
+        {
+            using (SqlConnection connection = new(_connectionString))
+            {
+                string query = "UPDATE Employees SET is_active = 1 WHERE employee_number = @employee_number";
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@employee_number", employeeId);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }
