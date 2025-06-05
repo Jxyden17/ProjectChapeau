@@ -71,5 +71,15 @@ namespace ProjectChapeau.Services
         {
             _employeeRepository.Delete(employee);
         }
+
+        public void DeactivateEmployee(int employeeId)
+        {
+            _employeeRepository.Deactivate(employeeId);
+        }
+
+        public void ActivateEmployee(int employeeId)
+        {
+            _employeeRepository.Activate(employeeId);
+        }
     }
 }
