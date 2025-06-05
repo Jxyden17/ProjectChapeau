@@ -15,8 +15,7 @@ namespace ProjectChapeau.Controllers
 
         public IActionResult Index(int? menuId, int? categoryId)
         {
-            //var menuItems = _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
-            var menuItems = _menuItemRepository.GetAllMenuItems();
+            var menuItems = _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
             return View(menuItems);
 
 
@@ -44,10 +43,11 @@ namespace ProjectChapeau.Controllers
             }
         }
 
-        public ActionResult Edit(int menuItemId)
+        [HttpGet]
+        public ActionResult Edit(int id)
         {
-            MenuItem? menuItem = _menuItemRepository.GetMenuItemById((int)menuItemId);
-            return View();
+            MenuItem? menuItem = _menuItemRepository.GetMenuItemById(id);
+            return View(menuItem);
         }
 
         [HttpPost]
@@ -60,8 +60,8 @@ namespace ProjectChapeau.Controllers
             }
             catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = ex.Message;
-                return View(menuItem);
+				    ViewData["ErrorMessage"] = ex.Message;
+				     return View(menuItem);
             }
         }
 
@@ -71,7 +71,11 @@ namespace ProjectChapeau.Controllers
             return RedirectToAction("Index");
         }
 
-
+        public IActionResult Activate(int id)
+        {
+            _menuItemRepository.ActivateMenuItem(id);
+            return RedirectToAction("Index");
+        }
     }
 
 }

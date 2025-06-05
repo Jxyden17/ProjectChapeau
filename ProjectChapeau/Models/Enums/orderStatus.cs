@@ -5,6 +5,7 @@
         Ordered,
         BeingPrepared,
         ReadyToBeServed,
+        Served,
         Completed
     }
 }
