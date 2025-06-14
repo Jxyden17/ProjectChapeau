@@ -1,4 +1,5 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.ViewModel;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Services.Interfaces;
 
@@ -18,14 +19,24 @@ namespace ProjectChapeau.Services
             return _tableRepository.GetAllTables();
         }
 
-        public RestaurantTable GetTableById(int id)
+        public List<TableViewModel> GetAllTablesWithLatestOrder()
         {
-            return _tableRepository.GetById(id);
+            return _tableRepository.GetAllTablesWithLatestOrder();
         }
 
-        public void UpdateTableStatus(RestaurantTable table)
+        public RestaurantTable GetTableById(int id)
         {
-            _tableRepository.UpdateTableStatus(table);
+            return _tableRepository.GetTableById(id);
+        }
+
+        public TableEditViewModel GetTableWithLatestOrderById(int? id)
+        {
+            return _tableRepository.GetTableWithLatestOrderById(id);
+        }
+
+        public void UpdateTableStatus(int tableId, bool isOccupied)
+        {
+            _tableRepository.UpdateTableStatus(tableId, isOccupied);
         }
     }
 }

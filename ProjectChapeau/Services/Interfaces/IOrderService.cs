@@ -1,4 +1,5 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
 
 namespace ProjectChapeau.Services.Interfaces
 {
@@ -7,7 +8,7 @@ namespace ProjectChapeau.Services.Interfaces
         List<Order> GetAllOrders();
         List<Order> GetRunningOrders();
 
-        void UpdateOrderStatus(Order order);
+        void UpdateOrderStatus(int? orderId, OrderStatus? newStatus);
 
     }
 }

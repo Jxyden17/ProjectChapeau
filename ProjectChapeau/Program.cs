@@ -21,9 +21,6 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<ITableService, TableService>();
             builder.Services.AddSingleton<ITableRepository, TableRepository>();
 
-            builder.Services.AddSingleton<IRoleService, RoleService>();
-            builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
-
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 

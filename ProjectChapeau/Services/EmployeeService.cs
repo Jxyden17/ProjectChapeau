@@ -27,7 +27,7 @@ namespace ProjectChapeau.Services
             Employee copyEmployee = employee;
             copyEmployee.password = _passwordService.HashPassword(interleavedSaltedPassword);
 
-            _employeeRepository.Add(copyEmployee);
+            _employeeRepository.AddEmployee(copyEmployee);
 
             if (employee.employeeId != copyEmployee.employeeId)
                 employee.employeeId = copyEmployee.employeeId;
@@ -35,18 +35,18 @@ namespace ProjectChapeau.Services
 
         public List<Employee> GetAllEmployees()
         {
-            return _employeeRepository.GetAll();
+            return _employeeRepository.GetAllEmployees();
         }
 
         public Employee? GetEmployeeByLoginCredentials(string userName, string password)
         {
 
-            return _employeeRepository.GetByLoginCredentials(userName, password);
+            return _employeeRepository.GetEmployeeByLoginCredentials(userName, password);
         }
 
-        public Employee? GetById(int id)
+        public Employee? GetEmployeeById(int id)
         {
-            return _employeeRepository.GetById(id); 
+            return _employeeRepository.GetEmployeeById(id); 
         } 
 
         public void UpdateEmployee(Employee employee)
@@ -64,22 +64,27 @@ namespace ProjectChapeau.Services
             if (employee.employeeId != copyEmployee.employeeId)
                 employee.employeeId = copyEmployee.employeeId;
 
-            _employeeRepository.Update(copyEmployee);
+            _employeeRepository.UpdateEmployee(copyEmployee);
         }
 
         public void DeleteEmployee(Employee employee)
         {
-            _employeeRepository.Delete(employee);
+            _employeeRepository.DeleteEmployee(employee);
         }
 
         public void DeactivateEmployee(int employeeId)
         {
-            _employeeRepository.Deactivate(employeeId);
+            _employeeRepository.DeactivateEmployee(employeeId);
         }
 
         public void ActivateEmployee(int employeeId)
         {
-            _employeeRepository.Activate(employeeId);
+            _employeeRepository.ActivateEmployee(employeeId);
+        }
+
+        public List<Role> GetAllEmployeeRoles()
+        {
+            return _employeeRepository.GetAllEmployeeRoles();
         }
     }
 }

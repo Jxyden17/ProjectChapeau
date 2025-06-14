@@ -25,10 +25,7 @@ namespace ProjectChapeau.Controllers
 
             ViewData["LoggedInEmployee"] = loggedInEmployee;
 
-            List<RestaurantTable> restaurantTables = _tableService.GetAllTables();
-            List<Order> Orders = _orderService.GetAllOrders();
-
-            List<TableViewModel> tableOrders = GetTableOrders(restaurantTables, Orders);
+            List<TableViewModel> tableOrders = _tableService.GetAllTablesWithLatestOrder();
 
             return View(tableOrders);
         }
@@ -47,62 +44,69 @@ namespace ProjectChapeau.Controllers
         {
             try
             {
-                List<Order> Orders =  _orderService.GetAllOrders();
-                Order? latestOrder = GetLatestOrder(Orders, tableEditViewModel.table);
+                TableEditViewModel tableEdit = _tableService.GetTableWithLatestOrderById(tableEditViewModel.tableID);
 
+                if (tableEdit == null || tableEditViewModel.orderId == null)
+                {
+                    ReturnWithError("Table or Order not found. try again.");
+                }
                 // Scenario 1: No active order for the table
-                if (latestOrder == null || latestOrder.orderStatus == OrderStatus.Completed)
+                Console.WriteLine($"{tableEdit.currentOrderStatus} +++++++++++ {tableEdit.currentOrderStatus}");
+                if (tableEdit.currentOrderStatus == null || tableEdit.currentOrderStatus == OrderStatus.Completed)
                 {
                     // Update the table status (occupied/free)
-                    _tableService.UpdateTableStatus(tableEditViewModel.table);
+                    _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
 
                     TempData["ConfirmMessage"] = "Your table has been edited successfully.";
                     return RedirectToAction("Index");
                 }
 
-                if (tableEditViewModel.order == null)
-                {
-                    return ReturnWithError("Table has an active order. Set the order status to Completed before editing the table.");
+                // If there is an active order, only allow valid status transitions
+                OrderStatus? requestedStatus = tableEditViewModel.currentOrderStatus;
+                OrderStatus currentStatus = tableEdit.currentOrderStatus.Value;
 
-                }
+                bool isTableStatusChanging = tableEdit.isOccupied != tableEditViewModel.isOccupied;
 
-                OrderStatus requestedStatus = tableEditViewModel.order.orderStatus;
-                OrderStatus currentStatus = latestOrder.orderStatus;
+                bool isOrderStatusChanging = currentStatus != requestedStatus;
+
+                Console.WriteLine($"{isOrderStatusChanging}, ++++++++++++++ {isTableStatusChanging} +++++++++++++++++++ {requestedStatus} +++++++++++++++++++++++++ {currentStatus}");
 
                 // Only allow ReadyToBeServed -> Served transition
-                if (requestedStatus == OrderStatus.Served && currentStatus != OrderStatus.ReadyToBeServed)
+                if (isOrderStatusChanging)
                 {
-                    return ReturnWithError("You can only set the status to Served if the current order status is ReadyToBeServed.");
+                    if (requestedStatus == OrderStatus.Served && currentStatus != OrderStatus.ReadyToBeServed)
+                    {
+                        return ReturnWithError("You can only set the status to Served if the current order status is ReadyToBeServed.");
+                    }
+                    if (currentStatus == OrderStatus.ReadyToBeServed && requestedStatus != OrderStatus.Served)
+                    {
+                        return ReturnWithError("You can only change 'ReadyToBeServed' orders to 'Served'.");
+                    }
+                    // All checks passed, update order status
+                    Console.WriteLine($"Check of dit gerunned is.");
+                    _orderService.UpdateOrderStatus(tableEditViewModel.orderId, requestedStatus);
                 }
 
-                // Only allow changing from ReadyToBeServed to Served (block all other changes if running)
-                if (currentStatus == OrderStatus.ReadyToBeServed && requestedStatus != OrderStatus.Served)
+                if (isTableStatusChanging)
                 {
-                    return ReturnWithError("You can only change 'ReadyToBeServed' orders to 'Served'.");
+                    _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
                 }
 
-                // Only update if the status is actually changing
-                if (requestedStatus == currentStatus)
+                if (isOrderStatusChanging || isTableStatusChanging)
                 {
-                    return ReturnWithError("No changes detected in order status.");
+                    TempData["ConfirmMessage"] = "Table and/or order status updated successfully.";
+                    return RedirectToAction("Index");
                 }
-
-                // All checks passed, update order
-                latestOrder.orderStatus = requestedStatus;
-                _orderService.UpdateOrderStatus(latestOrder);
-
-                TempData["ConfirmMessage"] = "Order status updated successfully.";
-                return RedirectToAction("Index");
-
-
+                else
+                {
+                    return ReturnWithError("No changes detected in table or order status.");
+                }
             }
             catch (Exception ex)
             {
-                
-                ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
-
+                ViewBag.ErrorMessage = $"An error occurred: {ex.Message}";
+                Console.WriteLine(ex);
                 tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
-
                 return View(tableEditViewModel);
             }
 
@@ -122,56 +126,12 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            RestaurantTable table =  _tableService.GetTableById((int)id);
-            List<Order> orders = _orderService.GetAllOrders();
-            Order? latestOrder = GetLatestOrder(orders, table);
-
-            IEnumerable<OrderStatus> orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
-
-            TableEditViewModel tableEditViewModel = new TableEditViewModel(table, latestOrder, orderStatusOptions);
+            TableEditViewModel tableEditViewModel = _tableService.GetTableWithLatestOrderById(id);
 
             return View(tableEditViewModel);
 
         }
 
-        public List<TableViewModel> GetTableOrders(List<RestaurantTable> restaurantTables, List<Order> Orders)
-        {
-            List<TableViewModel> tableOrders = new List<TableViewModel>();
-
-            foreach (RestaurantTable table in restaurantTables)
-            {
-
-                Order? latestOrder = GetLatestOrder(Orders, table);    
-
-                string cardColor = "bg-success text-white";
-                string statusText = "Available";
-
-                if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
-                {
-                    // Active order exists
-                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
-                    statusText = $"Order {latestOrder.orderStatus}";
-                }
-                else if (table.IsOccupied)
-                {
-                    // No active order, but table is still occupied
-                    cardColor = "bg-warning text-dark";
-                    statusText = "Occupied";
-                }
-
-                TableViewModel tableOrder = new TableViewModel(table.TableNumber, statusText, cardColor);
-                tableOrders.Add(tableOrder);
-
-                
-            }
-            return tableOrders;
-        }
-
-        public Order? GetLatestOrder(List<Order> orders, RestaurantTable table)
-        {
-            Order? latestOrder = orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
-            return latestOrder;
-        }
 
         
 

@@ -9,12 +9,10 @@ namespace ProjectChapeau.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
-        private readonly IRoleService _roleService;
 
-        public EmployeeController(IEmployeeService employeeService, IRoleService roleService) 
+        public EmployeeController(IEmployeeService employeeService) 
         {
             _employeeService = employeeService;
-            _roleService = roleService;
         }
 
         //index
@@ -82,7 +80,7 @@ namespace ProjectChapeau.Controllers
                
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
                 employeeRoleModel.employee = new Employee();
-                employeeRoleModel.Roles = _roleService.GetAllRoles();
+                employeeRoleModel.Roles = _employeeService.GetAllEmployeeRoles();
                 return View(employeeRoleModel);
             }
         }
@@ -91,7 +89,7 @@ namespace ProjectChapeau.Controllers
         public ActionResult Create()
         {
             Employee employee = new Employee();
-            List<Role> Roles = _roleService.GetAllRoles();
+            List<Role> Roles = _employeeService.GetAllEmployeeRoles();
             EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
 
             return View(viewModel);
@@ -112,7 +110,7 @@ namespace ProjectChapeau.Controllers
             {
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
                 employeeRoleModel.employee = new Employee();
-                employeeRoleModel.Roles = _roleService.GetAllRoles();
+                employeeRoleModel.Roles = _employeeService.GetAllEmployeeRoles();
                 return View(employeeRoleModel);
             }
         }
@@ -125,8 +123,8 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            Employee? employee = _employeeService.GetById((int)id);
-            List<Role> Roles = _roleService.GetAllRoles();
+            Employee? employee = _employeeService.GetEmployeeById((int)id);
+            List<Role> Roles = _employeeService.GetAllEmployeeRoles();
             EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
             return View(viewModel);
 
@@ -157,7 +155,7 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            Employee? employee = _employeeService.GetById((int)id);
+            Employee? employee = _employeeService.GetEmployeeById((int)id);
             return View(employee);
         }
 
