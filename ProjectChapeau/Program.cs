@@ -2,6 +2,8 @@ using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Services;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
+using ProjectChapeau.Validation.Interfaces;
+using ProjectChapeau.Validation;
 
 namespace ProjectChapeau
 {
@@ -29,6 +31,8 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+
+            builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
 
 
             builder.Services.AddSession(options =>
