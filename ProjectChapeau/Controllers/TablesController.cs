@@ -23,6 +23,8 @@ namespace ProjectChapeau.Controllers
             _tableEditValidator = tableEditValidator;
         }
 
+
+        //Initial page load with all tables and active order.
         public IActionResult Index()
         {
             Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
@@ -42,21 +44,27 @@ namespace ProjectChapeau.Controllers
         }
 
 
-        //edit
+        //Edit page proccessing with validator to keep controller lightweight.
         [HttpPost]
         public IActionResult Edit(TableEditViewModel tableEditViewModel)
         {
             try
             {
+                //Retruieve current table and order from db
                 TableEditViewModel tableEdit = _tableService.GetTableWithLatestOrderById(tableEditViewModel.tableID);
+
+                //Send through validation.
                 TableValidationResult validation = _tableEditValidator.ValidateTableEdit(tableEdit, tableEditViewModel);
 
+                //If the validation returns false it sends the error and reloads the edit page for the user to try again.
                 if (!validation.IsValid)
                 {
                     ViewBag.ErrorMessage = validation.ErrorMessage;
                     tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
                     return View(tableEditViewModel);
                 }
+
+                // If validation didnt return true this is ran and updates the tables.
                 _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
                 _orderService.UpdateOrderStatus(tableEditViewModel.orderId, tableEditViewModel.currentOrderStatus);
 
@@ -72,6 +80,8 @@ namespace ProjectChapeau.Controllers
             }
         }
 
+
+        //Inital edit page load that return the TableOrder through a ViewModel to the view.
         [HttpGet]
         public ActionResult Edit(int? id)
         {

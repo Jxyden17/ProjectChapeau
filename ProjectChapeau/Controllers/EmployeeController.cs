@@ -29,17 +29,23 @@ namespace ProjectChapeau.Controllers
 
 
         //login&logout
+
+        //Load login form on page load.
         public IActionResult Login()
         {
             return View();
         }
 
+
+        //Actual login processing on post request.
         [HttpPost]
         public ActionResult Login(Login loginModel)
         {
+            //retrieve employee with username password
             Employee? Employee = _employeeService.GetEmployeeByLoginCredentials(loginModel.UserName, loginModel.Password);
             try
             {
+                //return with error if user not found
                 if (Employee == null)
                 {
                     ViewBag.ErrorMessage = "Bad Username/Password Combo";
@@ -47,9 +53,17 @@ namespace ProjectChapeau.Controllers
                 }
                 else
                 {
-
-                    HttpContext.Session.SetObject("LoggedInEmployee", Employee);
-                    return RedirectToAction("Index", "Employee");
+                    //Owner goes to employee page all other employees to tables on succesfull login. NOTE:There isnt a specified redirect in the userstories/briefing.
+                    if(Employee.role.roleId ==  1)
+                    {
+                        HttpContext.Session.SetObject("LoggedInEmployee", Employee);
+                        return RedirectToAction("Index", "Employees");
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetObject("LoggedInEmployee", Employee);
+                        return RedirectToAction("Index", "Tables");
+                    }
                 }
             }
             catch (Exception ex)
@@ -58,6 +72,8 @@ namespace ProjectChapeau.Controllers
                 return View(loginModel);
             }
         }
+
+        //When user presses logout button this logs the user out.
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("LoggedInEmployee");
