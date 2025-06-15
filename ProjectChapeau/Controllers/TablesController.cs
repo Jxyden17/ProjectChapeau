@@ -64,9 +64,15 @@ namespace ProjectChapeau.Controllers
                     return View(tableEditViewModel);
                 }
 
-                // If validation didnt return true this is ran and updates the tables.
-                _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
-                _orderService.UpdateOrderStatus(tableEditViewModel.orderId, tableEditViewModel.currentOrderStatus);
+                // If validation returns true this is ran and updates based on if the bool UpdateTable or UpdateOrder is True.
+                if (validation.UpdateTable)
+                {
+                    _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
+                }
+                if (validation.UpdateOrder)
+                {
+                    _orderService.UpdateOrderStatus(tableEditViewModel.orderId, tableEditViewModel.currentOrderStatus);
+                }
 
                 TempData["ConfirmMessage"] = "Table and/or order status updated successfully.";
                 return RedirectToAction("Index");

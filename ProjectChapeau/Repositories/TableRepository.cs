@@ -36,14 +36,14 @@ namespace ProjectChapeau.Repositories
             return restaurantTables;
         }
 
-        public List<TableViewModel> GetAllTablesWithLatestOrder()
+        public List<TableOrder> GetAllTablesWithLatestOrder()
         {
-            List<TableViewModel> tableViewModels = new List<TableViewModel>();
+            List<TableOrder> AllTableOrders = new List<TableOrder>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 // This query gets each table and the latest order (if any) for that table
-                // Query selecteer alles wat nodig is voor de table view model en de laatse order is.
+                // Query selecteer alles wat nodig voor een edit en status bepaling.
                 string query = @"
                 SELECT 
                     t.table_number, 
@@ -69,38 +69,14 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    int tableId = (int)reader["table_number"];
-                    bool isOccupied = (bool)reader["is_occupied"];
-
-                    // Allebei de order properties nullable, properties wordt gezet naar null of niet op basis van db antwoord.
-                    int? orderId = reader["order_id"] != DBNull.Value ? (int)reader["order_id"] : (int?)null;
-                    OrderStatus? orderStatus = reader["order_status"] != DBNull.Value? Enum.Parse<OrderStatus>(reader["order_status"].ToString()) : (OrderStatus?)null;
-
-                    //Standaard Kleur en Status.
-                    string cardColor = "bg-success text-white";
-                    string statusText = "Available";
-
-                    //Check welke status de tafel heeft.
-                    if (orderId != null && orderStatus != OrderStatus.Completed)
-                    {
-                        // Active order bestaat. Card color wordt hier bepaald of IsOccupied True or false is e.g Rood of Geel.
-                        cardColor = isOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
-                        statusText = $"Order {orderStatus}";
-                    }
-                    else if (isOccupied)
-                    {
-                        // Geen actieve order maar tafel is wel bezet.
-                        cardColor = "bg-warning text-dark";
-                        statusText = "Occupied";
-                    }
-
-                    tableViewModels.Add(new TableViewModel(tableId, statusText, cardColor));
+                    TableOrder tableOrder = ReadTableOrder(reader);
+                    AllTableOrders.Add(tableOrder);
                 }
 
                 reader.Close();
             }
 
-            return tableViewModels;
+            return AllTableOrders;
         }
 
         public RestaurantTable GetTableById(int id)
@@ -158,18 +134,11 @@ namespace ProjectChapeau.Repositories
                 {
                     if (reader.Read())
                     {
-                        int tableId = (int)reader["table_number"];
-
-                        //Prevent null errors
-                        int? orderId = reader["order_id"] != DBNull.Value ? (int)reader["order_id"] : (int?)null;
-                        bool isOccupied = (bool)reader["is_occupied"];
-                        OrderStatus? orderStatus = reader["order_status"] != DBNull.Value
-                            ? Enum.Parse<OrderStatus>(reader["order_status"].ToString())
-                            : (OrderStatus?)null;
+                        TableOrder tableOrder = ReadTableOrder(reader);
 
                         IEnumerable<OrderStatus> statusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
 
-                        return new TableEditViewModel(tableId, orderId,isOccupied, orderStatus, statusOptions);
+                        return new TableEditViewModel(tableOrder.TableNumber, tableOrder.OrderId, tableOrder.IsOccupied, tableOrder.OrderStatus, statusOptions);
                     }
                 }
             }
@@ -202,6 +171,18 @@ namespace ProjectChapeau.Repositories
             bool IsOccupoed = (bool)reader["is_occupied"];
 
             return new RestaurantTable(id, IsOccupoed);
+        }
+
+        private TableOrder ReadTableOrder(SqlDataReader reader)
+        {
+            int tableNumber = (int)reader["table_number"];
+            bool IsOccupied = (bool)reader["is_occupied"];
+            int? OrderId = reader["order_id"] != DBNull.Value ? (int?)reader["order_id"] : null;
+            OrderStatus? orderStatus = reader["order_status"] != DBNull.Value
+                        ? Enum.Parse<OrderStatus>(reader["order_status"].ToString())
+                        : (OrderStatus?)null;
+
+            return new TableOrder(tableNumber, IsOccupied, OrderId, orderStatus);
         }
     }
 }

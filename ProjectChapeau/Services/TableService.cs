@@ -1,4 +1,5 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Models.ViewModel;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Services.Interfaces;
@@ -21,7 +22,30 @@ namespace ProjectChapeau.Services
 
         public List<TableViewModel> GetAllTablesWithLatestOrder()
         {
-            return _tableRepository.GetAllTablesWithLatestOrder();
+            List<TableOrder> tables = _tableRepository.GetAllTablesWithLatestOrder();
+            List<TableViewModel> tableViewModels = new List<TableViewModel>();
+
+            foreach (TableOrder table in tables)
+            {
+                
+                string cardColor = "bg-success text-white";
+                string statusText = "Available";
+
+                if (table.OrderId != null && table.OrderStatus != OrderStatus.Completed)
+                {
+                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
+                    statusText = $"Order {table.OrderStatus}";
+                }
+                else if (table.IsOccupied)
+                {
+                    cardColor = "bg-warning text-dark";
+                    statusText = "Occupied";
+                }
+
+                tableViewModels.Add(new TableViewModel(table.TableNumber, statusText, cardColor));
+            }
+
+            return tableViewModels;
         }
 
         public RestaurantTable GetTableById(int id)
