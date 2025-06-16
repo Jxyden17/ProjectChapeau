@@ -191,7 +191,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = @"SELECT o.order_id, o.order_datetime, o.order_status, o.payment_status, oi.amount, o.tip_amount,
-                                 mi.menu_item_id,
+                                 mi.menu_item_id, mi.price
                                  m.menu_name AS item_category, 
                                  (mi.price * oi.amount) AS sales_amount,
                                  ((mi.price * oi.amount) + o.tip_amount) AS income_amount
