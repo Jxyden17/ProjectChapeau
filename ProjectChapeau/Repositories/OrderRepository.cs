@@ -195,8 +195,8 @@ namespace ProjectChapeau.Repositories
                                  m.menu_name AS item_category, 
                                  oi.price * oi.amount AS sales_amount
                                  FROM Orders o
-                                 JOIN OrderItem oi ON o.order_id = oi.order_id
-                                 JOIN MenuItem mi ON oi.menu_item_id = mi.menu_item_id
+                                 JOIN order_item oi ON o.order_id = oi.order_id
+                                 JOIN Menu_item mi ON oi.menu_item_id = mi.menu_item_id
                                  JOIN Menu_Contains_Item mci ON mi.menu_item_id = mci.menu_item_id
                                  JOIN Menu m ON mci.menu_id = m.menu_id
                                  WHERE o.order_datetime >= @StartDate AND o.order_datetime <= @EndDate 

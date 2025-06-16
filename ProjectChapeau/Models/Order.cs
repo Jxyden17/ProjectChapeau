@@ -21,8 +21,6 @@ namespace ProjectChapeau.Models
 
         public string Category { get; set; }
 
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
         public Order(int orderId, Employee employee, RestaurantTable table, List<OrderItem> orderItems, DateTime datetime, OrderStatus orderStatus, paymentStatus paymentStatus, decimal salesAmount, decimal incomeAmount, decimal tipAmount)
         {
             this.orderId = orderId;
