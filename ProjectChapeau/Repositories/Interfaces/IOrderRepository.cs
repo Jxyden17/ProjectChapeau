@@ -12,5 +12,7 @@ namespace ProjectChapeau.Repositories.Interfaces
         List<Order> GetRunningOrders();
 
         void UpdateOrderStatus(Order order);
+
+        List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate);
     }
 }

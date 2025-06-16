@@ -42,8 +42,8 @@ namespace ProjectChapeau.Repositories
                     Employee employee = ReadEmployee(reader);
                     RestaurantTable restaurantTable = ReadTables(reader);
 
-                    List<OrderItem> orderItems =  new List<OrderItem>();
-                    
+                    List<OrderItem> orderItems = new List<OrderItem>();
+
 
                     OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
                     paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
@@ -175,7 +175,50 @@ namespace ProjectChapeau.Repositories
             string comment = (string)reader["comment"];
             int amount = (int)reader["amount"];
 
-            return new OrderItem(menuItemId,orderId, amount,orderLineStatus, comment);
+            return new OrderItem(menuItemId, orderId, amount, orderLineStatus, comment);
+        }
+
+        public List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate)
+        {
+            List<Order> orders = new List<Order>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT o.order_id, o.order_datetime, o.order_status, o.payment_status, oi.amount, o.tip_amount,
+                                 mi.menu_item_id, oi.income_amount,
+                                 m.menu_name AS item_category, 
+                                 oi.price * oi.amount AS sales_amount
+                                 FROM Orders o
+                                 JOIN OrderItem oi ON o.order_id = oi.order_id
+                                 JOIN MenuItem mi ON oi.menu_item_id = mi.menu_item_id
+                                 JOIN Menu_Contains_Item mci ON mi.menu_item_id = mci.menu_item_id
+                                 JOIN Menu m ON mci.menu_id = m.menu_id
+                                 WHERE o.order_datetime >= @StartDate AND o.order_datetime <= @EndDate 
+                                 AND o.payment_status = 'Paid'";
+
+                SqlCommand command = new SqlCommand(query, connection); 
+                command.Parameters.AddWithValue("@StartDate",startDate);
+                command.Parameters.AddWithValue("@EndDate", endDate);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    orders.Add(new Order
+                    {
+                        orderId = (int)reader["order_id"],
+                        datetime = (DateTime)reader["order_datetime"],
+                        orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString()),
+                        paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString()),
+                        SalesAmount = (decimal)reader["sales_amount"],
+                        IncomeAmount = (decimal)reader["income_amount"],
+                        TipAmount = (decimal)reader["tip_amount"],
+                        Category = reader["item_category"].ToString()
+
+                    });
+                }
+            }
+            return orders;
         }
     }
 }

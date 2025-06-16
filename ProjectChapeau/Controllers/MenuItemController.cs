@@ -1,21 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
 using ProjectChapeau.Repositories.Interfaces;
+using ProjectChapeau.Services.Interfaces;
 
 namespace ProjectChapeau.Controllers
 {
     public class MenuItemController : Controller
     {
-        private readonly IMenuItemRepository _menuItemRepository;
+        private readonly IMenuItemService _menuItemService;
 
-        public MenuItemController(IMenuItemRepository menuItemRepository)
+        public MenuItemController(IMenuItemService menuItemService)
         {
-            _menuItemRepository = menuItemRepository;
+            _menuItemService = menuItemService;
         }
 
         public IActionResult Index(int? menuId, int? categoryId)
         {
-            var menuItems = _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
+            var menuItems = _menuItemService.GetFilteredMenuItems(menuId, categoryId);
             return View(menuItems);
 
 
@@ -32,7 +33,7 @@ namespace ProjectChapeau.Controllers
         {
             try
             {
-                _menuItemRepository.AddMenuItem(menuItem);
+                _menuItemService.AddMenuItem(menuItem);
 
                 return RedirectToAction("Index");
             }
@@ -46,7 +47,7 @@ namespace ProjectChapeau.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            MenuItem? menuItem = _menuItemRepository.GetMenuItemById(id);
+            MenuItem? menuItem = _menuItemService.GetMenuItemById(id);
             return View(menuItem);
         }
 
@@ -55,7 +56,7 @@ namespace ProjectChapeau.Controllers
         {
             try
             {
-                _menuItemRepository.UpdateMenuItem(menuItem);
+                _menuItemService.UpdateMenuItem(menuItem);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -67,13 +68,13 @@ namespace ProjectChapeau.Controllers
 
         public IActionResult Deactivate(int id)
         {
-            _menuItemRepository.DeactivateMenuItem(id);
+            _menuItemService.DeactivateMenuItem(id);
             return RedirectToAction("Index");
         }
 
         public IActionResult Activate(int id)
         {
-            _menuItemRepository.ActivateMenuItem(id);
+            _menuItemService.ActivateMenuItem(id);
             return RedirectToAction("Index");
         }
     }
