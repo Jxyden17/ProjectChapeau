@@ -129,7 +129,7 @@ namespace ProjectChapeau.Repositories
             return orders;
         }
 
-        public void UpdateOrderStatus(Order order)
+        public void UpdateOrderStatus(int? orderId, OrderStatus? newStatus)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -137,8 +137,8 @@ namespace ProjectChapeau.Repositories
                                "WHERE order_id = @OrderId";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@OrderId", order.orderId);
-                command.Parameters.AddWithValue("@OrderStatus", order.orderStatus.ToString());
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                command.Parameters.AddWithValue("@OrderStatus", newStatus.ToString());
 
                 command.Connection.Open();
                 int nrOfRowsAffected = command.ExecuteNonQuery();

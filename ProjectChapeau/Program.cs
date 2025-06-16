@@ -2,6 +2,8 @@ using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Services;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
+using ProjectChapeau.Validation.Interfaces;
+using ProjectChapeau.Validation;
 
 namespace ProjectChapeau
 {
@@ -21,9 +23,6 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<ITableService, TableService>();
             builder.Services.AddSingleton<ITableRepository, TableRepository>();
 
-            builder.Services.AddSingleton<IRoleService, RoleService>();
-            builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
-
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 
@@ -32,8 +31,10 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
-
             builder.Services.AddSingleton<IFinancialService, FinancialService>();
+
+            builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
+
 
 
             builder.Services.AddSession(options =>

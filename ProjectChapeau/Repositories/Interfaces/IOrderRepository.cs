@@ -1,4 +1,6 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
+using System.Drawing;
 
 namespace ProjectChapeau.Repositories.Interfaces
 {
@@ -8,11 +10,11 @@ namespace ProjectChapeau.Repositories.Interfaces
         List<Order> GetAllOrders();
 
         Order GetOrder(int id);
-
         List<Order> GetRunningOrders();
 
-        void UpdateOrderStatus(Order order);
-
         List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate);
+
+        void UpdateOrderStatus(int? orderId, OrderStatus? newStatus);
+
     }
 }

@@ -9,12 +9,10 @@ namespace ProjectChapeau.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
-        private readonly IRoleService _roleService;
 
-        public EmployeeController(IEmployeeService employeeService, IRoleService roleService) 
+        public EmployeeController(IEmployeeService employeeService) 
         {
             _employeeService = employeeService;
-            _roleService = roleService;
         }
 
         //index
@@ -31,17 +29,23 @@ namespace ProjectChapeau.Controllers
 
 
         //login&logout
+
+        //Load login form on page load.
         public IActionResult Login()
         {
             return View();
         }
 
+
+        //Actual login processing on post request.
         [HttpPost]
         public ActionResult Login(Login loginModel)
         {
+            //retrieve employee with username password
             Employee? Employee = _employeeService.GetEmployeeByLoginCredentials(loginModel.UserName, loginModel.Password);
             try
             {
+                //return with error if user not found
                 if (Employee == null)
                 {
                     ViewBag.ErrorMessage = "Bad Username/Password Combo";
@@ -49,9 +53,17 @@ namespace ProjectChapeau.Controllers
                 }
                 else
                 {
-
-                    HttpContext.Session.SetObject("LoggedInEmployee", Employee);
-                    return RedirectToAction("Index", "Employee");
+                    //Owner goes to employee page all other employees to tables on succesfull login. NOTE:There isnt a specified redirect in the userstories/briefing.
+                    if(Employee.role.roleId ==  1)
+                    {
+                        HttpContext.Session.SetObject("LoggedInEmployee", Employee);
+                        return RedirectToAction("Index", "Employees");
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetObject("LoggedInEmployee", Employee);
+                        return RedirectToAction("Index", "Tables");
+                    }
                 }
             }
             catch (Exception ex)
@@ -60,6 +72,8 @@ namespace ProjectChapeau.Controllers
                 return View(loginModel);
             }
         }
+
+        //When user presses logout button this logs the user out.
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("LoggedInEmployee");
@@ -82,7 +96,7 @@ namespace ProjectChapeau.Controllers
                
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
                 employeeRoleModel.employee = new Employee();
-                employeeRoleModel.Roles = _roleService.GetAllRoles();
+                employeeRoleModel.Roles = _employeeService.GetAllEmployeeRoles();
                 return View(employeeRoleModel);
             }
         }
@@ -91,7 +105,7 @@ namespace ProjectChapeau.Controllers
         public ActionResult Create()
         {
             Employee employee = new Employee();
-            List<Role> Roles = _roleService.GetAllRoles();
+            List<Role> Roles = _employeeService.GetAllEmployeeRoles();
             EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
 
             return View(viewModel);
@@ -112,7 +126,7 @@ namespace ProjectChapeau.Controllers
             {
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
                 employeeRoleModel.employee = new Employee();
-                employeeRoleModel.Roles = _roleService.GetAllRoles();
+                employeeRoleModel.Roles = _employeeService.GetAllEmployeeRoles();
                 return View(employeeRoleModel);
             }
         }
@@ -125,8 +139,8 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            Employee? employee = _employeeService.GetById((int)id);
-            List<Role> Roles = _roleService.GetAllRoles();
+            Employee? employee = _employeeService.GetEmployeeById((int)id);
+            List<Role> Roles = _employeeService.GetAllEmployeeRoles();
             EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
             return View(viewModel);
 
@@ -157,7 +171,7 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            Employee? employee = _employeeService.GetById((int)id);
+            Employee? employee = _employeeService.GetEmployeeById((int)id);
             return View(employee);
         }
 
