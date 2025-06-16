@@ -191,12 +191,13 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = @"SELECT o.order_id, o.order_datetime, o.order_status, o.payment_status, oi.amount, o.tip_amount,
-                                 mi.menu_item_id, oi.income_amount,
+                                 mi.menu_item_id,
                                  m.menu_name AS item_category, 
-                                 oi.price * oi.amount AS sales_amount
+                                 (mi.price * oi.amount) AS sales_amount,
+                                 ((mi.price * oi.amount) + o.tip_amount) AS income_amount
                                  FROM Orders o
                                  JOIN order_item oi ON o.order_id = oi.order_id
-                                 JOIN Menu_item mi ON oi.menu_item_id = mi.menu_item_id
+                                 JOIN Menu_Item mi ON oi.menu_item_id = mi.menu_item_id
                                  JOIN Menu_Contains_Item mci ON mi.menu_item_id = mci.menu_item_id
                                  JOIN Menu m ON mci.menu_id = m.menu_id
                                  WHERE o.order_datetime >= @StartDate AND o.order_datetime <= @EndDate 

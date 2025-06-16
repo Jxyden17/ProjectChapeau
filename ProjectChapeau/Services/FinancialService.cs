@@ -15,7 +15,7 @@ namespace ProjectChapeau.Services
 
         public FinancialOverview GetFinancialOverview(DateTime startDate, DateTime endDate)
         {
-            List<Order> orders = _orderRepository.GetOrderByPeriod(startDate, endDate);
+            var orders = _orderRepository.GetOrderByPeriod(startDate, endDate);
 
             return new FinancialOverview
             {
