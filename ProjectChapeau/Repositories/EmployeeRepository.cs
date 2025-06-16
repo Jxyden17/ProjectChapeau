@@ -18,7 +18,7 @@ namespace ProjectChapeau.Repositories
             _passwordService = passwordService;
         }
 
-        public void Add(Employee employee)
+        public void AddEmployee(Employee employee)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -40,7 +40,7 @@ namespace ProjectChapeau.Repositories
                 employee.employeeId = Convert.ToInt32(command.ExecuteScalar());
             }
         }
-        public void Update(Employee employee)
+        public void UpdateEmployee(Employee employee)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -63,7 +63,7 @@ namespace ProjectChapeau.Repositories
                     throw new Exception("No records updated!");
             }
         }
-        public void Delete(Employee employee)
+        public void DeleteEmployee(Employee employee)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -79,7 +79,7 @@ namespace ProjectChapeau.Repositories
             }
         }
 
-        public List<Employee> GetAll()
+        public List<Employee> GetAllEmployees()
         {
             List<Employee> employees = new List<Employee>();
 
@@ -104,7 +104,7 @@ namespace ProjectChapeau.Repositories
             return employees;
         }
 
-        public Employee? GetById(int UserId)
+        public Employee? GetEmployeeById(int UserId)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -129,7 +129,7 @@ namespace ProjectChapeau.Repositories
             return null;
         }
 
-        public Employee? GetByLoginCredentials(string username, string password)
+        public Employee? GetEmployeeByLoginCredentials(string username, string password)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -200,7 +200,7 @@ namespace ProjectChapeau.Repositories
             }
         }
 
-        public void Deactivate(int employeeId)
+        public void DeactivateEmployee(int employeeId)
         {
             using (SqlConnection connection = new(_connectionString))
             {
@@ -214,7 +214,7 @@ namespace ProjectChapeau.Repositories
             }
         }
 
-        public void Activate(int employeeId)
+        public void ActivateEmployee(int employeeId)
         {
             using (SqlConnection connection = new(_connectionString))
             {
@@ -226,6 +226,39 @@ namespace ProjectChapeau.Repositories
                 connection.Open();
                 command.ExecuteNonQuery();
             }
+        }
+
+        public List<Role> GetAllEmployeeRoles()
+        {
+            List<Role> roles = new List<Role>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT role_number, role_name
+                    FROM Role";
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Role role = ReadRole(reader);
+                    roles.Add(role);
+                }
+                reader.Close();
+            }
+
+            return roles;
+        }
+
+        public Role ReadRole(SqlDataReader reader)
+        {
+            int id = (int)reader["role_number"];
+            string roleName = (string)reader["role_name"];
+
+
+            return new Role(id, roleName);
         }
     }
 }

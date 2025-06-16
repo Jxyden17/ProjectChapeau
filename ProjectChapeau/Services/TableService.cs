@@ -1,4 +1,6 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
+using ProjectChapeau.Models.ViewModel;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Services.Interfaces;
 
@@ -18,14 +20,47 @@ namespace ProjectChapeau.Services
             return _tableRepository.GetAllTables();
         }
 
-        public RestaurantTable GetTableById(int id)
+        public List<TableViewModel> GetAllTablesWithLatestOrder()
         {
-            return _tableRepository.GetById(id);
+            List<TableOrder> tables = _tableRepository.GetAllTablesWithLatestOrder();
+            List<TableViewModel> tableViewModels = new List<TableViewModel>();
+
+            foreach (TableOrder table in tables)
+            {
+                
+                string cardColor = "bg-success text-white";
+                string statusText = "Available";
+
+                if (table.OrderId != null && table.OrderStatus != OrderStatus.Completed)
+                {
+                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
+                    statusText = $"Order {table.OrderStatus}";
+                }
+                else if (table.IsOccupied)
+                {
+                    cardColor = "bg-warning text-dark";
+                    statusText = "Occupied";
+                }
+
+                tableViewModels.Add(new TableViewModel(table.TableNumber, statusText, cardColor));
+            }
+
+            return tableViewModels;
         }
 
-        public void UpdateTableStatus(RestaurantTable table)
+        public RestaurantTable GetTableById(int id)
         {
-            _tableRepository.UpdateTableStatus(table);
+            return _tableRepository.GetTableById(id);
+        }
+
+        public TableEditViewModel GetTableWithLatestOrderById(int? id)
+        {
+            return _tableRepository.GetTableWithLatestOrderById(id);
+        }
+
+        public void UpdateTableStatus(int tableId, bool isOccupied)
+        {
+            _tableRepository.UpdateTableStatus(tableId, isOccupied);
         }
     }
 }
