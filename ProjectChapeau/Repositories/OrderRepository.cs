@@ -55,7 +55,10 @@ namespace ProjectChapeau.Repositories
                         orderItems,
                         (DateTime)reader["order_datetime"],
                         orderStatus,
-                        paymentStatus
+                        paymentStatus,
+                        1.0m,
+                        1.0m,
+                        1.0m
                         );
 
                     orders.Add(order);
@@ -112,7 +115,10 @@ namespace ProjectChapeau.Repositories
                         OrderItems,
                         (DateTime)reader["order_datetime"],
                         orderStatus,
-                        paymentStatus
+                        paymentStatus,
+                        1.0m,    
+                        1.0m,
+                        1.0m
                         );
 
                     orders.Add(order);
