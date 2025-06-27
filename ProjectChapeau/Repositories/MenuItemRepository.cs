@@ -180,39 +180,6 @@ namespace ProjectChapeau.Repositories
             return category;
         }
 
-        public List<MenuItem> GetMenu(int menuId)
-        {
-            List<MenuItem> menu = new();
-
-            //1. Create an SQL connection with a connection string
-            using (SqlConnection connection = new(_connectionString))
-            {
-                // 2. Create an SQL command with a query
-                string query = @"SELECT M.item_name, M.price, m.stock
-                                 FROM Menu AS M
-                                 JOIN Menu_Item AS MI
-                                     ON MI.menu_id = M.menu_id
-                                 WHERE M.menu_id = @MenuId;";
-                SqlCommand command = new(query, connection);
-
-                command.Parameters.AddWithValue("@MenuId", menuId);
-
-                // 3. Open the SQL connection
-                command.Connection.Open();
-
-                // 4. Execute SQL command
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    MenuItem menuItem = ReadMenuItem(reader);
-                    menu.Add(menuItem);
-                }
-                reader.Close();
-            }
-            return menu;
-        }
-
 		public List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId)
 		{
 			List<MenuItem> menuItemList = new List<MenuItem>();

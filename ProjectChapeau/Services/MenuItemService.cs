@@ -47,11 +47,6 @@ namespace ProjectChapeau.Services
             return _menuItemsRepository.GetCategory(categoryId);
         }
 
-        public List<MenuItem> GetMenu(int menuId)
-        {
-            return _menuItemsRepository.GetMenu(menuId);
-        }
-
         public List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId)
         {
             return _menuItemsRepository.GetFilteredMenuItems(menuId, categoryId);
