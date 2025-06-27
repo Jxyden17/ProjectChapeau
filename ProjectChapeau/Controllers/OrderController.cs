@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
+using ProjectChapeau.Models.ViewModel;
 using ProjectChapeau.Services;
 using ProjectChapeau.Services.Interfaces;
-
-
 
 namespace ProjectChapeau.Controllers
 {
