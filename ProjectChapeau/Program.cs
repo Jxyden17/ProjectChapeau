@@ -31,8 +31,10 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+            builder.Services.AddSingleton<IFinancialService, FinancialService>();
 
             builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
+
 
 
             builder.Services.AddSession(options =>

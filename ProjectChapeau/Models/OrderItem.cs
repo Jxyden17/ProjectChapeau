@@ -8,6 +8,8 @@
         public string comment { get; set; }
         public string orderLineStatus { get; set; }
 
+        public MenuItem MenuItem { get; set; }
+
         public OrderItem(int menuItemId, int orderId, int amount, string comment, string orderLineStatus)
         {
             this.menuItemId = menuItemId;
