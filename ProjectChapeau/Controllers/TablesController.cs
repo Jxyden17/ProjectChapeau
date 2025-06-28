@@ -3,10 +3,9 @@ using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
-using ProjectChapeau.Services;
 using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Validation.Interfaces;
-using System.ComponentModel.DataAnnotations;
+
 
 namespace ProjectChapeau.Controllers
 {

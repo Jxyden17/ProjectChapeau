@@ -129,40 +129,26 @@ namespace ProjectChapeau.Repositories
             return null;
         }
 
-        public Employee? GetEmployeeByLoginCredentials(string username, string password)
+        public Employee? GetEmployeeByUsername(string username)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = @"SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
-                FROM Employees e 
-                JOIN Role r ON e.role = r.role_number 
-                WHERE e.username = @Username;";
+                         FROM Employees e 
+                         JOIN Role r ON e.role = r.role_number 
+                         WHERE e.username = @Username;";
                 SqlCommand cmd = new SqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@Username", username);
 
                 connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader(); 
+                SqlDataReader reader = cmd.ExecuteReader();
 
                 if (reader.Read())
                 {
-
-                    string storedHash = (string)reader["Password"];
-                    string storedSalt = (string)reader["salt"];
-
-
-                    string interleaved = _passwordService.InterleaveSalt(password, storedSalt);
-                    string hashedInputPassword = _passwordService.HashPassword(interleaved);
-
-
-                    if (hashedInputPassword == storedHash)
-                    {
-
-                        return ReadEmployee(reader);
-                    }
+                    return ReadEmployee(reader);
                 }
-                reader.Close();
+                return null;
             }
-            return null;
         }
 
         private Employee ReadEmployee(SqlDataReader reader)

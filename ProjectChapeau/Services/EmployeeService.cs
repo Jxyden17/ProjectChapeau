@@ -38,10 +38,20 @@ namespace ProjectChapeau.Services
             return _employeeRepository.GetAllEmployees();
         }
 
-        public Employee? GetEmployeeByLoginCredentials(string userName, string password)
+        public Employee? GetEmployeeByLoginCredentials(string username, string password)
         {
+            Employee? employee = _employeeRepository.GetEmployeeByUsername(username);
 
-            return _employeeRepository.GetEmployeeByLoginCredentials(userName, password);
+            if (employee == null)
+                return null;
+
+            string interleaved = _passwordService.InterleaveSalt(password, employee.salt);
+            string hashedInputPassword = _passwordService.HashPassword(interleaved);
+
+            if (hashedInputPassword == employee.password)
+                return employee;
+
+            return null;
         }
 
         public Employee? GetEmployeeById(int id)

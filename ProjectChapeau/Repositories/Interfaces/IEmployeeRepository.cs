@@ -9,7 +9,7 @@ namespace ProjectChapeau.Repositories.Interfaces
         void DeleteEmployee(Employee employee);
         List<Employee> GetAllEmployees();
         Employee? GetEmployeeById(int UserId);
-        Employee? GetEmployeeByLoginCredentials(string username, string password);
+        Employee? GetEmployeeByUsername(string username);
         bool UserNameExists(string userName);
         void DeactivateEmployee(int employeeId);
         void ActivateEmployee(int employeeId);
