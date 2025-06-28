@@ -4,8 +4,17 @@
     ViewData["Title"] = "Menu Overview";
 }
 
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
+<aside id="menu-filter-bar" class="col-md-3 col-lg-2 d-md-block bg-primary text-white sidebar position-fixed">
+    @await Html.PartialAsync("_MenuFilterBar")
+</aside>
+<main class="offset-md-3 offset-lg-2 col-md-9 col-lg-10 ms-auto">
+    <h1 class="display-4 text-center">@ViewData["Title"]</h1>
+    <ul class="nav nav-tabs justify-content-center mb-4">
+        <li class="nav-item"><a class="nav-link active" href="#">All Menus</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Lunch Menu (11–16h)</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Dinner Menu (17–21h)</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Drink Menu</a></li>
+    </ul>
     @if (Model.Menus != null)
     {
         foreach (Menu menu in Model.Menus)
@@ -26,4 +35,4 @@
             </div>
         }
     }
-</div>
+</main>
