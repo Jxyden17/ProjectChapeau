@@ -9,13 +9,14 @@ namespace ProjectChapeau.Controllers
     public class OrderController : Controller
     {
 
-        private readonly IMenuItemService _menuItemsService;
-
+        private readonly IMenuService _menuService;
+        private readonly IMenuItemService _menuItemService;
         private readonly IOrderService _orderService;
         
-        public OrderController(IMenuItemService menuItemsService, IOrderService orderService)
+        public OrderController(IMenuService menuService, IMenuItemService menuItemService, IOrderService orderService)
         {
-            _menuItemsService = menuItemsService;
+            _menuService = menuService;
+            _menuItemService = menuItemService;
             _orderService = orderService;
         }
        
@@ -28,7 +29,7 @@ namespace ProjectChapeau.Controllers
        
         public IActionResult Menu()
         {
-            MenusOverviewViewModel menusOverviewViewModel = new(_menuItemsService.GetAllMenuItems());
+            MenusOverviewViewModel menusOverviewViewModel = new(_menuService.GetAllMenus());
             return View(menusOverviewViewModel);
         }
         public IActionResult MenuItem(int? id)
@@ -37,7 +38,7 @@ namespace ProjectChapeau.Controllers
             {
                 return NotFound("There is no menu item ID provided in the URL. Please go back and try again.");
             }
-            MenuItem? menuItem = _menuItemsService.GetMenuItemById((int)id);
+            MenuItem? menuItem = _menuItemService.GetMenuItemById((int)id);
 
             if (menuItem == null)
             {

@@ -30,6 +30,9 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<IOrderItemRepository, OrderItemRepository>();
             builder.Services.AddSingleton<IOrderItemService, OrderItemService>();
 
+            builder.Services.AddSingleton<IMenuRepository, MenuRepository>();
+            builder.Services.AddSingleton<IMenuService, MenuService>();
+
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
 
