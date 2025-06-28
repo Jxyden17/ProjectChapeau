@@ -34,6 +34,7 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+            builder.Services.AddSingleton<IFinancialService, FinancialService>();
 
             builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
 
@@ -50,6 +51,7 @@ namespace ProjectChapeau
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
+
 
 
             builder.Services.AddSession(options =>

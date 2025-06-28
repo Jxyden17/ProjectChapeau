@@ -24,6 +24,9 @@
                 <li class="nav-item">
                     <a class="nav-link text-light" asp-area="" asp-controller="MenuItem" asp-action="Index">Menu Item</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" asp-area="" asp-controller="FinancialOverview" asp-action="Index">Financial Overview</a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 @if (User.Identity?.IsAuthenticated ?? false)

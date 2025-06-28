@@ -1,0 +1,45 @@
+﻿@model FinancialOverview
+
+@{
+	ViewData["Title"] = "Financial Overview";
+}
+
+<h2>Financial Overview (@Model.StartDate - @Model.EndDate)</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Category</th>
+			<th>Sales</th>
+			<th>Income</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Drinks</td>
+			<td>@Model.TotalDrinkSales</td>
+			<td>@Model.TotalDrinkIncome</td>
+		</tr>
+		<tr>
+			<td>Lunch</td>
+			<td>@Model.TotalLunchSales</td>
+			<td>@Model.TotalLunchIncome</td>
+		</tr>
+		<tr>
+			<td>Dinner</td>
+			<td>@Model.TotalDinnerSales</td>
+			<td>@Model.TotalDinnerIncome</td>
+		</tr>
+	</tbody>
+</table>
+
+<p><strong>Total Tip Amount:</strong> @Model.TotalTipAmount</p>
+
+<form method="get">
+	<label>Start Date:</label>
+	<input type="date" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+	<label>End Date:</label>
+	<input type="date" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+	<button type="submit">Filter</button>
+</form>
+
