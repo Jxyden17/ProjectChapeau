@@ -1,12 +1,6 @@
 ﻿@model List<Category>
 
-<input type="text" class="form-control mb-3" placeholder="Search for an item..." id="searchInput" />
-
-@* <div class="mb-4">
-    <label class="form-label">Price Range</label>
-    <input type="range" class="form-range" min="0" max="50" id="priceRange" />
-    <div class="d-flex justify-content-between"><small>€0</small><small>€50</small></div>
-</div> *@
+<input type="text" class="form-control mb-3" placeholder="Search for a menu item..." id="search-input" />
 
 <div class="mb-4">
     <label class="form-label">Categories</label>
@@ -14,11 +8,11 @@
         @foreach (Category category in Model)
         {
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="category-@category.CategoryId" name="category-@category.CategoryId"/>
+                <input class="form-check-input category-checkbox" type="checkbox" value="@category.CategoryId" id="category-@category.CategoryId" name="category-@category.CategoryId"/>
                 <label class="form-check-label" for="category-@category.CategoryId">@category.CategoryName</label>
             </div>
         }
     </div>
 </div>
 
-<button class="btn btn-danger w-100 mt-3">Clear Filters</button>
+<button class="btn btn-danger clear-filter-btn w-100 mt-3">Clear Filters</button>
