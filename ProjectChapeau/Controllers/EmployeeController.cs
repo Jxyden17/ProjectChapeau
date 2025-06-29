@@ -44,14 +44,14 @@ namespace ProjectChapeau.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Login(Login loginModel)
+        public async Task<IActionResult> Login(Login loginModel)
         {
             try
             {
                 // Retrieve employee with username and password
                 Employee? employee = _employeeService.GetEmployeeByLoginCredentials(loginModel.UserName, loginModel.Password);
 
-                return LoginUserAndRedirect(loginModel, employee);
+                return await LoginUserAndRedirect(loginModel, employee);
             }
             catch (Exception ex)
             {
