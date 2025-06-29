@@ -3,13 +3,12 @@
 @{
     MenuItem? menuItem = Model.MenuItem;
     ViewData["Title"] = $"{@Model?.MenuItem?.ItemName}";
-    Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
-    bool loggedIn = (loggedInEmployee != null);
+    bool userIsAuthenticated = User.Identity?.IsAuthenticated ?? false;
 }
 <h1>@menuItem?.ItemName</h1>
 <h2>
     &euro;@menuItem?.Price
-    @if (loggedIn)
+    @if (userIsAuthenticated)
     {
         <span> - @menuItem?.Stock left in stock</span>
     }

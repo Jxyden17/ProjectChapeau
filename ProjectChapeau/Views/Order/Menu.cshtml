@@ -2,8 +2,6 @@
 
 @{
     ViewData["Title"] = "Menu Overview";
-    Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
-    bool loggedIn = (loggedInEmployee != null);
 }
 <aside id="menu-filter-bar" class="col-4 col-md-3 col-lg-2 d-md-block bg-primary text-white sidebar position-fixed">
     @await Component.InvokeAsync("CategoryFilter")

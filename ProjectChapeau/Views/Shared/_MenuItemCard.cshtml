@@ -2,12 +2,12 @@
 
 @{
     Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
-    bool loggedIn = (loggedInEmployee != null);
+    bool userIsAuthenticated = User.Identity?.IsAuthenticated ?? false;
 }
 
 @{
     string cardStyle = string.Empty;
-    if (@Model.Stock > 12 || !(loggedIn))
+    if (@Model.Stock > 12 || !(userIsAuthenticated))
     {
         cardStyle = "";
     }
@@ -27,7 +27,7 @@
         <div class="card-body">
             <h5 class="card-title">@Model.ItemName</h5>
             <p class="card-text">&euro;@Model.Price
-                @if (loggedIn)
+                @if (userIsAuthenticated)
                 {
                     <span> - @Model.Stock left in stock</span>                 
                 }
