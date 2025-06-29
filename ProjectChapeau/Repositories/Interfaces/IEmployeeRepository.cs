@@ -4,14 +4,12 @@ namespace ProjectChapeau.Repositories.Interfaces
 {
     public interface IEmployeeRepository
     {
-        void Add(Employee employee);
-        void Update(Employee employee);
-        void Delete(Employee employee);
-        List<Employee> GetAll();
-        Employee? GetById(int UserId);
-        Employee? GetByLoginCredentials(string username, string password);
+        void AddEmployee(Employee employee);
+        void UpdateEmployee(Employee employee);
+        void DeleteEmployee(Employee employee);
+        List<Employee> GetEmployees(int? employeeNumber = null, string? username = null);
         bool UserNameExists(string userName);
-        void Deactivate(int employeeId);
-        void Activate(int employeeId);
+        void DeactivateEmployee(int employeeId);
+        void ActivateEmployee(int employeeId);
     }
 }

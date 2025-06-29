@@ -1,4 +1,5 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Services.Interfaces;
 
@@ -24,9 +25,9 @@ namespace ProjectChapeau.Services
             return _orderRepository.GetRunningOrders();
         }
 
-        public void UpdateOrderStatus(Order order)
+        public void UpdateOrderStatus(int? orderId, OrderStatus? newStatus)
         {
-            _orderRepository.UpdateOrderStatus(order);
+            _orderRepository.UpdateOrderStatus(orderId, newStatus);
         }
     }
 }

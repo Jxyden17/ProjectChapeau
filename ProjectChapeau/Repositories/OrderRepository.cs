@@ -6,14 +6,11 @@ using ProjectChapeau.Services;
 
 namespace ProjectChapeau.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : ConnectionDatabase,  IOrderRepository
     {
-        private readonly string? _connectionString;
 
-        public OrderRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ProjectChapeau");
-        }
+        public OrderRepository(IConfiguration configuration) : base(configuration) { }
+
         public List<Order> GetAllOrders()
         {
             List<Order> orders = new List<Order>();
@@ -25,12 +22,10 @@ namespace ProjectChapeau.Repositories
                 o.order_datetime,
                 o.order_status,
                 o.payment_status,
-                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number,
-                r.role_name,
+                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
                 rt.table_number, rt.is_occupied
                 FROM Orders o
                 JOIN Employees e ON o.employee_number = e.employee_number
-                JOIN Role r ON e.role = r.role_number
                 JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number;";
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -39,24 +34,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    Employee employee = ReadEmployee(reader);
-                    RestaurantTable restaurantTable = ReadTables(reader);
-
-                    List<OrderItem> orderItems =  new List<OrderItem>();
-                    
-
-                    OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-                    paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
-
-                    Order order = new Order(
-                        (int)reader["order_id"],
-                        employee,
-                        restaurantTable,
-                        orderItems,
-                        (DateTime)reader["order_datetime"],
-                        orderStatus,
-                        paymentStatus
-                        );
+                    Order order = ReadOrder(reader);
 
                     orders.Add(order);
                 }
@@ -82,12 +60,12 @@ namespace ProjectChapeau.Repositories
                 o.order_datetime,
                 o.order_status,
                 o.payment_status,
-                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number,
-                r.role_name,
+                o.income_amount,
+                o.tip_amount,
+                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
                 rt.table_number, rt.is_occupied
                 FROM Orders o
                 JOIN Employees e ON o.employee_number = e.employee_number
-                JOIN Role r ON e.role = r.role_number
                 JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number
     
                 WHERE o.order_status = 'BeingPrepared'
@@ -99,22 +77,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    Employee employee = ReadEmployee(reader);
-                    RestaurantTable restaurantTable = ReadTables(reader);
-                    List<OrderItem> OrderItems = new List<OrderItem>();
-                    OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-                    paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
-
-                    Order order = new Order(
-                        (int)reader["order_id"],
-                        employee,
-                        restaurantTable,
-                        OrderItems,
-                        (DateTime)reader["order_datetime"],
-                        orderStatus,
-                        paymentStatus
-                        );
-
+                    Order order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -123,7 +86,7 @@ namespace ProjectChapeau.Repositories
             return orders;
         }
 
-        public void UpdateOrderStatus(Order order)
+        public void UpdateOrderStatus(int? orderId, OrderStatus? newStatus)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -131,8 +94,8 @@ namespace ProjectChapeau.Repositories
                                "WHERE order_id = @OrderId";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@OrderId", order.orderId);
-                command.Parameters.AddWithValue("@OrderStatus", order.orderStatus.ToString());
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                command.Parameters.AddWithValue("@OrderStatus", newStatus.ToString());
 
                 command.Connection.Open();
                 int nrOfRowsAffected = command.ExecuteNonQuery();
@@ -150,11 +113,7 @@ namespace ProjectChapeau.Repositories
             string password = (string)reader["password"];
             string salt = (string)reader["salt"];
             bool isActive = (bool)reader["is_active"];
-            Role employeeRole = new Role
-            {
-                roleId = (int)reader["role_number"],
-                roleName = (string)reader["role_name"]
-            };
+            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
 
             return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
         }
@@ -175,7 +134,68 @@ namespace ProjectChapeau.Repositories
             string comment = (string)reader["comment"];
             int amount = (int)reader["amount"];
 
-            return new OrderItem(menuItemId,orderId, amount,orderLineStatus, comment);
+            return new OrderItem(menuItemId, orderId, amount, orderLineStatus, comment);
+        }
+
+        private Order ReadOrder(SqlDataReader reader)
+        {
+            int orderId = (int)reader["order_id"];
+            RestaurantTable table = ReadTables(reader);
+            Employee employee = ReadEmployee(reader);
+            List<OrderItem>? OrderItems = new List<OrderItem>();
+            DateTime dateTime = (DateTime)reader["order_datetime"];
+            OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
+            paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
+            decimal IncomeAmount = (decimal)reader["income_amount"];
+            decimal tipAmount = (decimal)reader["tip_amount"];
+            decimal SalesAmount = IncomeAmount + tipAmount;
+
+            return new Order(orderId, employee, table, OrderItems, dateTime, orderStatus, paymentStatus, SalesAmount, IncomeAmount, tipAmount);
+
+        }
+
+        public List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate)
+        {
+            List<Order> orders = new List<Order>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT o.order_id, o.order_datetime, o.order_status, o.payment_status, oi.amount, o.tip_amount,
+                                 mi.menu_item_id, mi.price
+                                 m.menu_name AS item_category, 
+                                 (mi.price * oi.amount) AS sales_amount,
+                                 ((mi.price * oi.amount) + o.tip_amount) AS income_amount
+                                 FROM Orders o
+                                 JOIN order_item oi ON o.order_id = oi.order_id
+                                 JOIN Menu_Item mi ON oi.menu_item_id = mi.menu_item_id
+                                 JOIN Menu_Contains_Item mci ON mi.menu_item_id = mci.menu_item_id
+                                 JOIN Menu m ON mci.menu_id = m.menu_id
+                                 WHERE o.order_datetime >= @StartDate AND o.order_datetime <= @EndDate 
+                                 AND o.payment_status = 'Paid'";
+
+                SqlCommand command = new SqlCommand(query, connection); 
+                command.Parameters.AddWithValue("@StartDate",startDate);
+                command.Parameters.AddWithValue("@EndDate", endDate);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    orders.Add(new Order
+                    {
+                        orderId = (int)reader["order_id"],
+                        datetime = (DateTime)reader["order_datetime"],
+                        orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString()),
+                        paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString()),
+                        SalesAmount = (decimal)reader["sales_amount"],
+                        IncomeAmount = (decimal)reader["income_amount"],
+                        TipAmount = (decimal)reader["tip_amount"],
+                        Category = reader["item_category"].ToString()
+
+                    });
+                }
+            }
+            return orders;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace ProjectChapeau.Services.Interfaces
     public interface IEmployeeService
     {
         List<Employee> GetAllEmployees();
-        Employee? GetById(int id);
+        Employee? GetEmployeeById(int id);
         Employee? GetEmployeeByLoginCredentials(string userName, string password);
         void AddEmployee(Employee employee);
         void UpdateEmployee(Employee employee);

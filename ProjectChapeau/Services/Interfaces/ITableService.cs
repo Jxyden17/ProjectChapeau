@@ -1,4 +1,5 @@
 ﻿using ProjectChapeau.Models;
+using ProjectChapeau.Models.ViewModel;
 
 namespace ProjectChapeau.Services.Interfaces
 {
@@ -8,6 +9,10 @@ namespace ProjectChapeau.Services.Interfaces
 
         RestaurantTable GetTableById(int id);
 
-        void UpdateTableStatus(RestaurantTable table);
+        void UpdateTableStatus(int tableId, bool isOccupied);
+
+        List<Order> GetAllTablesWithLatestOrder();
+
+        TableEditViewModel GetTableWithLatestOrderById(int? id);
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
-using ProjectChapeau.Services;
 using ProjectChapeau.Models.Enums;
+using ProjectChapeau.Validation.Interfaces;
+
 
 namespace ProjectChapeau.Controllers
 {
@@ -12,23 +12,20 @@ namespace ProjectChapeau.Controllers
     {
         private readonly ITableService _tableService;
         private readonly IOrderService _orderService;
+        private readonly ITableEditValidator _tableEditValidator;
 
-        public TablesController(ITableService tableService, IOrderService orderService)
+        public TablesController(ITableService tableService, IOrderService orderService, ITableEditValidator tableEditValidator)
         {
             _tableService = tableService;
             _orderService = orderService;
+            _tableEditValidator = tableEditValidator;
         }
 
+
+        //Initial page load with all tables and active order.
         public IActionResult Index()
         {
-            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
-
-            ViewData["LoggedInEmployee"] = loggedInEmployee;
-
-            List<RestaurantTable> restaurantTables = _tableService.GetAllTables();
-            List<Order> Orders = _orderService.GetAllOrders();
-
-            List<TableViewModel> tableOrders = GetTableOrders(restaurantTables, Orders);
+            List<Order> tableOrders = _tableService.GetAllTablesWithLatestOrder();
 
             return View(tableOrders);
         }
@@ -41,79 +38,54 @@ namespace ProjectChapeau.Controllers
         }
 
 
-        //edit
+        //Edit page proccessing with validator to keep controller lightweight.
         [HttpPost]
         public IActionResult Edit(TableEditViewModel tableEditViewModel)
         {
             try
             {
-                List<Order> Orders =  _orderService.GetAllOrders();
-                Order? latestOrder = GetLatestOrder(Orders, tableEditViewModel.table);
+                //Retruieve current table and order from db
+                TableEditViewModel tableEdit = _tableService.GetTableWithLatestOrderById(tableEditViewModel.tableID);
 
-                // Scenario 1: No active order for the table
-                if (latestOrder == null || latestOrder.orderStatus == OrderStatus.Completed)
-                {
-                    // Update the table status (occupied/free)
-                    _tableService.UpdateTableStatus(tableEditViewModel.table);
+                //Send through validation.
+                TableValidationResult validation = _tableEditValidator.ValidateTableEdit(tableEdit, tableEditViewModel);
 
-                    TempData["ConfirmMessage"] = "Your table has been edited successfully.";
-                    return RedirectToAction("Index");
-                }
-
-                if (tableEditViewModel.order == null)
-                {
-                    return ReturnWithError("Table has an active order. Set the order status to Completed before editing the table.");
-
-                }
-
-                OrderStatus requestedStatus = tableEditViewModel.order.orderStatus;
-                OrderStatus currentStatus = latestOrder.orderStatus;
-
-                // Only allow ReadyToBeServed -> Served transition
-                if (requestedStatus == OrderStatus.Served && currentStatus != OrderStatus.ReadyToBeServed)
-                {
-                    return ReturnWithError("You can only set the status to Served if the current order status is ReadyToBeServed.");
-                }
-
-                // Only allow changing from ReadyToBeServed to Served (block all other changes if running)
-                if (currentStatus == OrderStatus.ReadyToBeServed && requestedStatus != OrderStatus.Served)
-                {
-                    return ReturnWithError("You can only change 'ReadyToBeServed' orders to 'Served'.");
-                }
-
-                // Only update if the status is actually changing
-                if (requestedStatus == currentStatus)
-                {
-                    return ReturnWithError("No changes detected in order status.");
-                }
-
-                // All checks passed, update order
-                latestOrder.orderStatus = requestedStatus;
-                _orderService.UpdateOrderStatus(latestOrder);
-
-                TempData["ConfirmMessage"] = "Order status updated successfully.";
-                return RedirectToAction("Index");
-
-
+                return UpdateTableAndRedirect(tableEditViewModel, validation);
             }
             catch (Exception ex)
             {
-                
-                ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
-
-                tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
-
-                return View(tableEditViewModel);
-            }
-
-            IActionResult ReturnWithError(string message)
-            {
-                ViewBag.ErrorMessage = message;
+                ViewBag.ErrorMessage = $"An error occurred: {ex.Message}";
+                Console.WriteLine(ex);
                 tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
                 return View(tableEditViewModel);
             }
         }
 
+        private IActionResult UpdateTableAndRedirect(TableEditViewModel tableEditViewModel, TableValidationResult validation)
+        {
+            if (!validation.IsValid)
+            {
+                ViewBag.ErrorMessage = validation.ErrorMessage;
+                tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
+                return View(tableEditViewModel);
+            }
+
+            // If validation returns true this is ran and updates based on if the bool UpdateTable or UpdateOrder is True.
+            if (validation.UpdateTable)
+            {
+                _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
+            }
+            if (validation.UpdateOrder)
+            {
+                _orderService.UpdateOrderStatus(tableEditViewModel.orderId, tableEditViewModel.currentOrderStatus);
+            }
+
+            TempData["ConfirmMessage"] = "Table and/or order status updated successfully.";
+            return RedirectToAction("Index");
+        }
+
+
+        //Inital edit page load that return the TableOrder through a ViewModel to the view.
         [HttpGet]
         public ActionResult Edit(int? id)
         {
@@ -122,56 +94,12 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            RestaurantTable table =  _tableService.GetTableById((int)id);
-            List<Order> orders = _orderService.GetAllOrders();
-            Order? latestOrder = GetLatestOrder(orders, table);
-
-            IEnumerable<OrderStatus> orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
-
-            TableEditViewModel tableEditViewModel = new TableEditViewModel(table, latestOrder, orderStatusOptions);
+            TableEditViewModel tableEditViewModel = _tableService.GetTableWithLatestOrderById(id);
 
             return View(tableEditViewModel);
 
         }
 
-        public List<TableViewModel> GetTableOrders(List<RestaurantTable> restaurantTables, List<Order> Orders)
-        {
-            List<TableViewModel> tableOrders = new List<TableViewModel>();
-
-            foreach (RestaurantTable table in restaurantTables)
-            {
-
-                Order? latestOrder = GetLatestOrder(Orders, table);    
-
-                string cardColor = "bg-success text-white";
-                string statusText = "Available";
-
-                if (latestOrder != null && latestOrder.orderStatus != OrderStatus.Completed)
-                {
-                    // Active order exists
-                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
-                    statusText = $"Order {latestOrder.orderStatus}";
-                }
-                else if (table.IsOccupied)
-                {
-                    // No active order, but table is still occupied
-                    cardColor = "bg-warning text-dark";
-                    statusText = "Occupied";
-                }
-
-                TableViewModel tableOrder = new TableViewModel(table.TableNumber, statusText, cardColor);
-                tableOrders.Add(tableOrder);
-
-                
-            }
-            return tableOrders;
-        }
-
-        public Order? GetLatestOrder(List<Order> orders, RestaurantTable table)
-        {
-            Order? latestOrder = orders.Where(o => o.table.TableNumber == table.TableNumber).OrderByDescending(o => o.datetime).FirstOrDefault();
-            return latestOrder;
-        }
 
         
 

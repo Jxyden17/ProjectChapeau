@@ -27,7 +27,7 @@ namespace ProjectChapeau.Services
             Employee copyEmployee = employee;
             copyEmployee.password = _passwordService.HashPassword(interleavedSaltedPassword);
 
-            _employeeRepository.Add(copyEmployee);
+            _employeeRepository.AddEmployee(copyEmployee);
 
             if (employee.employeeId != copyEmployee.employeeId)
                 employee.employeeId = copyEmployee.employeeId;
@@ -35,25 +35,33 @@ namespace ProjectChapeau.Services
 
         public List<Employee> GetAllEmployees()
         {
-            return _employeeRepository.GetAll();
+            return _employeeRepository.GetEmployees();
         }
 
-        public Employee? GetEmployeeByLoginCredentials(string userName, string password)
+        public Employee? GetEmployeeByLoginCredentials(string Username, string password)
         {
+            Employee? employee = _employeeRepository.GetEmployees(username: Username).FirstOrDefault();
 
-            return _employeeRepository.GetByLoginCredentials(userName, password);
+            if (employee == null)
+                return null;
+
+            string interleavedSaltedPassword = _passwordService.InterleaveSalt(password, employee.salt);
+            string hashedInputPassword = _passwordService.HashPassword(interleavedSaltedPassword);
+
+
+            if (hashedInputPassword == employee.password)
+                return employee;
+
+            return null;
         }
 
-        public Employee? GetById(int id)
+        public Employee? GetEmployeeById(int id)
         {
-            return _employeeRepository.GetById(id); 
+            return _employeeRepository.GetEmployees(employeeNumber: id).FirstOrDefault(); 
         } 
 
         public void UpdateEmployee(Employee employee)
         {
-            if (_employeeRepository.UserNameExists(employee.userName))
-                throw new InvalidOperationException("A user with this username already exists");
-
             employee.salt = _passwordService.GenerateSalt();
             string interleavedSaltedPassword = _passwordService.InterleaveSalt(employee.password, employee.salt);
             string hashedPassword = _passwordService.HashPassword(interleavedSaltedPassword);
@@ -64,22 +72,23 @@ namespace ProjectChapeau.Services
             if (employee.employeeId != copyEmployee.employeeId)
                 employee.employeeId = copyEmployee.employeeId;
 
-            _employeeRepository.Update(copyEmployee);
+            _employeeRepository.UpdateEmployee(copyEmployee);
         }
 
         public void DeleteEmployee(Employee employee)
         {
-            _employeeRepository.Delete(employee);
+            _employeeRepository.DeleteEmployee(employee);
         }
 
         public void DeactivateEmployee(int employeeId)
         {
-            _employeeRepository.Deactivate(employeeId);
+            _employeeRepository.DeactivateEmployee(employeeId);
         }
 
         public void ActivateEmployee(int employeeId)
         {
-            _employeeRepository.Activate(employeeId);
+            _employeeRepository.ActivateEmployee(employeeId);
         }
+
     }
 }
