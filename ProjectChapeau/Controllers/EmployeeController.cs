@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Enums;
-using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -25,10 +24,6 @@ namespace ProjectChapeau.Controllers
         //index
         public IActionResult Index()
         {
-
-            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
-
-            ViewData["LoggedInEmployee"] = loggedInEmployee;
 
             List<Employee> employees = _employeeService.GetAllEmployees();
             return View(employees);
@@ -54,46 +49,55 @@ namespace ProjectChapeau.Controllers
                 // Retrieve employee with username and password
                 Employee? employee = _employeeService.GetEmployeeByLoginCredentials(loginModel.UserName, loginModel.Password);
 
-                if (employee == null)
-                {
-                    ViewBag.ErrorMessage = "Bad Username/Password Combo";
-                    return View(loginModel);
-                }
+                return LoginUserAndRedirect(loginModel, employee);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
+                return View(loginModel);
+            }
+        }
 
-                //Create user claims
-                List<Claim> claims = new List<Claim>
+        private IActionResult LoginUserAndRedirect(Login loginModel, Employee? employee)
+        {
+            if (employee == null)
+            {
+                ViewBag.ErrorMessage = "Bad Username/Password Combo";
+                return View(loginModel);
+            }
+
+            //Create user claims
+            List<Claim> claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, employee.userName), // or Username if preferred
                     new Claim("EmployeeId", employee.employeeId.ToString()),
                     new Claim(ClaimTypes.Role, employee.role.ToString()) // E.g., "Owner", "Waiter"
                 };
 
-                ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
-                AuthenticationProperties authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-                };
-
-                //Sign in the user using cookie authentication
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
-
-                // Redirect based on roleId (same as before)
-                if (employee.role == Roles.Administrator || employee.role == Roles.Owner)
-                {
-                    return RedirectToAction("Index", "Employees");
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Tables");
-                }
-            }
-            catch (Exception ex)
+            AuthenticationProperties authProperties = new AuthenticationProperties
             {
-                Console.WriteLine(ex.ToString());
-                return View(loginModel);
+                IsPersistent = true,
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+            };
+
+            //Sign in the user using cookie authentication
+            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+
+            // Redirect based on roleId (same as before)
+            if (employee.role == Roles.Administrator || employee.role == Roles.Owner || employee.role == Roles.Manager)
+            {
+                return RedirectToAction("Index", "Employee");
+            }
+            if(employee.role == Roles.KitchenStaff || employee.role == Roles.BarStaff)
+            {
+                return RedirectToAction("Index", "Order");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Tables");
             }
         }
 

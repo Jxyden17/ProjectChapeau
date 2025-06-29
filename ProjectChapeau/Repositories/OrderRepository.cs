@@ -6,14 +6,11 @@ using ProjectChapeau.Services;
 
 namespace ProjectChapeau.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : ConnectionDatabase,  IOrderRepository
     {
-        private readonly string? _connectionString;
 
-        public OrderRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ProjectChapeau");
-        }
+        public OrderRepository(IConfiguration configuration) : base(configuration) { }
+
         public List<Order> GetAllOrders()
         {
             List<Order> orders = new List<Order>();
@@ -37,27 +34,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    Employee employee = ReadEmployee(reader);
-                    RestaurantTable restaurantTable = ReadTables(reader);
-
-                    List<OrderItem> orderItems = new List<OrderItem>();
-
-
-                    OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-                    paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
-
-                    Order order = new Order(
-                        (int)reader["order_id"],
-                        employee,
-                        restaurantTable,
-                        orderItems,
-                        (DateTime)reader["order_datetime"],
-                        orderStatus,
-                        paymentStatus,
-                        1.0m,
-                        1.0m,
-                        1.0m
-                        );
+                    Order order = ReadOrder(reader);
 
                     orders.Add(order);
                 }
@@ -83,6 +60,8 @@ namespace ProjectChapeau.Repositories
                 o.order_datetime,
                 o.order_status,
                 o.payment_status,
+                o.income_amount
+                o.tip_amount
                 e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
                 rt.table_number, rt.is_occupied
                 FROM Orders o
@@ -98,25 +77,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    Employee employee = ReadEmployee(reader);
-                    RestaurantTable restaurantTable = ReadTables(reader);
-                    List<OrderItem> OrderItems = new List<OrderItem>();
-                    OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-                    paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
-
-                    Order order = new Order(
-                        (int)reader["order_id"],
-                        employee,
-                        restaurantTable,
-                        OrderItems,
-                        (DateTime)reader["order_datetime"],
-                        orderStatus,
-                        paymentStatus,
-                        1.0m,    
-                        1.0m,
-                        1.0m
-                        );
-
+                    Order order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -174,6 +135,23 @@ namespace ProjectChapeau.Repositories
             int amount = (int)reader["amount"];
 
             return new OrderItem(menuItemId, orderId, amount, orderLineStatus, comment);
+        }
+
+        private Order ReadOrder(SqlDataReader reader)
+        {
+            int orderId = (int)reader["order_id"];
+            RestaurantTable table = ReadTables(reader);
+            Employee employee = ReadEmployee(reader);
+            List<OrderItem>? OrderItems = new List<OrderItem>();
+            DateTime dateTime = (DateTime)reader["order_datetime"];
+            OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
+            paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
+            decimal IncomeAmount = (decimal)reader["income_amount"];
+            decimal tipAmount = (decimal)reader["tip_amount"];
+            decimal SalesAmount = IncomeAmount + tipAmount;
+
+            return new Order(orderId, employee, table, OrderItems, dateTime, orderStatus, paymentStatus, SalesAmount, IncomeAmount, tipAmount);
+
         }
 
         public List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate)

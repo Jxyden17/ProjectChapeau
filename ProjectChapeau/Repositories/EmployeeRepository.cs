@@ -8,14 +8,12 @@ using ProjectChapeau.Models.Enums;
 
 namespace ProjectChapeau.Repositories
 {
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : ConnectionDatabase, IEmployeeRepository
     {
-        private readonly string? _connectionString;
         private readonly IPasswordService _passwordService;
 
-        public EmployeeRepository(IConfiguration configuration, IPasswordService passwordService)
+        public EmployeeRepository(IConfiguration configuration, IPasswordService passwordService) : base(configuration) 
         {
-            _connectionString = configuration.GetConnectionString("ProjectChapeau");
             _passwordService = passwordService;
         }
 
@@ -43,25 +41,34 @@ namespace ProjectChapeau.Repositories
         }
         public void UpdateEmployee(Employee employee)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            try
             {
-                string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
-                               "WHERE employee_number = @Id";
+                Console.WriteLine($"{employee.firstName} + {employee.lastName} + {employee.role} + {employee.password}");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
+                                   "WHERE employee_number = @Id";
 
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Id", employee.employeeId);
-                command.Parameters.AddWithValue("@FirstName", employee.firstName);
-                command.Parameters.AddWithValue("@LastName", employee.lastName);
-                command.Parameters.AddWithValue("@Username", employee.userName);
-                command.Parameters.AddWithValue("@Password", employee.password);
-                command.Parameters.AddWithValue("@Salt", employee.salt);
-                command.Parameters.AddWithValue("@IsActive", employee.isActive);
-                command.Parameters.AddWithValue("@Role", employee.role);
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Id", employee.employeeId);
+                    command.Parameters.AddWithValue("@FirstName", employee.firstName);
+                    command.Parameters.AddWithValue("@LastName", employee.lastName);
+                    command.Parameters.AddWithValue("@Username", employee.userName);
+                    command.Parameters.AddWithValue("@Password", employee.password);
+                    command.Parameters.AddWithValue("@Salt", employee.salt);
+                    command.Parameters.AddWithValue("@IsActive", employee.isActive);
+                    command.Parameters.AddWithValue("@Role", employee.role.ToString());
 
-                command.Connection.Open();
-                int nrOfRowsAffected = command.ExecuteNonQuery();
-                if (nrOfRowsAffected == 0)
-                    throw new Exception("No records updated!");
+                    command.Connection.Open();
+                    int nrOfRowsAffected = command.ExecuteNonQuery();
+                    if (nrOfRowsAffected == 0)
+                        throw new Exception("No records updated!");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
         public void DeleteEmployee(Employee employee)
@@ -80,73 +87,46 @@ namespace ProjectChapeau.Repositories
             }
         }
 
-        public List<Employee> GetAllEmployees()
+        public List<Employee> GetEmployees(int? employeeNumber = null, string? username = null)
         {
             List<Employee> employees = new List<Employee>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = @"SELECT employee_number,  firstname,  lastname, username, password, salt, is_active, role
-                        FROM Employees";
-                SqlCommand command = new SqlCommand(query, connection);
+                string query = @"SELECT employee_number, firstname, lastname, username, password, salt, is_active, role
+                         FROM Employees";
+                List<string> conditions = new List<string>();
+                SqlCommand command = new SqlCommand();
 
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                if (employeeNumber.HasValue)
                 {
-                    Employee employee = ReadEmployee(reader);
-                    employees.Add(employee);
+                    conditions.Add("employee_number = @EmployeeNumber");
+                    command.Parameters.AddWithValue("@EmployeeNumber", employeeNumber.Value);
                 }
-                reader.Close();
-            }
+                if (!string.IsNullOrEmpty(username))
+                {
+                    conditions.Add("username = @Username");
+                    command.Parameters.AddWithValue("@Username", username);
+                }
+                if (conditions.Count > 0)
+                {
+                    query += " WHERE " + string.Join(" AND ", conditions);
+                }
 
-            return employees;
-        }
-
-        public Employee? GetEmployeeById(int UserId)
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"SELECT employee_number,  firstname,  lastname, username, password, salt, is_active, role
-                        FROM Employees 
-                        WHERE employee_number = @UserId;";
-
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@UserId", UserId);
+                command.CommandText = query;
+                command.Connection = connection;
 
                 connection.Open();
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        Employee employee = ReadEmployee(reader);
-                        return employee;
+                        employees.Add(ReadEmployee(reader));
                     }
                 }
             }
-            return null;
-        }
 
-        public Employee? GetEmployeeByUsername(string username)
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"SELECT employee_number, firstname, lastname, username, password, salt, is_active, role
-                         FROM Employees 
-                         WHERE username = @Username;";
-                SqlCommand cmd = new SqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@Username", username);
-
-                connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    return ReadEmployee(reader);
-                }
-                return null;
-            }
+            return employees;
         }
 
         private Employee ReadEmployee(SqlDataReader reader)

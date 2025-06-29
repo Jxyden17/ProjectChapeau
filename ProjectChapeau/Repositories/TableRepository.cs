@@ -6,14 +6,10 @@ using ProjectChapeau.Repositories.Interfaces;
 
 namespace ProjectChapeau.Repositories
 {
-    public class TableRepository : ITableRepository
+    public class TableRepository : ConnectionDatabase, ITableRepository
     {
-        private readonly string? _connectionString;
+        public TableRepository(IConfiguration configuration) : base(configuration) { }
 
-        public TableRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ProjectChapeau");
-        }
         public List<RestaurantTable> GetAllTables()
         {
             List<RestaurantTable> restaurantTables = new List<RestaurantTable>();

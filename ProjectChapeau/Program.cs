@@ -52,17 +52,6 @@ namespace ProjectChapeau
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
 
-
-
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-
-
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -77,14 +66,13 @@ namespace ProjectChapeau
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Employee}/{action=Login}/{id?}");
 
             app.Run();
         }

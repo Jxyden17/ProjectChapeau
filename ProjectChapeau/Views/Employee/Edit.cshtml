@@ -10,7 +10,7 @@
 <partial name="_ErrorMessage" />
 
 <form asp-controller="Employee" asp-action="Edit" method="post">
-    <input type="hidden" name="employeeId" value="@Model?.employee.employeeId" />
+    <input type="hidden" name="employee.employeeId" value="@Model?.employee.employeeId" />
 
     <div class="mb-3">
         <label for="firstName" class="form-label">First Name</label>
@@ -46,7 +46,7 @@
 
     <div class="mb-3">
         <label for="Role" class="form-label">Role</label>
-        <select id="Role" name="employee.role.roleId" class="form-select" required>
+        <select id="Role" name="employee.role" class="form-select" required>
             <option value="">-- Select Role --</option>
             @foreach (Roles role in Model.Roles)
             {
