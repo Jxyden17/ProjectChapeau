@@ -1,0 +1,18 @@
+﻿@model List<Category>
+
+<input type="text" class="form-control mb-3" placeholder="Search for a menu item..." id="search-input" />
+
+<div class="mb-4">
+    <label class="form-label">Categories</label>
+    <div class="form-check">
+        @foreach (Category category in Model)
+        {
+            <div class="form-check">
+                <input class="form-check-input category-checkbox" type="checkbox" value="@category.CategoryId" id="category-@category.CategoryId" name="category-@category.CategoryId"/>
+                <label class="form-check-label" for="category-@category.CategoryId">@category.CategoryName</label>
+            </div>
+        }
+    </div>
+</div>
+
+<button class="btn btn-danger clear-filter-btn w-100 mt-3">Clear Filters</button>

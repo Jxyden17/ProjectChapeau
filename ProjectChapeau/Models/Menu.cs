@@ -4,7 +4,8 @@
     {
         public int MenuId { get; set; }
         public string? MenuName { get; set; }
-        public List<MenuItem>? MenuItems { get; set; }
+        // Initialize the list in the constructor
+        public List<MenuItem>? MenuItems { get; set; } = new();
         public Menu()
         {
         }

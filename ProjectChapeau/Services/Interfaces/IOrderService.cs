@@ -7,8 +7,6 @@ namespace ProjectChapeau.Services.Interfaces
     {
         List<Order> GetAllOrders();
         List<Order> GetRunningOrders();
-
         void UpdateOrderStatus(int? orderId, OrderStatus? newStatus);
-
     }
 }

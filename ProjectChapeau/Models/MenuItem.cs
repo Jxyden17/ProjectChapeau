@@ -58,7 +58,7 @@
             67 => "cappuccino.webp",
             68 => "espresso.jpg",
             70 => "tea.jpg",
-            _ => "steak-tartare.jpg"
+            _ => "menu-item-default.png"
         };
 
         // An empty constructor is needed when a new MenuItem object is created in the controller!

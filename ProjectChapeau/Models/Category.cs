@@ -8,7 +8,7 @@
         public Category()
         {
         }
-        public Category(int categoryId, string categoryName)
+        public Category(int categoryId, string? categoryName)
         {
             CategoryId = categoryId;
             CategoryName = categoryName;
