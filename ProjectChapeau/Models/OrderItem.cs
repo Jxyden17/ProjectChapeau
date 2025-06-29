@@ -2,21 +2,21 @@
 {
     public class OrderItem
     {
-        public int menuItemId { get; set; }
-        public int orderId { get; set; } 
-        public int amount { get; set; }
-        public string comment { get; set; }
-        public string orderLineStatus { get; set; }
+        public int MenuItemId { get; set; }
+        public int OrderId { get; set; } 
+        public int Amount { get; set; }
+        public string Comment { get; set; }
+        public string OrderLineStatus { get; set; }
 
         public MenuItem MenuItem { get; set; }
 
         public OrderItem(int menuItemId, int orderId, int amount, string comment, string orderLineStatus)
         {
-            this.menuItemId = menuItemId;
-            this.orderId = orderId;
-            this.amount = amount;
-            this.comment = comment;
-            this.orderLineStatus = orderLineStatus;
+            this.MenuItemId = menuItemId;
+            this.OrderId = orderId;
+            this.Amount = amount;
+            this.Comment = comment;
+            this.OrderLineStatus = orderLineStatus;
         }
     }
 }

@@ -45,6 +45,9 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
 
+            builder.Services.AddSession();
+            builder.Services.AddDistributedMemoryCache();
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
@@ -74,6 +77,7 @@ namespace ProjectChapeau
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();
