@@ -60,7 +60,7 @@ namespace ProjectChapeau.Controllers
             }
         }
 
-        private IActionResult LoginUserAndRedirect(Login loginModel, Employee? employee)
+        private async Task<IActionResult> LoginUserAndRedirect(Login loginModel, Employee? employee)
         {
             if (employee == null)
             {
@@ -86,7 +86,7 @@ namespace ProjectChapeau.Controllers
             };
 
             //Sign in the user using cookie authentication
-            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
             // Redirect based on roleId (same as before)
             if (employee.role == Roles.Administrator || employee.role == Roles.Owner || employee.role == Roles.Manager)

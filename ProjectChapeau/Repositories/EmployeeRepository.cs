@@ -41,35 +41,27 @@ namespace ProjectChapeau.Repositories
         }
         public void UpdateEmployee(Employee employee)
         {
-            try
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                Console.WriteLine($"{employee.firstName} + {employee.lastName} + {employee.role} + {employee.password}");
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
-                                   "WHERE employee_number = @Id";
+                string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
+                                "WHERE employee_number = @Id";
 
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@Id", employee.employeeId);
-                    command.Parameters.AddWithValue("@FirstName", employee.firstName);
-                    command.Parameters.AddWithValue("@LastName", employee.lastName);
-                    command.Parameters.AddWithValue("@Username", employee.userName);
-                    command.Parameters.AddWithValue("@Password", employee.password);
-                    command.Parameters.AddWithValue("@Salt", employee.salt);
-                    command.Parameters.AddWithValue("@IsActive", employee.isActive);
-                    command.Parameters.AddWithValue("@Role", employee.role.ToString());
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@Id", employee.employeeId);
+                command.Parameters.AddWithValue("@FirstName", employee.firstName);
+                command.Parameters.AddWithValue("@LastName", employee.lastName);
+                command.Parameters.AddWithValue("@Username", employee.userName);
+                command.Parameters.AddWithValue("@Password", employee.password);
+                command.Parameters.AddWithValue("@Salt", employee.salt);
+                command.Parameters.AddWithValue("@IsActive", employee.isActive);
+                command.Parameters.AddWithValue("@Role", employee.role.ToString());
 
-                    command.Connection.Open();
-                    int nrOfRowsAffected = command.ExecuteNonQuery();
-                    if (nrOfRowsAffected == 0)
-                        throw new Exception("No records updated!");
-                }
+                command.Connection.Open();
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                    throw new Exception("No records updated!");
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            
         }
         public void DeleteEmployee(Employee employee)
         {
