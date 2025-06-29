@@ -2,12 +2,13 @@
 
 @{
     ViewData["Title"] = "Menu Overview";
+    Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
+    bool loggedIn = (loggedInEmployee != null);
 }
-
-<aside id="menu-filter-bar" class="col-md-3 col-lg-2 d-md-block bg-primary text-white sidebar position-fixed">
+<aside id="menu-filter-bar" class="col-4 col-md-3 col-lg-2 d-md-block bg-primary text-white sidebar position-fixed">
     @await Component.InvokeAsync("CategoryFilter")
 </aside>
-<main class="offset-md-3 offset-lg-2 col-md-9 col-lg-10 ms-auto">
+<main class="offset-4 offset-md-3 offset-lg-2 col-8 col-md-9 col-lg-10 ms-auto">
     <h1 class="display-4 text-center">@ViewData["Title"]</h1>
     <ul class="nav nav-tabs justify-content-center mb-4" id="menu-tabs">
         <li class="nav-item">
@@ -43,7 +44,7 @@
                         {
                             foreach (MenuItem menuItem in menu.MenuItems)
                             {
-                                <div class="col-md-3 mb-3 menu-item"
+                                <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3 menu-item"
                                      data-category-id="@menuItem.Category?.CategoryId"
                                      data-menu-name="@menu.MenuName?.ToLowerInvariant()"
                                      id="@menuItem.MenuItemId">

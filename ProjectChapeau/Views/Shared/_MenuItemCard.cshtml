@@ -1,8 +1,13 @@
 ﻿@model MenuItem
 
 @{
+    Employee? loggedInEmployee = (Employee?)ViewData["LoggedInEmployee"];
+    bool loggedIn = (loggedInEmployee != null);
+}
+
+@{
     string cardStyle = string.Empty;
-    if (@Model.Stock > 12)
+    if (@Model.Stock > 12 || !(loggedIn))
     {
         cardStyle = "";
     }
@@ -21,7 +26,12 @@
         <img src="/img/menu-item/@Model.ImageURL" class="card-img-top" alt="@Model.ItemName" style="height: 200px; object-fit: cover;">
         <div class="card-body">
             <h5 class="card-title">@Model.ItemName</h5>
-            <p class="card-text">&euro;@Model.Price - @Model.Stock left in stock</p>
+            <p class="card-text">&euro;@Model.Price
+                @if (loggedIn)
+                {
+                    <span> - @Model.Stock left in stock</span>                 
+                }
+            </p>
         </div>
     </div>
 </a>

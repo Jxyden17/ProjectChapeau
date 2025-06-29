@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
+using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Models.ViewModel;
 using ProjectChapeau.Services;
 using ProjectChapeau.Services.Interfaces;
@@ -29,6 +30,9 @@ namespace ProjectChapeau.Controllers
        
         public IActionResult Menu()
         {
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            ViewData["LoggedInEmployee"] = loggedInEmployee;
+
             MenusOverviewViewModel menusOverviewViewModel = new(_menuService.GetAllMenus());
             return View(menusOverviewViewModel);
         }
