@@ -5,7 +5,7 @@
 }
 
 <aside id="menu-filter-bar" class="col-md-3 col-lg-2 d-md-block bg-primary text-white sidebar position-fixed">
-    @await Html.PartialAsync("_MenuFilterBar")
+    @await Component.InvokeAsync("CategoryFilter")
 </aside>
 <main class="offset-md-3 offset-lg-2 col-md-9 col-lg-10 ms-auto">
     <h1 class="display-4 text-center">@ViewData["Title"]</h1>
