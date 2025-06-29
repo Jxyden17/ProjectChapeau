@@ -22,6 +22,8 @@ namespace ProjectChapeau.Controllers
         }
 
         //index
+
+        [Authorize(Roles= "Administrator,Owner,Manager")]
         public IActionResult Index()
         {
 
@@ -69,9 +71,9 @@ namespace ProjectChapeau.Controllers
             //Create user claims
             List<Claim> claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, employee.userName), // or Username if preferred
+                    new Claim(ClaimTypes.Name, employee.userName),
                     new Claim("EmployeeId", employee.employeeId.ToString()),
-                    new Claim(ClaimTypes.Role, employee.role.ToString()) // E.g., "Owner", "Waiter"
+                    new Claim(ClaimTypes.Role, employee.role.ToString())
                 };
 
             ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

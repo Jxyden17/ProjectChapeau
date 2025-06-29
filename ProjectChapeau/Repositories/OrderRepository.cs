@@ -60,8 +60,8 @@ namespace ProjectChapeau.Repositories
                 o.order_datetime,
                 o.order_status,
                 o.payment_status,
-                o.income_amount
-                o.tip_amount
+                o.income_amount,
+                o.tip_amount,
                 e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
                 rt.table_number, rt.is_occupied
                 FROM Orders o

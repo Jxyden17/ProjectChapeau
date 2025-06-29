@@ -41,7 +41,8 @@ namespace ProjectChapeau
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/Employee/Login"; 
+                    options.LoginPath = "/Employee/Login";
+                    options.AccessDeniedPath = "/Tables/Index";
                 });
 
             builder.Services.AddControllersWithViews(options =>
