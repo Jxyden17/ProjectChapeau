@@ -14,7 +14,5 @@ namespace ProjectChapeau.Services.Interfaces
 
         void DeactivateEmployee(int employeeId);
         void ActivateEmployee(int employeeId);
-
-        List<Role> GetAllEmployeeRoles();
     }
 }

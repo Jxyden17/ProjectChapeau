@@ -30,7 +30,7 @@ namespace ProjectChapeau.Controllers
 
             ViewData["LoggedInEmployee"] = loggedInEmployee;
 
-            List<TableViewModel> tableOrders = _tableService.GetAllTablesWithLatestOrder();
+            List<Order> tableOrders = _tableService.GetAllTablesWithLatestOrder();
 
             return View(tableOrders);
         }

@@ -4,6 +4,7 @@ using ProjectChapeau.Models;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
 using ProjectChapeau.Services.Interfaces;
+using ProjectChapeau.Models.Enums;
 
 namespace ProjectChapeau.Repositories
 {
@@ -34,7 +35,7 @@ namespace ProjectChapeau.Repositories
                 command.Parameters.AddWithValue("@Password", employee.password);
                 command.Parameters.AddWithValue("@Salt", employee.salt);
                 command.Parameters.AddWithValue("@IsActive", employee.isActive);
-                command.Parameters.AddWithValue("@Role", employee.role.roleId);
+                command.Parameters.AddWithValue("@Role", employee.role);
 
                 command.Connection.Open();
                 employee.employeeId = Convert.ToInt32(command.ExecuteScalar());
@@ -55,7 +56,7 @@ namespace ProjectChapeau.Repositories
                 command.Parameters.AddWithValue("@Password", employee.password);
                 command.Parameters.AddWithValue("@Salt", employee.salt);
                 command.Parameters.AddWithValue("@IsActive", employee.isActive);
-                command.Parameters.AddWithValue("@Role", employee.role.roleId);
+                command.Parameters.AddWithValue("@Role", employee.role);
 
                 command.Connection.Open();
                 int nrOfRowsAffected = command.ExecuteNonQuery();
@@ -85,9 +86,8 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = @"SELECT e.employee_number,  e.firstname,  e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
-                        FROM Employees e 
-                        JOIN Role r ON e.role = r.role_number;";
+                string query = @"SELECT employee_number,  firstname,  lastname, username, password, salt, is_active, role
+                        FROM Employees";
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Connection.Open();
@@ -108,10 +108,9 @@ namespace ProjectChapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = @"SELECT e.employee_number,  e.firstname,  e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
-                        FROM Employees e 
-                        JOIN Role r ON e.role = r.role_number
-                        WHERE e.employee_number = @UserId;";
+                string query = @"SELECT employee_number,  firstname,  lastname, username, password, salt, is_active, role
+                        FROM Employees 
+                        WHERE employee_number = @UserId;";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@UserId", UserId);
@@ -133,10 +132,9 @@ namespace ProjectChapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = @"SELECT e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number, r.role_name 
-                         FROM Employees e 
-                         JOIN Role r ON e.role = r.role_number 
-                         WHERE e.username = @Username;";
+                string query = @"SELECT employee_number, firstname, lastname, username, password, salt, is_active, role
+                         FROM Employees 
+                         WHERE username = @Username;";
                 SqlCommand cmd = new SqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@Username", username);
 
@@ -160,11 +158,7 @@ namespace ProjectChapeau.Repositories
             string password = (string)reader["password"];
             string salt = (string)reader["salt"];
             bool isActive = (bool)reader["is_active"];
-            Role employeeRole = new Role
-            {
-                roleId = (int)reader["role_number"],
-                roleName = (string)reader["role_name"]
-            };
+            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
 
             return new Employee(id, firstname ,lastname,username , password , isActive, employeeRole, salt);
         }
@@ -212,39 +206,6 @@ namespace ProjectChapeau.Repositories
                 connection.Open();
                 command.ExecuteNonQuery();
             }
-        }
-
-        public List<Role> GetAllEmployeeRoles()
-        {
-            List<Role> roles = new List<Role>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"SELECT role_number, role_name
-                    FROM Role";
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    Role role = ReadRole(reader);
-                    roles.Add(role);
-                }
-                reader.Close();
-            }
-
-            return roles;
-        }
-
-        public Role ReadRole(SqlDataReader reader)
-        {
-            int id = (int)reader["role_number"];
-            string roleName = (string)reader["role_name"];
-
-
-            return new Role(id, roleName);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using System.Data;
+
 
 namespace ProjectChapeau.Controllers
 {
@@ -62,7 +65,7 @@ namespace ProjectChapeau.Controllers
                 {
                     new Claim(ClaimTypes.Name, employee.userName), // or Username if preferred
                     new Claim("EmployeeId", employee.employeeId.ToString()),
-                    new Claim(ClaimTypes.Role, employee.role.roleName.ToString()) // E.g., "Owner", "Waiter"
+                    new Claim(ClaimTypes.Role, employee.role.ToString()) // E.g., "Owner", "Waiter"
                 };
 
                 ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -70,7 +73,7 @@ namespace ProjectChapeau.Controllers
 
                 AuthenticationProperties authProperties = new AuthenticationProperties
                 {
-                    IsPersistent = true, 
+                    IsPersistent = true,
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
                 };
 
@@ -78,7 +81,7 @@ namespace ProjectChapeau.Controllers
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
                 // Redirect based on roleId (same as before)
-                if (employee.role.roleId == 1)
+                if (employee.role == Roles.Administrator || employee.role == Roles.Owner)
                 {
                     return RedirectToAction("Index", "Employees");
                 }
@@ -117,7 +120,7 @@ namespace ProjectChapeau.Controllers
                
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
                 employeeRoleModel.employee = new Employee();
-                employeeRoleModel.Roles = _employeeService.GetAllEmployeeRoles();
+                employeeRoleModel.Roles = Enum.GetValues(typeof(Roles)).Cast<Roles>().ToList();
                 return View(employeeRoleModel);
             }
         }
@@ -126,7 +129,7 @@ namespace ProjectChapeau.Controllers
         public ActionResult Create()
         {
             Employee employee = new Employee();
-            List<Role> Roles = _employeeService.GetAllEmployeeRoles();
+            List<Roles> Roles = Enum.GetValues(typeof(Roles)).Cast<Roles>().ToList();
             EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
 
             return View(viewModel);
@@ -147,7 +150,7 @@ namespace ProjectChapeau.Controllers
             {
                 ViewBag.ErrorMessage = $"An error occured: {ex.Message}";
                 employeeRoleModel.employee = new Employee();
-                employeeRoleModel.Roles = _employeeService.GetAllEmployeeRoles();
+                employeeRoleModel.Roles = Enum.GetValues(typeof(Roles)).Cast<Roles>().ToList();
                 return View(employeeRoleModel);
             }
         }
@@ -161,7 +164,7 @@ namespace ProjectChapeau.Controllers
             }
 
             Employee? employee = _employeeService.GetEmployeeById((int)id);
-            List<Role> Roles = _employeeService.GetAllEmployeeRoles();
+            List<Roles> Roles = Enum.GetValues(typeof(Roles)).Cast<Roles>().ToList();
             EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
             return View(viewModel);
 

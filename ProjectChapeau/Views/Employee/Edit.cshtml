@@ -1,4 +1,5 @@
-﻿@model ProjectChapeau.Models.ViewModel.EmployeeRoleModel;
+﻿@using ProjectChapeau.Models.Enums
+@model ProjectChapeau.Models.ViewModel.EmployeeRoleModel;
 
 @{
     ViewData["Title"] = "Edit Employee";
@@ -47,9 +48,9 @@
         <label for="Role" class="form-label">Role</label>
         <select id="Role" name="employee.role.roleId" class="form-select" required>
             <option value="">-- Select Role --</option>
-            @foreach (Role role in Model.Roles)
+            @foreach (Roles role in Model.Roles)
             {
-                <option value="@role.roleId">@role.roleName</option>
+                <option value="@role">@role</option>
             }
         </select>
     </div>

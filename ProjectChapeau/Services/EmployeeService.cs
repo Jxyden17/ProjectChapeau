@@ -45,8 +45,8 @@ namespace ProjectChapeau.Services
             if (employee == null)
                 return null;
 
-            string interleaved = _passwordService.InterleaveSalt(password, employee.salt);
-            string hashedInputPassword = _passwordService.HashPassword(interleaved);
+            string interleavedSaltedPassword = _passwordService.InterleaveSalt(password, employee.salt);
+            string hashedInputPassword = _passwordService.HashPassword(interleavedSaltedPassword);
 
             if (hashedInputPassword == employee.password)
                 return employee;
@@ -92,9 +92,5 @@ namespace ProjectChapeau.Services
             _employeeRepository.ActivateEmployee(employeeId);
         }
 
-        public List<Role> GetAllEmployeeRoles()
-        {
-            return _employeeRepository.GetAllEmployeeRoles();
-        }
     }
 }

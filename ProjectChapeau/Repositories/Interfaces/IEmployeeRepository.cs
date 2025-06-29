@@ -13,6 +13,5 @@ namespace ProjectChapeau.Repositories.Interfaces
         bool UserNameExists(string userName);
         void DeactivateEmployee(int employeeId);
         void ActivateEmployee(int employeeId);
-        List<Role> GetAllEmployeeRoles();
     }
 }

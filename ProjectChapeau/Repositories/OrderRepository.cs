@@ -25,12 +25,10 @@ namespace ProjectChapeau.Repositories
                 o.order_datetime,
                 o.order_status,
                 o.payment_status,
-                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number,
-                r.role_name,
+                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
                 rt.table_number, rt.is_occupied
                 FROM Orders o
                 JOIN Employees e ON o.employee_number = e.employee_number
-                JOIN Role r ON e.role = r.role_number
                 JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number;";
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -85,12 +83,10 @@ namespace ProjectChapeau.Repositories
                 o.order_datetime,
                 o.order_status,
                 o.payment_status,
-                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role AS role_number,
-                r.role_name,
+                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
                 rt.table_number, rt.is_occupied
                 FROM Orders o
                 JOIN Employees e ON o.employee_number = e.employee_number
-                JOIN Role r ON e.role = r.role_number
                 JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number
     
                 WHERE o.order_status = 'BeingPrepared'
@@ -156,11 +152,7 @@ namespace ProjectChapeau.Repositories
             string password = (string)reader["password"];
             string salt = (string)reader["salt"];
             bool isActive = (bool)reader["is_active"];
-            Role employeeRole = new Role
-            {
-                roleId = (int)reader["role_number"],
-                roleName = (string)reader["role_name"]
-            };
+            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
 
             return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
         }
