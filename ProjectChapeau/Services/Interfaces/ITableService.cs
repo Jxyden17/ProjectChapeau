@@ -11,7 +11,7 @@ namespace ProjectChapeau.Services.Interfaces
 
         void UpdateTableStatus(int tableId, bool isOccupied);
 
-        List<TableViewModel> GetAllTablesWithLatestOrder();
+        List<Order> GetAllTablesWithLatestOrder();
 
         TableEditViewModel GetTableWithLatestOrderById(int? id);
     }

@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectChapeau.Models.Extensions;
 using ProjectChapeau.Models;
 using ProjectChapeau.Services.Interfaces;
 using ProjectChapeau.Models.ViewModel;
-using ProjectChapeau.Services;
 using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Validation.Interfaces;
-using System.ComponentModel.DataAnnotations;
+
 
 namespace ProjectChapeau.Controllers
 {
@@ -27,11 +25,7 @@ namespace ProjectChapeau.Controllers
         //Initial page load with all tables and active order.
         public IActionResult Index()
         {
-            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
-
-            ViewData["LoggedInEmployee"] = loggedInEmployee;
-
-            List<TableViewModel> tableOrders = _tableService.GetAllTablesWithLatestOrder();
+            List<Order> tableOrders = _tableService.GetAllTablesWithLatestOrder();
 
             return View(tableOrders);
         }
@@ -56,26 +50,7 @@ namespace ProjectChapeau.Controllers
                 //Send through validation.
                 TableValidationResult validation = _tableEditValidator.ValidateTableEdit(tableEdit, tableEditViewModel);
 
-                //If the validation returns false it sends the error and reloads the edit page for the user to try again.
-                if (!validation.IsValid)
-                {
-                    ViewBag.ErrorMessage = validation.ErrorMessage;
-                    tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
-                    return View(tableEditViewModel);
-                }
-
-                // If validation returns true this is ran and updates based on if the bool UpdateTable or UpdateOrder is True.
-                if (validation.UpdateTable)
-                {
-                    _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
-                }
-                if (validation.UpdateOrder)
-                {
-                    _orderService.UpdateOrderStatus(tableEditViewModel.orderId, tableEditViewModel.currentOrderStatus);
-                }
-
-                TempData["ConfirmMessage"] = "Table and/or order status updated successfully.";
-                return RedirectToAction("Index");
+                return UpdateTableAndRedirect(tableEditViewModel, validation);
             }
             catch (Exception ex)
             {
@@ -84,6 +59,29 @@ namespace ProjectChapeau.Controllers
                 tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
                 return View(tableEditViewModel);
             }
+        }
+
+        private IActionResult UpdateTableAndRedirect(TableEditViewModel tableEditViewModel, TableValidationResult validation)
+        {
+            if (!validation.IsValid)
+            {
+                ViewBag.ErrorMessage = validation.ErrorMessage;
+                tableEditViewModel.orderStatusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
+                return View(tableEditViewModel);
+            }
+
+            // If validation returns true this is ran and updates based on if the bool UpdateTable or UpdateOrder is True.
+            if (validation.UpdateTable)
+            {
+                _tableService.UpdateTableStatus(tableEditViewModel.tableID, tableEditViewModel.isOccupied);
+            }
+            if (validation.UpdateOrder)
+            {
+                _orderService.UpdateOrderStatus(tableEditViewModel.orderId, tableEditViewModel.currentOrderStatus);
+            }
+
+            TempData["ConfirmMessage"] = "Table and/or order status updated successfully.";
+            return RedirectToAction("Index");
         }
 
 

@@ -4,6 +4,9 @@ using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
 using ProjectChapeau.Validation.Interfaces;
 using ProjectChapeau.Validation;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ProjectChapeau
 {
@@ -35,13 +38,19 @@ namespace ProjectChapeau
 
             builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
 
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Employee/Login";
+                    options.AccessDeniedPath = "/Tables/Index";
+                });
 
-
-            builder.Services.AddSession(options =>
+            builder.Services.AddControllersWithViews(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
             });
 
             var app = builder.Build();
@@ -58,13 +67,13 @@ namespace ProjectChapeau
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseSession();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Employee}/{action=Login}/{id?}");
 
             app.Run();
         }

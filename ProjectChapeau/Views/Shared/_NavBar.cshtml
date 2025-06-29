@@ -1,4 +1,4 @@
-﻿@using ProjectChapeau.Models.Extensions
+﻿@using System.Security.Claims
 <nav class="navbar navbar-expand-md navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
     <div class="container-fluid">
         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProjectChapeau</a>
@@ -28,20 +28,17 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
-                @{
-                    Employee? loggedInEmployee = Context.Session.GetObject<Employee>("LoggedInEmployee");
-                    if (loggedInEmployee != null)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Employee" asp-action="Logout">Logout</a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Employee" asp-action="Login">Login</a>
-                        </li>
-                    }
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-area="" asp-controller="Employee" asp-action="Logout">Logout</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-area="" asp-controller="Employee" asp-action="Login">Login</a>
+                    </li>
                 }
             </ul>
         </div>

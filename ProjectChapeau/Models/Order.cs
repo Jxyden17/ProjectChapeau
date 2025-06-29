@@ -1,5 +1,4 @@
-
-﻿using ProjectChapeau.Models.Enums;
+using ProjectChapeau.Models.Enums;
 
 namespace ProjectChapeau.Models
 

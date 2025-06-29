@@ -18,10 +18,10 @@
 
         <div class="btn-group" role="group" aria-label="Is Table Occupied">
             <input type="radio" class="btn-check" name="IsOccupied" id="IsOccupiedFalse" autocomplete="off" value="False" @(Model?.isOccupied == false ? "checked" : "") />
-            <label class="btn btn-outline-danger" for="IsOccupiedFalse">False</label>
+            <label class="btn btn-outline-success" for="IsOccupiedFalse">Free</label>
 
             <input type="radio" class="btn-check" name="IsOccupied" id="IsOccupiedTrue" autocomplete="off" value="True" @(Model?.isOccupied == true ? "checked" : "") />
-            <label class="btn btn-outline-success" for="IsOccupiedTrue">True</label>
+            <label class="btn btn-outline-danger" for="IsOccupiedTrue">Occupied</label>
         </div>
 
     </div>

@@ -8,8 +8,7 @@ namespace ProjectChapeau.Repositories.Interfaces
         List<RestaurantTable> GetAllTables();
         RestaurantTable GetTableById(int id);
         void UpdateTableStatus(int tableId, bool isOccupied);
-        List<TableOrder> GetAllTablesWithLatestOrder();
-
+        List<Order> GetAllTablesWithLatestOrder();
         TableEditViewModel GetTableWithLatestOrderById(int? id);
     }
 }

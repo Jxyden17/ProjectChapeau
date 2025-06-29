@@ -1,4 +1,6 @@
-﻿namespace ProjectChapeau.Models
+﻿using ProjectChapeau.Models.Enums;
+
+namespace ProjectChapeau.Models
 {
     public class Employee
     {
@@ -9,10 +11,10 @@
         public string userName { get; set; }
         public string password { get; set; }
         public bool isActive { get; set; }
-        public Role role { get; set; }
+        public Roles role { get; set; }
         public string salt { get; set; }
 
-        public Employee(int employeeId, string firstName, string lastName, string userName, string password, bool isActive, Role Role, string salt)
+        public Employee(int employeeId, string firstName, string lastName, string userName, string password, bool isActive, Roles Role, string salt)
         {
             this.employeeId = employeeId;
             this.firstName = firstName;
