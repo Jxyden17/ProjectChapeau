@@ -5,20 +5,62 @@
     ViewData["Title"] = $"{@Model?.MenuItem?.ItemName}";
     bool userIsAuthenticated = User.Identity?.IsAuthenticated ?? false;
 }
-<h1>@menuItem?.ItemName</h1>
-<h2>
-    &euro;@menuItem?.Price
-    @if (userIsAuthenticated)
-    {
-        <span> - @menuItem?.Stock left in stock</span>
-    }
-</h2>
-@if (menuItem?.Category != null)
-{
-    <p>Category - @menuItem?.Category.CategoryName</p>
-}
-<p>@menuItem?.ItemDescription</p>
-<img src="/img/menu-item/@menuItem?.ImageURL" class="img-fluid rounded" alt="@menuItem?.ItemName" />
-<a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-primary">
-    Return to Menus
-</a>
+<div class="container py-4">
+    <div class="row">
+        <!-- Left Section -->
+        <div class="col-lg-8 order-2 order-lg-1">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title h4">@menuItem?.ItemName</h1>
+                    <p class="card-subtitle mb-1">
+                        &euro;@menuItem?.Price (incl. VAT)
+                        @if (userIsAuthenticated)
+                        {
+                            <strong> - @menuItem?.Stock left in stock</strong>
+                        }
+                    </p>
+                    <p>
+                        <strong>Category:</strong> @menuItem?.Category?.CategoryName
+                    </p>
+                    <p class="card-text">
+                        @menuItem?.ItemDescription
+                    </p>
+                </div>
+            </div>
+            @if (userIsAuthenticated)
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 for="amount">Amount</h5>
+                        <input type="number" id="amount" name="amount" min="1" max="100" value="1"/>
+                        <h5>Comment</h5>
+                        <textarea class="form-control" rows="3" placeholder="Type your comment for the bar and kitchen staff here (max. 500 characters)..."></textarea>
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- Right Section with the image-->
+        <div class="col-lg-4 order-1 order-lg-2">
+            <div class="card mb-3">
+                <img src="/img/menu-item/@menuItem?.ImageURL" class="card-img-top rounded" alt="@menuItem?.ItemName" />
+                @* <div class="card-body">
+                </div> *@
+            </div>
+        </div>
+    </div>
+    <!-- Buttons -->
+    <div class="d-flex justify-content-between align-items-end mt-4">
+        <a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-outline-primary">
+            Return to Menus
+        </a>
+        <div class="d-flex gap-2">
+            <button class="btn btn-success">
+                Add 1 and Return to Menus
+            </button>
+            <button class="btn btn-success">
+                Add 1 and Go to Order Overview<br />
+                <small>€0 for 0 items</small>
+            </button>
+        </div>
+    </div>
+</div>
