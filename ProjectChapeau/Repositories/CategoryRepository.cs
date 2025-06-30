@@ -12,14 +12,14 @@ namespace ProjectChapeau.Repositories
 
         public List<Category> GetAllCategories()
         {
-            List<Category> categories = new();
+            List<Category> categories = [];
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"SELECT *
                                  FROM Category
                                  ORDER BY category_id";
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();

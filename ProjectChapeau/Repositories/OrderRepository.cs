@@ -12,9 +12,9 @@ namespace ProjectChapeau.Repositories
 
         public List<Order> GetAllOrders()
         {
-            List<Order> orders = new List<Order>();
+            List<Order> orders = [];
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @" SELECT 
                 o.order_id,
@@ -26,7 +26,7 @@ namespace ProjectChapeau.Repositories
                 FROM Orders o
                 JOIN Employees e ON o.employee_number = e.employee_number
                 JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number;";
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -48,11 +48,16 @@ namespace ProjectChapeau.Repositories
             throw new NotImplementedException();
         }
 
+        public void AddOrder(Order order)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Order> GetRunningOrders()
         {
-            List<Order> orders = new List<Order>();
+            List<Order> orders = [];
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"SELECT 
                 o.*,
@@ -65,7 +70,7 @@ namespace ProjectChapeau.Repositories
     
                 WHERE o.order_status = 'BeingPrepared'
                 ORDER BY o.order_datetime ASC;";
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -83,12 +88,12 @@ namespace ProjectChapeau.Repositories
 
         public void UpdateOrderStatus(int? orderId, OrderStatus? newStatus)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"UPDATE Orders SET order_status = @OrderStatus
                                  WHERE order_id = @OrderId";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@OrderId", orderId);
                 command.Parameters.AddWithValue("@OrderStatus", newStatus.ToString());
 
@@ -101,9 +106,9 @@ namespace ProjectChapeau.Repositories
 
         public List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate)
         {
-            List<Order> orders = new List<Order>();
+            List<Order> orders = [];
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"SELECT o.*,
                                  mi.menu_item_id, mi.price,
@@ -118,7 +123,7 @@ namespace ProjectChapeau.Repositories
                                  WHERE o.order_datetime >= @StartDate AND o.order_datetime <= @EndDate 
                                  AND o.is_paid = 1";
 
-                SqlCommand command = new SqlCommand(query, connection); 
+                SqlCommand command = new(query, connection); 
                 command.Parameters.AddWithValue("@StartDate",startDate);
                 command.Parameters.AddWithValue("@EndDate", endDate);
 

@@ -56,7 +56,14 @@
         }
     }
 </main>
-<a class="btn btn-success" href="CurrentOrder">
-    @await Component.InvokeAsync("CurrentOrderButton", new { buttonText = "Go to Order Overview" })
-</a>
+<div class="d-flex justify-content-between align-items-center px-3 py-2 position-fixed bottom-0 start-0 w-100 bottom-buttons">
+    <form method="post" asp-controller="Order" asp-action="DeleteCurrentOrder">
+        <button type="submit" class="btn btn-danger">
+            Delete Order
+        </button>
+    </form>
+    <a class="btn btn-success" href="CurrentOrder">
+        @await Component.InvokeAsync("CurrentOrderButton", new { buttonText = "Go to Order Overview" })
+    </a>
+</div>
 <script src="/js/menuFilters.js"></script>

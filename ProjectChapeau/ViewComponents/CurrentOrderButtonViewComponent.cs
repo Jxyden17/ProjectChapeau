@@ -15,8 +15,8 @@ namespace ProjectChapeau.ViewComponents
             CurrentOrderButtonViewModel viewModel = new();
             if (order != null)
             {
-                viewModel.ItemAmount = order.OrderLines.Count();
-                viewModel.TotalPrice = order.TotalAmount;
+                viewModel.ItemAmount = order.ItemAmount;
+                viewModel.TotalPrice = order.PriceIncludingVAT;
             }
             viewModel.ButtonText = buttonText;
 

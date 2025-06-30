@@ -10,10 +10,10 @@ namespace ProjectChapeau.Repositories.Interfaces
         List<Order> GetAllOrders();
 
         Order GetOrderById(int orderId);
+        void AddOrder(Order order);
         List<Order> GetRunningOrders();
 
         List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate);
-
         void UpdateOrderStatus(int? orderId, OrderStatus? newStatus);
 
     }

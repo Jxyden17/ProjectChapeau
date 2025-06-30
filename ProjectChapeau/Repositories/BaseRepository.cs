@@ -69,7 +69,7 @@ namespace ProjectChapeau.Repositories
             int orderId = (int)reader["order_id"];
             Employee employee = ReadEmployee(reader);
             RestaurantTable table = ReadTable(reader);
-            List<OrderLine>? orderLines = new List<OrderLine>();
+            List<OrderLine>? orderLines = [];
             DateTime orderDateTime = (DateTime)reader["order_datetime"];
             OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
             bool isPaid = (bool)reader["is_paid"];

@@ -139,7 +139,7 @@ namespace ProjectChapeau.Repositories
                 SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
-                command.Parameters.AddWithValue("@price", menuItem.Price);
+                command.Parameters.AddWithValue("@price", menuItem.PriceExcludingVAT);
                 command.Parameters.AddWithValue("@stock", menuItem.Stock);
                 command.Parameters.AddWithValue("@is_active", menuItem.IsActive);
 
@@ -160,7 +160,7 @@ namespace ProjectChapeau.Repositories
                 SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@menu_item_id", menuItem.MenuItemId);
                 command.Parameters.AddWithValue("@item_name", menuItem.ItemName);
-                command.Parameters.AddWithValue("@price", menuItem.Price);
+                command.Parameters.AddWithValue("@price", menuItem.PriceExcludingVAT);
                 command.Parameters.AddWithValue("@stock", menuItem.Stock);
                 command.Parameters.AddWithValue("@category_id", menuItem.Category.CategoryId);
                 command.Parameters.AddWithValue("@menu_id", menuItem.Category.CategoryName);

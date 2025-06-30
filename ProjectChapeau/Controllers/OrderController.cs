@@ -3,7 +3,6 @@ using MvcWhatsUp.Models.Extensions;
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Models.ViewModel;
-using ProjectChapeau.Services;
 using ProjectChapeau.Services.Interfaces;
 
 namespace ProjectChapeau.Controllers
@@ -61,37 +60,68 @@ namespace ProjectChapeau.Controllers
         [HttpPost]
         public IActionResult AddItemToOrder(int? menuItemId, int? amount, string? comment, string? returnTo)
         {
-            if (!menuItemId.HasValue)
+            if (menuItemId == null)
             {
-                TempData["ErrorMessage"] = "No menu item specified.";
-                return View();
+                TempData["ErrorMessage"] = "No menu item ID is specified to add to the order.";
+                return RedirectToAction("MenuItem", new {id = menuItemId});
             }
+
             try
             {
                 Order order = GetOrCreateCurrentOrder();
-                MenuItem menuItem = _menuItemService.GetMenuItemById(menuItemId.Value);
-                OrderLine orderLine = CreateOrderLine(menuItem, amount ?? 1, comment);
+                MenuItem? menuItem = _menuItemService.GetMenuItemById(menuItemId.Value);
+                int quantity = amount ?? 1;
 
-                order.OrderLines.Add(orderLine);
+                AddOrUpdateOrderLine(order, menuItem, quantity, comment);
                 SaveCurrentOrderToSession(order);
 
-                switch(returnTo)
+                switch (returnTo)
                 {
                     case "menu":
                         return RedirectToAction("Menu");
                     case "currentOrder":
                         return RedirectToAction("CurrentOrder");
                     default:
-                        return RedirectToAction("MenuItem");
+                        return RedirectToAction("MenuItem", new {id = menuItemId});
 
                 }
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Item could not be added to order: {ex.Message}";
-                return View();
+                return RedirectToAction("MenuItem", new { id = menuItemId });
             }
         }
+
+        [HttpGet]
+        public IActionResult ChangeTable()
+        {
+            return View(GetOrCreateCurrentOrder());
+        }
+        [HttpPost]
+        public IActionResult ChangeTable(int number)
+        {
+            try
+            {
+                Order order = GetOrCreateCurrentOrder();
+                order.Table.TableNumber = number;
+                SaveCurrentOrderToSession(order);
+                return RedirectToAction("CurrentOrder");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"The table of the current order could not be changed: {ex.Message}";
+                return View(number);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult SendCurrentOrder()
+        {
+            Order order = GetOrCreateCurrentOrder();
+            return RedirectToAction("Menu");
+        }
+
 
         // Private methods
         private Order GetOrCreateCurrentOrder()
@@ -110,18 +140,47 @@ namespace ProjectChapeau.Controllers
             HttpContext.Session.SetObject(orderSessionKey, order);
         }
 
-        private Order CreateNewOrder()
+        private static Order CreateNewOrder()
         {
             // TODO
             var employee = new Employee();
             var table = new RestaurantTable();
-            return new Order(0, employee, table, new List<OrderLine>(), DateTime.Now, OrderStatus.NotOrdered, false, 0);
+            return new Order(0, employee, table, new(), DateTime.Now, OrderStatus.NotOrdered, false, 0);
         }
 
-        private OrderLine CreateOrderLine(MenuItem menuItem, int amount, string? comment)
+        private static OrderLine CreateOrderLine(MenuItem menuItem, int amount, string? comment)
         {
             return new OrderLine(menuItem, amount, comment, OrderStatus.NotOrdered);
         }
 
+        private void AddOrUpdateOrderLine(Order order, MenuItem menuItem, int amount, string? comment)
+        {
+            OrderLine? existingOrderLine = FindExistingOrderLine(order, menuItem.MenuItemId);
+
+            if (existingOrderLine != null)
+            {
+                UpdateOrderLine(existingOrderLine, amount, comment);
+            }
+            else
+            {
+                OrderLine newOrderLine = CreateOrderLine(menuItem, amount, comment);
+                order.OrderLines.Add(newOrderLine);
+            }
+        }
+
+        private OrderLine? FindExistingOrderLine(Order order, int menuItemId)
+        {
+            return order.OrderLines.FirstOrDefault(orderLine => orderLine.MenuItem.MenuItemId == menuItemId);
+        }
+
+        private void UpdateOrderLine(OrderLine orderLine, int amount, string? comment)
+        {
+            orderLine.Amount += amount;
+
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                orderLine.Comment = comment;
+            }
+        }
     }
 }

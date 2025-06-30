@@ -8,6 +8,20 @@ namespace ProjectChapeau.Models
         public int Amount { get; set; }
         public string? Comment { get; set; }
         public OrderStatus OrderLineStatus { get; set; }
+        public decimal PriceExcludingVAT
+        {
+            get
+            {
+                return MenuItem.PriceExcludingVAT * Amount;
+            }
+        }
+        public decimal PriceIncludingVAT
+        {
+            get
+            {
+                return MenuItem.PriceIncludingVAT * Amount;
+            }
+        }
 
         public OrderLine(MenuItem menuItem, int amount, string? comment, OrderStatus orderLineStatus)
         {

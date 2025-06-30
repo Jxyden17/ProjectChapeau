@@ -10,9 +10,9 @@ namespace ProjectChapeau.Repositories
 
         public List<OrderLine> GetAllOrderItemsById(int id)
         {
-            List<OrderLine> orderItems = new List<OrderLine>();
+            List<OrderLine> orderItems = [];
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"SELECT 
                             order_id,
@@ -23,7 +23,7 @@ namespace ProjectChapeau.Repositories
                          FROM order_item
                          WHERE order_id = @OrderId";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@OrderId", id);
 
                 command.Connection.Open();
@@ -39,6 +39,11 @@ namespace ProjectChapeau.Repositories
             }
 
             return orderItems;
+        }
+
+        public void AddOrderLine(OrderLine orderLine)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -8,29 +8,48 @@ namespace ProjectChapeau.Models
         public int OrderId { get; set; }
         public Employee Employee { get; set; }
         public RestaurantTable Table { get; set; }
-        public List<OrderLine>? OrderLines { get; set; } = new();
+        public List<OrderLine>? OrderLines { get; set; } = [];
         public DateTime OrderDateTime { get; set; }
         public OrderStatus OrderStatus { get; set; }
         public bool IsPaid { get; set; }
-        public decimal SubtotalAmount
+        public decimal? TipAmount { get; set; }
+        public int ItemAmount
         {
             get
             {
                 if (OrderLines == null)
                     return 0;
-
-                return OrderLines.Sum(line => (line?.MenuItem?.Price ?? 0) * line.Amount
-                );
+                return OrderLines.Sum(orderLine => (orderLine.Amount));
             }
         }
-        public decimal TotalAmount
+        public decimal PriceExcludingVAT
         {
             get
             {
-                return SubtotalAmount + (TipAmount ?? 0);
+                if (OrderLines == null)
+                    return 0;
+                return OrderLines.Sum(orderLine => (orderLine.PriceExcludingVAT)
+                );
             }
         }
-        public decimal? TipAmount { get; set; }
+        public decimal PriceIncludingVAT
+        {
+            get
+            {
+                if (OrderLines == null)
+                    return 0;
+                return OrderLines.Sum(orderLine => (orderLine.PriceIncludingVAT)
+                );
+            }
+        }
+        public decimal VAT
+        {
+            get { return PriceIncludingVAT - PriceExcludingVAT; }
+        }
+        public decimal TotalPrice
+        {
+            get { return PriceIncludingVAT + (TipAmount ?? 0); }
+        }
 
         public Order()
         {

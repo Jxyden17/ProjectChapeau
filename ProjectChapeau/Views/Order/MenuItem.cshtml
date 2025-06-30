@@ -23,7 +23,7 @@
                     <h1 class="card-title h4">@menuItem?.ItemName</h1>
                     <p class="card-subtitle mb-1">
                         <strong>
-                            &euro;@menuItem?.Price (incl. VAT)
+                            &euro;@menuItem?.PriceIncludingVAT (incl. VAT)
                             @if (userIsAuthenticated)
                             {
                                 <span> - @menuItem?.Stock left in stock</span>

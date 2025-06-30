@@ -26,7 +26,7 @@
         <img src="/img/menu-item/@Model.ImageURL" class="card-img-top" alt="@Model.ItemName" style="height: 200px; object-fit: cover;">
         <div class="card-body">
             <h5 class="card-title">@Model.ItemName</h5>
-            <p class="card-text">&euro;@Model.Price
+            <p class="card-text">&euro;@Model.PriceIncludingVAT
                 @if (userIsAuthenticated)
                 {
                     <span> - @Model.Stock left in stock</span>                 
