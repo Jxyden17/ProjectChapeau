@@ -1,15 +1,21 @@
-@model ProjectChapeau.Models.ViewModel.MenuItemOverviewViewModel;
+@model ProjectChapeau.Models.ViewModel.MenuItemOverviewViewModel
 
 @{
     MenuItem? menuItem = Model.MenuItem;
-    ViewData["Title"] = $"{@Model?.MenuItem?.ItemName}";
+    ViewData["Title"] = $"{menuItem?.ItemName}";
     bool userIsAuthenticated = User.Identity?.IsAuthenticated ?? false;
-
     bool isInStock = menuItem?.Stock > 0;
     int maxAmount = menuItem?.Stock < 100 ? menuItem.Stock : 100;
 }
+
 <div class="container py-4">
     <div class="row">
+        <!-- Right Section -->
+        <div class="col-lg-4 order-1 order-lg-2">
+            <div class="card mb-3">
+                <img src="/img/menu-item/@menuItem?.ImageURL" class="card-img-top rounded" alt="@menuItem?.ItemName" />
+            </div>
+        </div>
         <!-- Left Section -->
         <div class="col-lg-8 order-2 order-lg-1">
             <div class="card mb-4">
@@ -17,7 +23,6 @@
                     <h1 class="card-title h4">@menuItem?.ItemName</h1>
                     <p class="card-subtitle mb-1">
                         <strong>
-
                             &euro;@menuItem?.Price (incl. VAT)
                             @if (userIsAuthenticated)
                             {
@@ -25,22 +30,35 @@
                             }
                         </strong>
                     </p>
-                    <p>
-                        <strong>Category:</strong> @menuItem?.Category?.CategoryName
-                    </p>
-                    <p class="card-text">
-                        @menuItem?.ItemDescription
-                    </p>
+                    <p><strong>Category:</strong> @menuItem?.Category?.CategoryName</p>
+                    <p class="card-text">@menuItem?.ItemDescription</p>
                 </div>
             </div>
+
             @if (userIsAuthenticated && isInStock)
             {
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h5 for="amount">Amount</h5>
-                        <input type="number" id="amount" name="amount" min="0" max="@maxAmount" value="1" />
-                        <h5>Comment</h5>
-                        <textarea class="form-control" rows="3" placeholder="Type your comment for the bar and kitchen staff here (max. 500 characters)..."></textarea>
+                        <form method="post" asp-controller="Order" asp-action="AddItemToOrder">
+                            <input type="hidden" name="menuItemId" value="@menuItem?.MenuItemId" />
+                            <h5 for="amount">Amount</h5>
+                            <input type="number" class="form-control mb-3" id="amount" name="amount" min="1" max="@maxAmount" value="1" />
+                            <h5>Comment</h5>
+                            <textarea class="form-control mb-3" name="comment" rows="3" placeholder="Type your comment for the bar and kitchen staff here (max. 500 characters)..."></textarea>
+
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-end align-items-end mt-4">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-success" name="returnTo" value="menus">
+                                        Add and Return to Menus
+                                    </button>
+                                    <button type="submit" class="btn btn-success" name="returnTo" value="overview">
+                                        Add and Go to Order Overview<br />
+                                        <small>€ 0 for 0 items</small>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             }
@@ -53,28 +71,8 @@
                 </div>
             }
         </div>
-        <!-- Right Section with the image-->
-        <div class="col-lg-4 order-1 order-lg-2">
-            <div class="card mb-3">
-                <img src="/img/menu-item/@menuItem?.ImageURL" class="card-img-top rounded" alt="@menuItem?.ItemName" />
-                @* <div class="card-body">
-                </div> *@
-            </div>
-        </div>
     </div>
-    <!-- Buttons -->
-    <div class="d-flex justify-content-between align-items-end mt-4">
-        <a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-outline-primary">
-            Return to Menus
-        </a>
-        <div class="d-flex gap-2">
-            <button class="btn btn-success">
-                Add 1 and Return to Menus
-            </button>
-            <button class="btn btn-success">
-                Add 1 and Go to Order Overview<br />
-                <small>€0 for 0 items</small>
-            </button>
-        </div>
-    </div>
+    <a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-outline-primary">
+        Return to Menus
+    </a>
 </div>
