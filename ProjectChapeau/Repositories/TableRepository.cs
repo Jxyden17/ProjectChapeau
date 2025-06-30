@@ -24,7 +24,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    RestaurantTable restaurantTable = ReadTables(reader);
+                    RestaurantTable restaurantTable = ReadTable(reader);
                     restaurantTables.Add(restaurantTable);
                 }
                 reader.Close();
@@ -100,7 +100,7 @@ namespace ProjectChapeau.Repositories
                 {
                     if (reader.Read())
                     {
-                        RestaurantTable table = ReadTables(reader);
+                        RestaurantTable table = ReadTable(reader);
                         return table;
                     }
                 }

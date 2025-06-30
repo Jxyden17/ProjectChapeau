@@ -26,12 +26,12 @@ namespace ProjectChapeau.Repositories
 
             return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
         }
-        protected RestaurantTable ReadTables(SqlDataReader reader)
+        protected RestaurantTable ReadTable(SqlDataReader reader)
         {
-            int id = (int)reader["table_number"];
-            bool IsOccupoed = (bool)reader["is_occupied"];
+            int tableNumber = (int)reader["table_number"];
+            bool isOccupied = (bool)reader["is_occupied"];
 
-            return new RestaurantTable(id, IsOccupoed);
+            return new RestaurantTable(tableNumber, isOccupied);
         }
 
         protected static MenuItem ReadMenuItem(SqlDataReader reader)
@@ -68,10 +68,10 @@ namespace ProjectChapeau.Repositories
         {
             int orderId = (int)reader["order_id"];
             Employee employee = ReadEmployee(reader);
-            RestaurantTable table = ReadTables(reader);
+            RestaurantTable table = ReadTable(reader);
             List<OrderLine>? orderLines = new List<OrderLine>();
             DateTime orderDateTime = (DateTime)reader["order_datetime"];
-            OrderStatus? orderStatus = reader["order_status"] == DBNull.Value ? null : Enum.Parse<OrderStatus>(reader["order_status"].ToString());
+            OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
             bool isPaid = (bool)reader["is_paid"];
             decimal tipAmount = (decimal)reader["tip_amount"];
 
