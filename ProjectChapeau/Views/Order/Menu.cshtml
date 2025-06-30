@@ -56,4 +56,7 @@
         }
     }
 </main>
+<a class="btn btn-success" href="CurrentOrder">
+    @await Component.InvokeAsync("CurrentOrderButton", new { buttonText = "Go to Order Overview" })
+</a>
 <script src="/js/menuFilters.js"></script>

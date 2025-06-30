@@ -53,8 +53,7 @@
                                         Add and Return to Menus
                                     </button>
                                     <button type="submit" class="btn btn-success" name="returnTo" value="currentOrder">
-                                        Add and Go to Order Overview<br />
-                                        <small>€ 0 for 0 items</small>
+                                        @await Component.InvokeAsync("CurrentOrderButton", new { buttonText = "Add and Go to Order Overview"})
                                     </button>
                                 </div>
                             </div>

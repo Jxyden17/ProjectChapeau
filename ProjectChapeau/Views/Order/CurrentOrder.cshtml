@@ -7,4 +7,6 @@
 @foreach (OrderLine orderLine in Model.OrderLines)
 {
     <p>@orderLine.MenuItem.ItemName</p>
+    <p>@orderLine.Amount</p>
 }
+<p>@Model.SubtotalAmount</p>
