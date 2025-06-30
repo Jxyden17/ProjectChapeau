@@ -4,6 +4,9 @@
     MenuItem? menuItem = Model.MenuItem;
     ViewData["Title"] = $"{@Model?.MenuItem?.ItemName}";
     bool userIsAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+    bool isInStock = menuItem?.Stock > 0;
+    int maxAmount = menuItem?.Stock < 100 ? menuItem.Stock : 100;
 }
 <div class="container py-4">
     <div class="row">
@@ -13,11 +16,14 @@
                 <div class="card-body">
                     <h1 class="card-title h4">@menuItem?.ItemName</h1>
                     <p class="card-subtitle mb-1">
-                        &euro;@menuItem?.Price (incl. VAT)
-                        @if (userIsAuthenticated)
-                        {
-                            <strong> - @menuItem?.Stock left in stock</strong>
-                        }
+                        <strong>
+
+                            &euro;@menuItem?.Price (incl. VAT)
+                            @if (userIsAuthenticated)
+                            {
+                                <span> - @menuItem?.Stock left in stock</span>
+                            }
+                        </strong>
                     </p>
                     <p>
                         <strong>Category:</strong> @menuItem?.Category?.CategoryName
@@ -27,14 +33,22 @@
                     </p>
                 </div>
             </div>
-            @if (userIsAuthenticated)
+            @if (userIsAuthenticated && isInStock)
             {
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 for="amount">Amount</h5>
-                        <input type="number" id="amount" name="amount" min="1" max="100" value="1"/>
+                        <input type="number" id="amount" name="amount" min="0" max="@maxAmount" value="1" />
                         <h5>Comment</h5>
                         <textarea class="form-control" rows="3" placeholder="Type your comment for the bar and kitchen staff here (max. 500 characters)..."></textarea>
+                    </div>
+                </div>
+            }
+            else if (!isInStock)
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        Sorry, this menu item is not in stock at the moment.
                     </div>
                 </div>
             }
