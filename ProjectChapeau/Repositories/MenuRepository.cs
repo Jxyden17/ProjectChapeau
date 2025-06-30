@@ -4,26 +4,10 @@ using ProjectChapeau.Repositories.Interfaces;
 
 namespace ProjectChapeau.Repositories
 {
-    public class MenuRepository : ConnectionDatabase, IMenuRepository
+    public class MenuRepository : BaseRepository, IMenuRepository
     {
         public MenuRepository(IConfiguration configuration) : base(configuration)
         { }
-        private static MenuItem ReadMenuItem(SqlDataReader reader)
-        {
-            int menuItemId = (int)reader["menu_item_id"];
-            // Shortened if-else statement (condition ? true-statement : false-statement)
-            Category? category = reader["category_id"] == DBNull.Value || reader["category_name"] == DBNull.Value ? null : new Category((int)reader["category_id"], (string)reader["category_name"]);
-            string itemName = (string)reader["item_name"];
-            string? itemDescription = reader["item_description"] == DBNull.Value ? null : (string)reader["item_description"];
-            bool? isAlcoholic = reader["is_alcoholic"] == DBNull.Value ? null : (bool)reader["is_alcoholic"];
-            decimal price = (decimal)reader["price"];
-            int stock = (int)reader["stock"];
-            int? prepTime = reader["prep_time"] == DBNull.Value ? null : (int)reader["prep_time"];
-            bool isActive = (bool)reader["is_active"];
-
-            return new MenuItem(menuItemId, category, itemName, itemDescription, isAlcoholic, price, stock, prepTime, isActive);
-        }
-
         public List<int> GetAllMenuIds()
         {
             List<int> menuIds = new();

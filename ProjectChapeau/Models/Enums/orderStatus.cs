@@ -2,6 +2,7 @@
 {
     public enum OrderStatus
     {
+        NotOrdered,
         Ordered,
         BeingPrepared,
         ReadyToBeServed,

@@ -2,8 +2,8 @@
 
 namespace ProjectChapeau.Repositories.Interfaces
 {
-    public interface IOrderItemRepository
+    public interface IOrderLineRepository
     {
-        List<OrderItem> GetAllOrderItemsById(int id);
+        List<OrderLine> GetAllOrderItemsById(int id);
     }
 }

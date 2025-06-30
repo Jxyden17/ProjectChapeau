@@ -9,7 +9,7 @@ namespace ProjectChapeau.Repositories.Interfaces
 
         List<Order> GetAllOrders();
 
-        Order GetOrder(int id);
+        Order GetOrderById(int orderId);
         List<Order> GetRunningOrders();
 
         List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate);

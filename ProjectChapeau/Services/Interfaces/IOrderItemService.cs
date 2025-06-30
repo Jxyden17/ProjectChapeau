@@ -4,6 +4,6 @@ namespace ProjectChapeau.Services.Interfaces
 {
     public interface IOrderItemService
     {
-        List<OrderItem> GetAllOrderItemsById(int id);
+        List<OrderLine> GetAllOrderItemsById(int id);
     }
 }

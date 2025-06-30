@@ -5,19 +5,10 @@ using ProjectChapeau.Services.Interfaces;
 
 namespace ProjectChapeau.Repositories
 {
-    public class CategoryRepository : ConnectionDatabase, ICategoryRepository
+    public class CategoryRepository : BaseRepository, ICategoryRepository
     {
         public CategoryRepository(IConfiguration configuration) : base(configuration)
         { }
-
-        private static Category ReadCategory(SqlDataReader reader)
-        {
-            // Shortened if-else statement (condition ? true-statement : false-statement)
-            int categoryId = (int)reader["category_id"];
-            string? categoryName = reader["category_name"] == DBNull.Value ? null : (string)reader["category_name"];
-
-            return new Category(categoryId, categoryName);
-        }
 
         public List<Category> GetAllCategories()
         {

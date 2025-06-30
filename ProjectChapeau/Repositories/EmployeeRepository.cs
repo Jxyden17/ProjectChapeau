@@ -8,7 +8,7 @@ using ProjectChapeau.Models.Enums;
 
 namespace ProjectChapeau.Repositories
 {
-    public class EmployeeRepository : ConnectionDatabase, IEmployeeRepository
+    public class EmployeeRepository : BaseRepository, IEmployeeRepository
     {
         private readonly IPasswordService _passwordService;
 
@@ -119,20 +119,6 @@ namespace ProjectChapeau.Repositories
             }
 
             return employees;
-        }
-
-        private Employee ReadEmployee(SqlDataReader reader)
-        {
-            int id = (int)reader["employee_number"];
-            string firstname = (string)reader["firstname"];
-            string lastname = (string)reader["lastname"];
-            string username = (string)reader["username"];
-            string password = (string)reader["password"];
-            string salt = (string)reader["salt"];
-            bool isActive = (bool)reader["is_active"];
-            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
-
-            return new Employee(id, firstname ,lastname,username , password , isActive, employeeRole, salt);
         }
 
         public bool UserNameExists(string userName)

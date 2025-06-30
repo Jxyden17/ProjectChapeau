@@ -1,22 +1,16 @@
-﻿
-
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using ProjectChapeau.Models;
 using ProjectChapeau.Repositories.Interfaces;
 namespace ProjectChapeau.Repositories
 {
-    public class OrderItemRepository : IOrderItemRepository
+    public class OrderLineRepository : BaseRepository, IOrderLineRepository
     {
+        public OrderLineRepository(IConfiguration configuration) : base(configuration)
+        { }
 
-        private readonly string? _connectionString;
-
-        public OrderItemRepository(IConfiguration configuration)
+        public List<OrderLine> GetAllOrderItemsById(int id)
         {
-            _connectionString = configuration.GetConnectionString("ProjectChapeau");
-        }
-        public List<OrderItem> GetAllOrderItemsById(int id)
-        {
-            List<OrderItem> orderItems = new List<OrderItem>();
+            List<OrderLine> orderItems = new List<OrderLine>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -37,7 +31,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    OrderItem orderItem = ReadOrderItem(reader);
+                    OrderLine orderItem = ReadOrderLine(reader);
                     orderItems.Add(orderItem);
                 }
 
@@ -45,18 +39,6 @@ namespace ProjectChapeau.Repositories
             }
 
             return orderItems;
-        }
-
-
-        private OrderItem ReadOrderItem(SqlDataReader reader)
-        {
-            int orderId = (int)reader["order_id"];
-            int menuItemId = (int)reader["menu_item_id"];
-            string orderLineStatus = (string)reader["order_line_status"];
-            string comment = (string)reader["comment"];
-            int amount = (int)reader["amount"];
-
-            return new OrderItem(menuItemId, orderId, amount, comment, orderLineStatus);
         }
     }
 }
