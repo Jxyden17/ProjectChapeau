@@ -4,17 +4,19 @@
     ViewData["Title"] = "Current Order";
     int tableNumber = Model.Table.TableNumber;
 }
-<h1>
-    @if (tableNumber != 0)
-    {
-        <span>Currently Ordering for Table @tableNumber</span>
-    }
-    else
-    {
-        <span>@ViewData["Title"]</span>
-    }
-</h1>
+
 <div class="container-fluid mt-3">
+    <h1>
+        @if (tableNumber != 0)
+        {
+            <span>Currently Ordering for Table @tableNumber</span>
+        }
+        else
+        {
+            <span>@ViewData["Title"]</span>
+        }
+    </h1>
+    <partial name="_ErrorMessage" />
     <div class="row">
         <div class="d-flex justify-content-end align-items-center">
             <div class="col-5">Menu Item</div>
