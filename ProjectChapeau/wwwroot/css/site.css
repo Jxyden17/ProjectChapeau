@@ -32,3 +32,8 @@ body {
     z-index: 1000;
     border-radius: 0 16px 16px 0;
 }
+
+.bottom-buttons {
+    bottom: 1rem;
+    z-index:1100;
+}

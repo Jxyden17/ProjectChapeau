@@ -1,24 +1,77 @@
-@model ProjectChapeau.Models.ViewModel.MenuItemOverviewViewModel;
+@model ProjectChapeau.Models.ViewModel.MenuItemOverviewViewModel
 
 @{
     MenuItem? menuItem = Model.MenuItem;
-    ViewData["Title"] = $"{@Model?.MenuItem?.ItemName}";
+    ViewData["Title"] = $"{menuItem?.ItemName}";
     bool userIsAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    bool isInStock = menuItem?.Stock > 0;
+    int maxAmount = menuItem?.Stock < 100 ? menuItem.Stock : 100;
 }
-<h1>@menuItem?.ItemName</h1>
-<h2>
-    &euro;@menuItem?.Price
-    @if (userIsAuthenticated)
-    {
-        <span> - @menuItem?.Stock left in stock</span>
-    }
-</h2>
-@if (menuItem?.Category != null)
-{
-    <p>Category - @menuItem?.Category.CategoryName</p>
-}
-<p>@menuItem?.ItemDescription</p>
-<img src="/img/menu-item/@menuItem?.ImageURL" class="img-fluid rounded" alt="@menuItem?.ItemName" />
-<a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-primary">
-    Return to Menus
-</a>
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Right Section -->
+        <div class="col-lg-4 order-1 order-lg-2">
+            <div class="card mb-3">
+                <img src="/img/menu-item/@menuItem?.ImageURL" class="card-img-top rounded" alt="@menuItem?.ItemName" />
+            </div>
+        </div>
+        <!-- Left Section -->
+        <div class="col-lg-8 order-2 order-lg-1">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title h4">@menuItem?.ItemName</h1>
+                    <p class="card-subtitle mb-1">
+                        <strong>
+                            &euro;@menuItem?.PriceIncludingVAT (incl. VAT)
+                            @if (userIsAuthenticated)
+                            {
+                                <span> - @menuItem?.Stock left in stock</span>
+                            }
+                        </strong>
+                    </p>
+                    <p><strong>Category:</strong> @menuItem?.Category?.CategoryName</p>
+                    <p class="card-text">@menuItem?.ItemDescription</p>
+                </div>
+            </div>
+
+            @if (userIsAuthenticated && isInStock)
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="post" asp-controller="Order" asp-action="AddItemToOrder">
+                            <input type="hidden" name="menuItemId" value="@menuItem?.MenuItemId" />
+                            <h5 for="amount">Amount</h5>
+                            <input type="number" class="form-control mb-3" id="amount" name="amount" min="1" max="@maxAmount" value="1" />
+                            <h5>Comment</h5>
+                            <textarea class="form-control mb-3" name="comment" rows="3" placeholder="Type your comment for the bar and kitchen staff here (max. 500 characters)..."></textarea>
+
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-end align-items-end mt-4">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-success" name="returnTo" value="menu">
+                                        Add and Return to Menus
+                                    </button>
+                                    <button type="submit" class="btn btn-success" name="returnTo" value="currentOrder">
+                                        @await Component.InvokeAsync("CurrentOrderButton", new { buttonText = "Add and Go to Order Overview"})
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else if (!isInStock)
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        Sorry, this menu item is not in stock at the moment.
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <a href="/Order/Menu#@menuItem?.MenuItemId" class="btn btn-outline-primary">
+        Return to Menus
+    </a>
+</div>

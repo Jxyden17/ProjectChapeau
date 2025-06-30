@@ -6,7 +6,7 @@ using ProjectChapeau.Repositories.Interfaces;
 
 namespace ProjectChapeau.Repositories
 {
-    public class TableRepository : ConnectionDatabase, ITableRepository
+    public class TableRepository : BaseRepository, ITableRepository
     {
         public TableRepository(IConfiguration configuration) : base(configuration) { }
 
@@ -24,7 +24,7 @@ namespace ProjectChapeau.Repositories
 
                 while (reader.Read())
                 {
-                    RestaurantTable restaurantTable = ReadTables(reader);
+                    RestaurantTable restaurantTable = ReadTable(reader);
                     restaurantTables.Add(restaurantTable);
                 }
                 reader.Close();
@@ -45,12 +45,7 @@ namespace ProjectChapeau.Repositories
                     t.table_number, 
                     t.is_occupied,
 
-                    o.order_id,
-                    o.order_status,
-                    o.order_datetime,
-                    o.payment_status,
-                    o.tip_amount,
-                    o.income_amount,
+                    o.*,
 
                     e.employee_number,
                     e.firstname,
@@ -105,7 +100,7 @@ namespace ProjectChapeau.Repositories
                 {
                     if (reader.Read())
                     {
-                        RestaurantTable table = ReadTables(reader);
+                        RestaurantTable table = ReadTable(reader);
                         return table;
                     }
                 }
@@ -122,12 +117,7 @@ namespace ProjectChapeau.Repositories
                     t.table_number, 
                     t.is_occupied,
 
-                    o.order_id,
-                    o.order_status,
-                    o.order_datetime,
-                    o.payment_status,
-                    o.tip_amount,
-                    o.income_amount,
+                    o.*,
 
                     e.employee_number,
                     e.firstname,
@@ -165,7 +155,7 @@ namespace ProjectChapeau.Repositories
 
                         IEnumerable<OrderStatus> statusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
 
-                        return new TableEditViewModel(order.table.TableNumber, order.orderId, order.table.IsOccupied, order.orderStatus, statusOptions);
+                        return new TableEditViewModel(order.Table.TableNumber, order.OrderId, order.Table.IsOccupied, order.OrderStatus, statusOptions);
                     }
                 }
             }
@@ -189,45 +179,5 @@ namespace ProjectChapeau.Repositories
                     throw new Exception("No records updated!");
             }
         }
-
-        private Employee ReadEmployee(SqlDataReader reader)
-        {
-            int id = (int)reader["employee_number"];
-            string firstname = (string)reader["firstname"];
-            string lastname = (string)reader["lastname"];
-            string username = (string)reader["username"];
-            string password = (string)reader["password"];
-            string salt = (string)reader["salt"];
-            bool isActive = (bool)reader["is_active"];
-            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
-
-            return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
-        }
-
-        private RestaurantTable ReadTables(SqlDataReader reader)
-        {
-            int id = (int)reader["table_number"];
-            bool IsOccupoed = (bool)reader["is_occupied"];
-
-            return new RestaurantTable(id, IsOccupoed);
-        }
-
-        private Order ReadOrder(SqlDataReader reader)
-        {
-            int orderId = (int)reader["order_id"];
-            RestaurantTable table = ReadTables(reader);
-            Employee employee = ReadEmployee(reader);
-            List<OrderItem>? OrderItems = new List<OrderItem>();
-            DateTime dateTime = (DateTime)reader["order_datetime"];
-            OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-            paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
-            decimal IncomeAmount = (decimal)reader["income_amount"];
-            decimal tipAmount = (decimal)reader["tip_amount"];
-            decimal SalesAmount = IncomeAmount + tipAmount;
-
-            return new Order(orderId, employee, table, OrderItems, dateTime, orderStatus, paymentStatus, SalesAmount, IncomeAmount, tipAmount);
-
-        }
-
     }
 }
