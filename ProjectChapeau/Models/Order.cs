@@ -32,7 +32,11 @@ namespace ProjectChapeau.Models
         }
         public decimal? TipAmount { get; set; }
 
-        public Order(int orderId, Employee employee, RestaurantTable table, List<OrderLine> orderLines, DateTime orderDateTime, OrderStatus orderStatus, bool isPaid, decimal? tipAmount)
+        public Order()
+        {
+        }
+
+        public Order(int orderId, Employee employee, RestaurantTable table, List<OrderLine>? orderLines, DateTime orderDateTime, OrderStatus orderStatus, bool isPaid, decimal? tipAmount)
         {
             OrderId = orderId;
             Employee = employee;
@@ -42,10 +46,6 @@ namespace ProjectChapeau.Models
             OrderStatus = orderStatus;
             IsPaid = isPaid;
             TipAmount = tipAmount;
-        }
-
-        public Order()
-        {
         }
     }
 }

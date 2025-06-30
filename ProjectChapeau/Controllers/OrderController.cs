@@ -35,6 +35,7 @@ namespace ProjectChapeau.Controllers
             MenusOverviewViewModel menusOverviewViewModel = new(_menuService.GetAllMenus());
             return View(menusOverviewViewModel);
         }
+
         public IActionResult MenuItem(int? id)
         {
             if (id == null)
@@ -51,35 +52,76 @@ namespace ProjectChapeau.Controllers
 
             return View(menuItemOverviewViewModel);
         }
-        public IActionResult StartOrder()
-        {
-            Order order = new();
-            HttpContext.Session.SetObject(orderSessionKey, order);
 
-            return View();
-        }
-        public IActionResult AddItemToOrder(int? menuItemId, int? amount, string? comment)
+        public IActionResult CurrentOrder()
         {
+            return View(GetOrCreateCurrentOrder());
+        }
+
+        [HttpPost]
+        public IActionResult AddItemToOrder(int? menuItemId, int? amount, string? comment, string? returnTo)
+        {
+            if (!menuItemId.HasValue)
+            {
+                TempData["ErrorMessage"] = "No menu item specified.";
+                return View();
+            }
             try
             {
-                Order? order = HttpContext.Session.GetObject<Order>(orderSessionKey);
-
-                if (menuItemId == null)
-                {
-                    throw new ArgumentNullException(nameof(menuItemId));
-                }
-                int quantity = amount ?? 1;
+                Order order = GetOrCreateCurrentOrder();
                 MenuItem menuItem = _menuItemService.GetMenuItemById(menuItemId.Value);
-                OrderLine orderLine = new(menuItem, quantity, comment, OrderStatus.NotOrdered);
+                OrderLine orderLine = CreateOrderLine(menuItem, amount ?? 1, comment);
+
                 order.OrderLines.Add(orderLine);
-                HttpContext.Session.SetObject<Order>(orderSessionKey, order);
-                return View();
+                SaveCurrentOrderToSession(order);
+
+                switch(returnTo)
+                {
+                    case "menu":
+                        return RedirectToAction("Menu");
+                    case "currentOrder":
+                        return RedirectToAction("CurrentOrder");
+                    default:
+                        return RedirectToAction("MenuItem");
+
+                }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Item could not be added to current order: {ex.Message}";
+                TempData["ErrorMessage"] = $"Item could not be added to order: {ex.Message}";
                 return View();
             }
         }
+
+        // Private methods
+        private Order GetOrCreateCurrentOrder()
+        {
+            var order = HttpContext.Session.GetObject<Order>(orderSessionKey);
+            if (order == null)
+            {
+                order = CreateNewOrder();
+                SaveCurrentOrderToSession(order);
+            }
+            return order;
+        }
+
+        private void SaveCurrentOrderToSession(Order order)
+        {
+            HttpContext.Session.SetObject(orderSessionKey, order);
+        }
+
+        private Order CreateNewOrder()
+        {
+            // TODO
+            var employee = new Employee();
+            var table = new RestaurantTable();
+            return new Order(0, employee, table, new List<OrderLine>(), DateTime.Now, OrderStatus.NotOrdered, false, 0);
+        }
+
+        private OrderLine CreateOrderLine(MenuItem menuItem, int amount, string? comment)
+        {
+            return new OrderLine(menuItem, amount, comment, OrderStatus.NotOrdered);
+        }
+
     }
 }

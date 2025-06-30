@@ -1,3 +1,10 @@
-﻿@{
+﻿@model Order
+
+@{
     ViewData["Title"] = "Current Order";
+}
+<h1>@ViewData["Title"]</h1>
+@foreach (OrderLine orderLine in Model.OrderLines)
+{
+    <p>@orderLine.MenuItem.ItemName</p>
 }
