@@ -17,9 +17,34 @@ namespace ProjectChapeau.Repositories
             _passwordService = passwordService;
         }
 
+        public Employee? GetEmployeeByNumber(int employeeNumber)
+        {
+            Employee? employee = null;
+
+            using (SqlConnection connection = CreateConnection())
+            {
+                string query = @"SELECT *
+                                 FROM Employees
+                                 WHERE employee_number = @EmployeeNumber;";
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@EmployeeNumber", employeeNumber);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    employee = ReadEmployee(reader);
+                }
+                reader.Close();
+            }
+            return employee;
+        }
+
         public void AddEmployee(Employee employee)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = $"INSERT INTO Employees (firstname, lastname, username, password, salt, is_active, role) " +
                                "VALUES (@FirstName, @LastName, @Username, @Password, @Salt, @IsActive, @Role); " +
@@ -41,7 +66,7 @@ namespace ProjectChapeau.Repositories
         }
         public void UpdateEmployee(Employee employee)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
                                 "WHERE employee_number = @Id";
@@ -65,7 +90,7 @@ namespace ProjectChapeau.Repositories
         }
         public void DeleteEmployee(Employee employee)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = $"DELETE FROM Employees WHERE employee_number = @Id";
 
@@ -83,7 +108,7 @@ namespace ProjectChapeau.Repositories
         {
             List<Employee> employees = new List<Employee>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = @"SELECT employee_number, firstname, lastname, username, password, salt, is_active, role
                          FROM Employees";
@@ -123,7 +148,7 @@ namespace ProjectChapeau.Repositories
 
         public bool UserNameExists(string userName)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = "SELECT COUNT(*) FROM Employees WHERE username = @UserName";
 
@@ -140,7 +165,7 @@ namespace ProjectChapeau.Repositories
 
         public void DeactivateEmployee(int employeeId)
         {
-            using (SqlConnection connection = new(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = "UPDATE Employees SET is_active = 0 WHERE employee_number = @employee_number";
                 SqlCommand command = new(query, connection);
@@ -154,7 +179,7 @@ namespace ProjectChapeau.Repositories
 
         public void ActivateEmployee(int employeeId)
         {
-            using (SqlConnection connection = new(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = "UPDATE Employees SET is_active = 1 WHERE employee_number = @employee_number";
                 SqlCommand command = new(query, connection);

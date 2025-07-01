@@ -134,9 +134,9 @@ namespace ProjectChapeau.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            Employee employee = new Employee();
+            Employee employee = new();
             List<Roles> Roles = Enum.GetValues(typeof(Roles)).Cast<Roles>().ToList();
-            EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
+            EmployeeRoleModel viewModel = new(employee, Roles);
 
             return View(viewModel);
         }
@@ -169,9 +169,9 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            Employee? employee = _employeeService.GetEmployeeById((int)id);
+            Employee? employee = _employeeService.GetEmployeeByNumber((int)id);
             List<Roles> Roles = Enum.GetValues(typeof(Roles)).Cast<Roles>().ToList();
-            EmployeeRoleModel viewModel = new EmployeeRoleModel(employee, Roles);
+            EmployeeRoleModel viewModel = new(employee, Roles);
             return View(viewModel);
 
         }
@@ -201,7 +201,7 @@ namespace ProjectChapeau.Controllers
                 return NotFound();
             }
 
-            Employee? employee = _employeeService.GetEmployeeById((int)id);
+            Employee? employee = _employeeService.GetEmployeeByNumber((int)id);
             return View(employee);
         }
 

@@ -6,8 +6,8 @@ namespace ProjectChapeau.Models
     public class Order
     {
         public int OrderId { get; set; }
-        public Employee Employee { get; set; }
-        public RestaurantTable Table { get; set; }
+        public Employee? Employee { get; set; }
+        public RestaurantTable? Table { get; set; }
         public List<OrderLine>? OrderLines { get; set; } = [];
         public DateTime OrderDateTime { get; set; }
         public OrderStatus OrderStatus { get; set; }
@@ -55,7 +55,7 @@ namespace ProjectChapeau.Models
         {
         }
 
-        public Order(int orderId, Employee employee, RestaurantTable table, List<OrderLine>? orderLines, DateTime orderDateTime, OrderStatus orderStatus, bool isPaid, decimal? tipAmount)
+        public Order(int orderId, Employee? employee, RestaurantTable? table, List<OrderLine>? orderLines, DateTime orderDateTime, OrderStatus orderStatus, bool isPaid, decimal? tipAmount)
         {
             OrderId = orderId;
             Employee = employee;

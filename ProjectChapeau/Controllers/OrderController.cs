@@ -39,17 +39,18 @@ namespace ProjectChapeau.Controllers
         {
             if (id == null)
             {
-                return NotFound("There is no menu item ID provided in the URL. Please go back and try again.");
+                return NotFound("There is no menu item ID provided in the URL.");
             }
-            MenuItem? menuItem = _menuItemService.GetMenuItemById((int)id);
-
-            if (menuItem == null)
+            try
             {
-                return NotFound($"Menu item with ID {id} does not exist");
+                MenuItem menuItem = _menuItemService.GetMenuItemById((int)id);
+                MenuItemOverviewViewModel menuItemOverviewViewModel = new(menuItem);
+                return View(menuItemOverviewViewModel);
             }
-            MenuItemOverviewViewModel menuItemOverviewViewModel = new(menuItem);
-
-            return View(menuItemOverviewViewModel);
+            catch (Exception)
+            {
+                return NotFound($"No menu item with ID {id} found.");
+            }
         }
 
         public IActionResult CurrentOrder()
@@ -63,32 +64,27 @@ namespace ProjectChapeau.Controllers
             if (menuItemId == null)
             {
                 TempData["ErrorMessage"] = "No menu item ID is specified to add to the order.";
-                return RedirectToAction("MenuItem", new {id = menuItemId});
+                return RedirectToAction("MenuItem", new { id = menuItemId });
             }
-
             try
             {
                 Order order = GetOrCreateCurrentOrder();
-                MenuItem? menuItem = _menuItemService.GetMenuItemById(menuItemId.Value);
+                MenuItem menuItem = _menuItemService.GetMenuItemById(menuItemId.Value);
                 int quantity = amount ?? 1;
 
                 AddOrUpdateOrderLine(order, menuItem, quantity, comment);
                 SaveCurrentOrderToSession(order);
 
-                switch (returnTo)
+                return returnTo switch
                 {
-                    case "menu":
-                        return RedirectToAction("Menu");
-                    case "currentOrder":
-                        return RedirectToAction("CurrentOrder");
-                    default:
-                        return RedirectToAction("MenuItem", new {id = menuItemId});
-
-                }
+                    "menu" => RedirectToAction("Menu"),
+                    "currentOrder" => RedirectToAction("CurrentOrder"),
+                    _ => RedirectToAction("MenuItem", new { id = menuItemId }),
+                };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["ErrorMessage"] = $"Item could not be added to order: {ex.Message}";
+                TempData["ErrorMessage"] = $"Menu item could not be added to order.";
                 return RedirectToAction("MenuItem", new { id = menuItemId });
             }
         }
@@ -108,9 +104,9 @@ namespace ProjectChapeau.Controllers
                 SaveCurrentOrderToSession(order);
                 return RedirectToAction("CurrentOrder");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["ErrorMessage"] = $"The table of the current order could not be changed: {ex.Message}";
+                TempData["ErrorMessage"] = $"The table of the current order could not be changed.";
                 return View(number);
             }
         }
@@ -118,7 +114,6 @@ namespace ProjectChapeau.Controllers
         [HttpPost]
         public IActionResult SendCurrentOrder()
         {
-            Order order = GetOrCreateCurrentOrder();
             return RedirectToAction("Menu");
         }
 
@@ -153,7 +148,7 @@ namespace ProjectChapeau.Controllers
             return new OrderLine(menuItem, amount, comment, OrderStatus.NotOrdered);
         }
 
-        private void AddOrUpdateOrderLine(Order order, MenuItem menuItem, int amount, string? comment)
+        private static void AddOrUpdateOrderLine(Order order, MenuItem menuItem, int amount, string? comment)
         {
             OrderLine? existingOrderLine = FindExistingOrderLine(order, menuItem.MenuItemId);
 
@@ -168,12 +163,12 @@ namespace ProjectChapeau.Controllers
             }
         }
 
-        private OrderLine? FindExistingOrderLine(Order order, int menuItemId)
+        private static OrderLine? FindExistingOrderLine(Order order, int menuItemId)
         {
             return order.OrderLines.FirstOrDefault(orderLine => orderLine.MenuItem.MenuItemId == menuItemId);
         }
 
-        private void UpdateOrderLine(OrderLine orderLine, int amount, string? comment)
+        private static void UpdateOrderLine(OrderLine orderLine, int amount, string? comment)
         {
             orderLine.Amount += amount;
 

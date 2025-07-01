@@ -1,8 +1,8 @@
 ﻿using ProjectChapeau.Models;
 
-namespace ProjectChapeau.Repositories.Interfaces
+namespace ProjectChapeau.Services.Interfaces
 {
-    public interface IOrderLineRepository
+    public interface IOrderLineService
     {
         List<OrderLine> GetOrderLinesByOrderId(int orderId);
         void AddOrderLine(OrderLine orderLine);

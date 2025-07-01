@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Enums;
+using ProjectChapeau.Repositories.Interfaces;
 
 namespace ProjectChapeau.Repositories
 {
@@ -13,7 +14,11 @@ namespace ProjectChapeau.Repositories
             _connectionString = configuration.GetConnectionString("ProjectChapeau");
         }
 
-        protected Employee ReadEmployee(SqlDataReader reader)
+        protected SqlConnection CreateConnection()
+        {
+            return new SqlConnection(_connectionString);
+        }
+        protected static Employee ReadEmployee(SqlDataReader reader)
         {
             int id = (int)reader["employee_number"];
             string firstname = (string)reader["firstname"];
@@ -26,7 +31,7 @@ namespace ProjectChapeau.Repositories
 
             return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
         }
-        protected RestaurantTable ReadTable(SqlDataReader reader)
+        protected static RestaurantTable ReadTable(SqlDataReader reader)
         {
             int tableNumber = (int)reader["table_number"];
             bool isOccupied = (bool)reader["is_occupied"];
@@ -34,11 +39,26 @@ namespace ProjectChapeau.Repositories
             return new RestaurantTable(tableNumber, isOccupied);
         }
 
+        protected static Category ReadCategory(SqlDataReader reader)
+        {
+            // Shortened if-else statement (condition ? true-statement : false-statement)
+            int categoryId = (int)reader["category_id"];
+            string categoryName = (string)reader["category_name"];
+            return new Category(categoryId, categoryName);
+        }
+
         protected static MenuItem ReadMenuItem(SqlDataReader reader)
         {
             int menuItemId = (int)reader["menu_item_id"];
-            // Shortened if-else statement (condition ? true-statement : false-statement)
-            Category? category = ReadCategory(reader);
+            int? categoryId = reader["category_id"] == DBNull.Value ? null : (int)reader["category_id"];
+
+            Category? category = null;
+            // Pattern matching, cast int? categoryId to int id if it has a value and is of type int.
+            if (categoryId is int)
+            {
+                category = ReadCategory(reader);
+            }
+
             string itemName = (string)reader["item_name"];
             string? itemDescription = reader["item_description"] == DBNull.Value ? null : (string)reader["item_description"];
             bool? isAlcoholic = reader["is_alcoholic"] == DBNull.Value ? null : (bool)reader["is_alcoholic"];
@@ -49,41 +69,17 @@ namespace ProjectChapeau.Repositories
 
             return new MenuItem(menuItemId, category, itemName, itemDescription, isAlcoholic, price, stock, prepTime, isActive);
         }
-        protected static Category? ReadCategory(SqlDataReader reader)
-        {
-            if (reader["category_id"] == DBNull.Value)
-            {
-                return null;
-            }
-            else
-            {
-                // Shortened if-else statement (condition ? true-statement : false-statement)
-                int categoryId = (int)reader["category_id"];
-                string? categoryName = reader["category_name"] == DBNull.Value ? null : (string)reader["category_name"];
-                return new Category(categoryId, categoryName);
-            }
-        }
 
-        protected Order ReadOrder(SqlDataReader reader)
+        protected static OrderLine ReadOrderLine(SqlDataReader reader)
         {
-            int orderId = (int)reader["order_id"];
-            Employee employee = ReadEmployee(reader);
-            RestaurantTable table = ReadTable(reader);
-            List<OrderLine>? orderLines = [];
-            DateTime orderDateTime = (DateTime)reader["order_datetime"];
-            OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-            bool isPaid = (bool)reader["is_paid"];
-            decimal tipAmount = (decimal)reader["tip_amount"];
-
-            return new Order(orderId, employee, table, orderLines, orderDateTime, orderStatus, isPaid, tipAmount);
-        }
-
-        protected OrderLine ReadOrderLine(SqlDataReader reader)
-        {
-            MenuItem menuItem = ReadMenuItem(reader);
+            int menuItemId = (int)reader["menu_item_id"];
+            var menuItem = ReadMenuItem(reader) ?? throw new Exception($"Menu item with ID {menuItemId} does not exist.");
             int amount = (int)reader["amount"];
-            string comment = (string)reader["comment"];
-            OrderStatus orderLineStatus = Enum.Parse<OrderStatus>(reader["order_line_status"].ToString());
+            string? comment = (string)reader["comment"] as string;
+            if (!Enum.TryParse<OrderStatus>(reader["order_line_status"].ToString(), out OrderStatus orderLineStatus))
+            {
+                throw new ArgumentException($"Invalid order status value {reader["order_line_status"]} found in the database.");
+            }
 
             return new OrderLine(menuItem, amount, comment, orderLineStatus);
         }

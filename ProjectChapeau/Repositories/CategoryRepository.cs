@@ -14,25 +14,48 @@ namespace ProjectChapeau.Repositories
         {
             List<Category> categories = [];
 
-            using (SqlConnection connection = new(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT *
+                string query = @"SELECT category_id, category_name
                                  FROM Category
                                  ORDER BY category_id";
                 SqlCommand command = new(query, connection);
 
                 connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    Category category = ReadCategory(reader);
-                    categories.Add(category);
+                    while (reader.Read())
+                    {
+                        categories.Add(ReadCategory(reader));
+                    }
                 }
-                reader.Close();
-
             }
             return categories;
+        }
+
+        public Category? GetCategoryById(int categoryId)
+        {
+            Category? category = null;
+
+            using (SqlConnection connection = CreateConnection())
+            {
+                string query = @"SELECT category_id, category_name
+                                 FROM Category
+                                 WHERE category_id = @CategoryId";
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@CategoryId", categoryId);
+
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        category = ReadCategory(reader);
+                    }
+                }
+            }
+            return category;
         }
     }
 }

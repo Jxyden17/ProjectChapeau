@@ -32,18 +32,18 @@
 	<thead>
 		<tr>
 			<th>Name</th>
-			<th>Price</th>
+			<th>Price (Excl. VAT)</th>
 			<th>Stock</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
 		@{
-			foreach (var menuItem in Model)
+			foreach (MenuItem menuItem in Model)
 			{
 				<tr>
 					<td>@menuItem.ItemName</td>
-					<td>@menuItem.PriceIncludingVAT</td>
+					<td>@menuItem.PriceExcludingVAT</td>
 					<td>
 						@menuItem.Stock
 						<partial name="_StockMessage" model="menuItem"/>

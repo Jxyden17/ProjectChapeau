@@ -4,24 +4,19 @@ namespace ProjectChapeau.Models.ViewModel
 {
     public class TableEditViewModel
     {
-        public int tableID { get; set; }
-
-        public int? orderId { get; set; }
-        public bool isOccupied { get; set; }
-        public OrderStatus? currentOrderStatus { get; set; }
-        public IEnumerable<OrderStatus> orderStatusOptions { get; set; }
-
-        public TableEditViewModel(int tableID, int? orderId, bool isOccupied, OrderStatus? currentOrderStatus, IEnumerable<OrderStatus> orderStatusOptions)
-        {
-            this.tableID = tableID;
-            this.orderId = orderId;
-            this.isOccupied = isOccupied;
-            this.currentOrderStatus = currentOrderStatus;
-            this.orderStatusOptions = orderStatusOptions;
-        }
+        public RestaurantTable Table { get; set; }
+        public Order? Order { get; set; }
+        public IEnumerable<OrderStatus> OrderStatusOptions { get; set; }
 
         public TableEditViewModel()
         {
+        }
+
+        public TableEditViewModel(RestaurantTable table, Order? order, IEnumerable<OrderStatus> orderStatusOptions)
+        {
+            Table = table;
+            Order = order;
+            OrderStatusOptions = orderStatusOptions;
         }
     }
 }

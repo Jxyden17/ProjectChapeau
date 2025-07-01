@@ -7,9 +7,11 @@ namespace ProjectChapeau.Services
     public class MenuService : IMenuService
     {
         private readonly IMenuRepository _menuRepository;
-        public MenuService(IMenuRepository menuRepository)
+        private readonly IMenuItemRepository _menuItemRepository;
+        public MenuService(IMenuRepository menuRepository, IMenuItemRepository menuItemRepository)
         {
             _menuRepository = menuRepository;
+            _menuItemRepository = menuItemRepository;
         }
         public List<Menu> GetAllMenus()
         {
@@ -34,7 +36,8 @@ namespace ProjectChapeau.Services
         }
         public Menu GetMenuItemsWithoutDefinedMenu(string menuName)
         {
-            return _menuRepository.GetMenuItemsWithoutDefinedMenu(menuName);
+            List<MenuItem> menuItems = _menuItemRepository.GetMenuItemsWithoutMenuId();
+            return new Menu(0, menuName, menuItems);
         }
     }
 }

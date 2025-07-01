@@ -6,13 +6,9 @@ namespace ProjectChapeau.Services.Interfaces
     public interface ITableService
     {
         List<RestaurantTable> GetAllTables();
-
-        RestaurantTable GetTableById(int id);
-
-        void UpdateTableStatus(int tableId, bool isOccupied);
-
-        List<Order> GetAllTablesWithLatestOrder();
-
-        TableEditViewModel GetTableWithLatestOrderById(int? id);
+        RestaurantTable? GetTableByNumber(int tableNumber);
+        TableEditViewModel GetTableWithLatestOrder(int tableNumber);
+        List<TableWithOrder> GetAllTablesWithLatestOrder();
+        void UpdateTableStatus(int tableNumber, bool isOccupied);
     }
 }

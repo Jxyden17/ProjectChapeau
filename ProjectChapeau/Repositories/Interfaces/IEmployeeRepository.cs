@@ -4,6 +4,7 @@ namespace ProjectChapeau.Repositories.Interfaces
 {
     public interface IEmployeeRepository
     {
+        Employee? GetEmployeeByNumber(int employeeNumber);
         void AddEmployee(Employee employee);
         void UpdateEmployee(Employee employee);
         void DeleteEmployee(Employee employee);

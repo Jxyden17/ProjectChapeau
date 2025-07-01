@@ -18,8 +18,6 @@ namespace ProjectChapeau.Controllers
         {
             var menuItems = _menuItemService.GetFilteredMenuItems(menuId, categoryId);
             return View(menuItems);
-
-
         }
 
         [HttpGet]
@@ -34,21 +32,27 @@ namespace ProjectChapeau.Controllers
             try
             {
                 _menuItemService.AddMenuItem(menuItem);
-
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				ViewData["ErrorMessage"] = ex.Message;
-				return View(menuItem);
+                ViewData["ErrorMessage"] = $"{menuItem.ItemName} could not be added";
+                return View(menuItem);
             }
         }
 
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            MenuItem? menuItem = _menuItemService.GetMenuItemById(id);
-            return View(menuItem);
+            try
+            {
+                MenuItem menuItem = _menuItemService.GetMenuItemById(id);
+                return View(menuItem);
+            }
+            catch (Exception)
+            {
+                return NotFound($"Menu item with ID {id} not found.");
+            }
         }
 
         [HttpPost]
@@ -59,10 +63,10 @@ namespace ProjectChapeau.Controllers
                 _menuItemService.UpdateMenuItem(menuItem);
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				    ViewData["ErrorMessage"] = ex.Message;
-				     return View(menuItem);
+                ViewData["ErrorMessage"] = $"Menu item {menuItem.ItemName} could not be edited";
+                return View(menuItem);
             }
         }
 
