@@ -29,7 +29,7 @@ namespace ProjectChapeau.Repositories
 
             if (!Enum.TryParse<OrderStatus>(reader["order_status"].ToString(), out OrderStatus orderStatus))
             {
-                throw new ArgumentException($"Invalid order status value {reader["order_line_status"]} found in the database.");
+                throw new ArgumentException($"Invalid order status value {reader["order_status"]} found in the database.");
             }
 
             bool isPaid = (bool)reader["is_paid"];
