@@ -7,6 +7,7 @@
     @await Component.InvokeAsync("CategoryFilter")
 </aside>
 <main class="offset-4 offset-md-3 offset-lg-2 col-8 col-md-9 col-lg-10 ms-auto">
+    <partial name="_ErrorMessage" />
     <h1 class="display-4 text-center">@ViewData["Title"]</h1>
     <ul class="nav nav-tabs justify-content-center mb-4" id="menu-tabs">
         <li class="nav-item">

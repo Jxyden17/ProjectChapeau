@@ -41,9 +41,26 @@ namespace ProjectChapeau.Repositories
             return orderItems;
         }
 
-        public void AddOrderLine(OrderLine orderLine)
+        public void AddOrderLine(OrderLine orderLine, int orderId)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"INSERT INTO Order_Item (order_id, menu_item_id, amount, comment, order_line_status)
+                                 VALUES (@OrderId, @MenuItemId, @Amount, @Comment, @OrderLineStatus);
+                                 SELECT SCOPE_IDENTITY();";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                command.Parameters.AddWithValue("@MenuItemId", orderLine.MenuItem.MenuItemId);
+                command.Parameters.AddWithValue("@Amount", orderLine.Amount);
+                command.Parameters.AddWithValue("@Comment", orderLine.Comment);
+                command.Parameters.AddWithValue("@OrderLineStatus", orderLine.OrderLineStatus);
+
+                command.Connection.Open();
+
+                command.ExecuteNonQuery();
+            }
         }
     }
 }
