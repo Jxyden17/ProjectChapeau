@@ -211,7 +211,24 @@ namespace ProjectChapeau.Repositories
         }
         public void AddOrder(Order order)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"INSERT INTO Orders (employee_number, table_number, order_datetime, order_status, is_paid, tip_amount)
+                                 VALUES (@EmployeeNumber, @TableNumber, @OrderDateTime, @OrderStatus, @IsPaid, @TipAmount);
+                                 SELECT SCOPE_IDENTITY();";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@EmployeeNumber", order.Employee.employeeId);
+                command.Parameters.AddWithValue("@TableNumber", order.Table.TableNumber);
+                command.Parameters.AddWithValue("@OrderDateTime", order.OrderDateTime);
+                command.Parameters.AddWithValue("@OrderStatus", order.OrderStatus);
+                command.Parameters.AddWithValue("@IsPaid", order.IsPaid);
+                command.Parameters.AddWithValue("@TipAmount", order.TipAmount);
+
+                command.Connection.Open();
+                order.OrderId = Convert.ToInt32(command.ExecuteScalar());
+            }
         }
 
         public List<Order> GetRunningOrders()
