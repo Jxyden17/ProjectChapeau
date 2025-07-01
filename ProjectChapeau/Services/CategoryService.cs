@@ -16,5 +16,9 @@ namespace ProjectChapeau.Services
         {
             return _categoryRepository.GetAllCategories();
         }
+        public Category? GetCategoryById(int categoryId)
+        {
+            return _categoryRepository.GetCategoryById(categoryId);
+        }
     }
 }

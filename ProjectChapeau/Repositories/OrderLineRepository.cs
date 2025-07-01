@@ -1,55 +1,52 @@
 ﻿using Microsoft.Data.SqlClient;
 using ProjectChapeau.Models;
+using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Repositories.Interfaces;
 namespace ProjectChapeau.Repositories
 {
     public class OrderLineRepository : BaseRepository, IOrderLineRepository
     {
-        public OrderLineRepository(IConfiguration configuration) : base(configuration)
-        { }
-
-        public List<OrderLine> GetAllOrderItemsById(int id)
+        private readonly IMenuItemRepository _menuItemRepository;
+        public OrderLineRepository(IConfiguration configuration, IMenuItemRepository menuItemRepository) : base(configuration)
         {
-            List<OrderLine> orderItems = [];
+            _menuItemRepository = menuItemRepository;
+        }
 
-            using (SqlConnection connection = new(_connectionString))
+        public List<OrderLine> GetOrderLinesByOrderId(int orderId)
+        {
+            List<OrderLine> orderItems = new();
+
+            using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT 
-                            order_id,
-                            menu_item_id,
-                            order_line_status,
-                            comment,
-                            amount
-                         FROM order_item
-                         WHERE order_id = @OrderId";
+                string query = @"SELECT order_id, menu_item_id, amount, comment, order_line_status
+                                 FROM Order_Line
+                                 WHERE order_id = @OrderId;";
 
                 SqlCommand command = new(query, connection);
-                command.Parameters.AddWithValue("@OrderId", id);
+
+                command.Parameters.AddWithValue("@OrderId", orderId);
 
                 command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    OrderLine orderItem = ReadOrderLine(reader);
-                    orderItems.Add(orderItem);
+                    while (reader.Read())
+                    {
+                        orderItems.Add(ReadOrderLine(reader));
+                    }
                 }
-
-                reader.Close();
             }
-
             return orderItems;
         }
 
         public void AddOrderLine(OrderLine orderLine, int orderId)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
-                string query = @"INSERT INTO Order_Item (order_id, menu_item_id, amount, comment, order_line_status)
+                string query = @"INSERT INTO Order_Line (order_id, menu_item_id, amount, comment, order_line_status)
                                  VALUES (@OrderId, @MenuItemId, @Amount, @Comment, @OrderLineStatus);
                                  SELECT SCOPE_IDENTITY();";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@OrderId", orderId);
                 command.Parameters.AddWithValue("@MenuItemId", orderLine.MenuItem.MenuItemId);

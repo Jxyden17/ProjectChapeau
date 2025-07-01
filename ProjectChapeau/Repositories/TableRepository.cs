@@ -8,16 +8,17 @@ namespace ProjectChapeau.Repositories
 {
     public class TableRepository : BaseRepository, ITableRepository
     {
-        public TableRepository(IConfiguration configuration) : base(configuration) { }
+        public TableRepository(IConfiguration configuration) : base(configuration)
+        {}
 
         public List<RestaurantTable> GetAllTables()
         {
-            List<RestaurantTable> restaurantTables = new List<RestaurantTable>();
+            List<RestaurantTable> restaurantTables = new();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = "SELECT table_number, is_occupied FROM RESTAURANT_TABLE";
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -31,145 +32,59 @@ namespace ProjectChapeau.Repositories
             }
             return restaurantTables;
         }
-
-        public List<Order> GetAllTablesWithLatestOrder()
+        public List<int> GetAllTableNumbers()
         {
-            List<Order> Orders = new List<Order>();
+            List<int> tableNumbers = new();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                // This query gets each table and the latest order (if any) for that table
-                // Query selecteer alles wat nodig voor een edit en status bepaling.
-                string query = @"
-                    SELECT 
-                    t.table_number, 
-                    t.is_occupied,
+                string query = "SELECT DISTINCT table_number FROM RESTAURANT_TABLE ORDER BY table_number";
+                SqlCommand command = new(query, connection);
 
-                    o.*,
-
-                    e.employee_number,
-                    e.firstname,
-                    e.lastname,
-                    e.username,
-                    e.password,
-                    e.salt,
-                    e.is_active,
-                    e.role
-
-                FROM RESTAURANT_TABLE t
-                LEFT JOIN (
-                    SELECT o1.*
-                    FROM Orders o1
-                    INNER JOIN (
-                        SELECT table_number, MAX(order_datetime) AS MaxDate
-                        FROM Orders
-                        GROUP BY table_number
-                    ) o2 ON o1.table_number = o2.table_number AND o1.order_datetime = o2.MaxDate
-                ) o ON t.table_number = o.table_number
-                LEFT JOIN Employees e ON o.employee_number = e.employee_number
-                ORDER BY t.table_number ASC;";
-
-                SqlCommand command = new SqlCommand(query, connection);
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    Order order = ReadOrder(reader);
-                    Orders.Add(order);
+                    tableNumbers.Add((int)reader["table_number"]);
                 }
-
                 reader.Close();
             }
-
-            return Orders;
+            return tableNumbers;
         }
 
-        public RestaurantTable GetTableById(int id)
+        public RestaurantTable GetTableByNumber(int tableNumber)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            RestaurantTable table = new();
+            using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT table_number, is_occupied FROM RESTAURANT_TABLE
-                        WHERE table_number = @TableNumber;";
+                string query = @"SELECT table_number, is_occupied
+                                 FROM RESTAURANT_TABLE
+                                 WHERE table_number = @TableNumber;";
 
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@TableNumber", id);
+                SqlCommand command = new(query, connection);
+                command.Parameters.AddWithValue("@TableNumber", tableNumber);
 
                 connection.Open();
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        RestaurantTable table = ReadTable(reader);
-                        return table;
+                        table = ReadTable(reader);
                     }
                 }
             }
-            return null;
-        }
-
-        public TableEditViewModel GetTableWithLatestOrderById(int? id)
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"
-                 SELECT 
-                    t.table_number, 
-                    t.is_occupied,
-
-                    o.*,
-
-                    e.employee_number,
-                    e.firstname,
-                    e.lastname,
-                    e.username,
-                    e.password,
-                    e.salt,
-                    e.is_active,
-                    e.role
-
-                FROM RESTAURANT_TABLE t
-                LEFT JOIN (
-                    SELECT o1.*
-                    FROM Orders o1
-                    INNER JOIN (
-                        SELECT table_number, MAX(order_datetime) AS MaxDate
-                        FROM Orders
-                        GROUP BY table_number
-                    ) o2 ON o1.table_number = o2.table_number AND o1.order_datetime = o2.MaxDate
-                ) o ON t.table_number = o.table_number
-                LEFT JOIN Employees e ON o.employee_number = e.employee_number
-                WHERE t.table_number = @id
-                ORDER BY t.table_number ASC;";
-
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@id", id);
-
-                connection.Open();
-
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        Order order = ReadOrder(reader);
-
-                        IEnumerable<OrderStatus> statusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
-
-                        return new TableEditViewModel(order.Table.TableNumber, order.OrderId, order.Table.IsOccupied, order.OrderStatus, statusOptions);
-                    }
-                }
-            }
-            return null;
+            return table;
         }
 
         public void UpdateTableStatus(int tableId, bool isOccupied)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
                 string query = "UPDATE RESTAURANT_TABLE SET is_occupied = @isOccupied " +
                                "WHERE table_number = @Id";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@Id", tableId);
                 command.Parameters.AddWithValue("@IsOccupied", isOccupied);
 

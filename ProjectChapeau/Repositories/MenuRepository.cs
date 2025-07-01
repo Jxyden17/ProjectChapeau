@@ -8,111 +8,69 @@ namespace ProjectChapeau.Repositories
     {
         public MenuRepository(IConfiguration configuration) : base(configuration)
         { }
+
         public List<int> GetAllMenuIds()
         {
             List<int> menuIds = new();
 
-            //1. Create an SQL connection with a connection string
-            using (SqlConnection connection = new(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                // 2. Create an SQL command with a query
-                string query = @"SELECT *
+                string query = @"SELECT menu_id, menu_name
                                  FROM Menu
                                  ORDER BY menu_id;";
                 SqlCommand command = new(query, connection);
 
-                // 3. Open the SQL connection
                 command.Connection.Open();
-
-                // 4. Execute SQL command
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    int menuId = (int)reader["menu_id"];
-                    menuIds.Add(menuId);
+                    while (reader.Read())
+                    {
+                        int menuId = (int)reader["menu_id"];
+                        menuIds.Add(menuId);
+                    }
                 }
-                reader.Close();
             }
-
             return menuIds;
         }
 
         public Menu GetMenuById(int menuId)
         {
-            Menu menu = new();
-
-            //1. Create an SQL connection with a connection string
-            using (SqlConnection connection = new(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                // 2. Create an SQL command with a query
-                string query = @"SELECT MCI.menu_id, M.menu_name, MI.*, C.category_name
-                                 FROM Menu_Contains_Item AS MCI
-                                 INNER JOIN Menu AS M ON M.menu_id = MCI.menu_id
-                                 INNER JOIN Menu_Item AS MI ON MI.menu_item_id = MCI.menu_item_id
-                                 INNER JOIN Category AS C ON C.category_id = MI.category_id
-                                 WHERE MCI.menu_id LIKE @MenuId
-                                 ORDER BY MI.category_id;";
+                string query = @"SELECT MCI.menu_id, M.menu_name,
+                                     MCI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM Menu_Contains_Item MCI
+                                 JOIN Menu M ON MCI.menu_id = M.menu_id
+                                 JOIN Menu_Item MI ON MCI.menu_item_id = MI.menu_item_id
+                                 JOIN Category C ON MI.category_id = C.category_id
+                                 WHERE MCI.menu_id = @MenuId
+                                 ORDER BY MI.category_id, MCI.menu_item_id;";
                 SqlCommand command = new(query, connection);
-
-                // Add parameters to prevent SQL injection
                 command.Parameters.AddWithValue("@MenuId", menuId);
 
-                // 3. Open the SQL connection
                 command.Connection.Open();
-
-                // 4. Execute SQL command
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    if (string.IsNullOrEmpty(menu.MenuName))
+                    if (!reader.HasRows)
                     {
-                        menu.MenuName = reader["menu_name"].ToString();
+                        throw new KeyNotFoundException($"No menu found with ID {menuId}");
                     }
-                    MenuItem menuItem = ReadMenuItem(reader);
-                    menu.MenuItems.Add(menuItem);
+                    reader.Read();
+                    Menu menu = new Menu(
+                        (int)reader["menu_id"],
+                        reader["menu_name"] == DBNull.Value ? null : (string)reader["menu_name"],
+                        new List<MenuItem>());
+
+                    // First Menu Item
+                    menu.MenuItems.Add(ReadMenuItem(reader));
+                    while (reader.Read())
+                    {
+                        MenuItem menuItem = ReadMenuItem(reader);
+                        menu.MenuItems.Add(menuItem);
+                    }
+                    return menu;
                 }
-                reader.Close();
             }
-            menu.MenuId = menuId;
-
-            return menu;
-        }
-
-        public Menu GetMenuItemsWithoutDefinedMenu(string menuName)
-        {
-            Menu menu = new();
-
-            //1. Create an SQL connection with a connection string
-            using (SqlConnection connection = new(_connectionString))
-            {
-                // 2. Create an SQL command with a query
-                string query = @"SELECT MI.*, C.category_name
-                                 FROM Menu_Item AS MI
-                                 LEFT JOIN Menu_Contains_Item AS MCI ON MCI.menu_item_id = MI.menu_item_id
-                                 LEFT JOIN Category AS C ON C.category_id = MI.category_id
-                                 WHERE MCI.menu_item_id IS NULL
-                                 ORDER BY MI.category_id;";
-                SqlCommand command = new(query, connection);
-
-                // 3. Open the SQL connection
-                command.Connection.Open();
-
-                // 4. Execute SQL command
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    MenuItem menuItem = ReadMenuItem(reader);
-                    menu.MenuItems.Add(menuItem);
-                }
-                reader.Close();
-            }
-            menu.MenuName = menuName;
-            menu.MenuId = 0;
-
-            return menu;
         }
     }
 }

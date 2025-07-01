@@ -8,46 +8,50 @@ namespace ProjectChapeau.Services
 {
     public class MenuItemService : IMenuItemService
     {
-        private readonly IMenuItemRepository _menuItemsRepository;
+        private readonly IMenuItemRepository _menuItemRepository;
 
         public MenuItemService(IMenuItemRepository menuItemsRepository)
         {
-            _menuItemsRepository = menuItemsRepository;
+            _menuItemRepository = menuItemsRepository;
         }
         
-        public MenuItem? GetMenuItemById(int menuItemId)
+        public MenuItem GetMenuItemById(int menuItemId)
         {
-            return _menuItemsRepository.GetMenuItemById(menuItemId);
+            return _menuItemRepository.GetMenuItemById(menuItemId);
+        }
+        public List<MenuItem> GetMenuItemsByMenuId(int menuId)
+        {
+            return _menuItemRepository.GetMenuItemsByMenuId(menuId);
         }
 
-        public List<MenuItem> GetCategory(int categoryId)
+        public List<MenuItem> GetMenuItemsWithoutMenuId()
         {
-            return _menuItemsRepository.GetCategory(categoryId);
+            return _menuItemRepository.GetMenuItemsWithoutMenuId();
         }
 
         public List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId)
         {
-            return _menuItemsRepository.GetFilteredMenuItems(menuId, categoryId);
+            return _menuItemRepository.GetFilteredMenuItems(menuId, categoryId);
         }
 
         public void AddMenuItem(MenuItem menuItem)
         {
-            _menuItemsRepository.AddMenuItem(menuItem);
+            _menuItemRepository.AddMenuItem(menuItem);
         }
 
         public void UpdateMenuItem(MenuItem menuItem)
         {
-            _menuItemsRepository.UpdateMenuItem(menuItem);
+            _menuItemRepository.UpdateMenuItem(menuItem);
         }
 
         public void DeactivateMenuItem(int menuItemId)
         {
-            _menuItemsRepository.DeactivateMenuItem(menuItemId);
+            _menuItemRepository.DeactivateMenuItem(menuItemId);
         }
 
         public void ActivateMenuItem(int menuItemId)
         {
-            _menuItemsRepository.ActivateMenuItem(menuItemId);
+            _menuItemRepository.ActivateMenuItem(menuItemId);
         }
     }
 }

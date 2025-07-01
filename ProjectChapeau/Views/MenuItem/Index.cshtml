@@ -1,66 +1,64 @@
 ﻿@model List<ProjectChapeau.Models.MenuItem>
 
 @{
-	ViewData["Title"] = "MenuItem";
+    ViewData["Title"] = "MenuItem";
 }
-
-<div class="text-center">
-	<h1 class="display-4">MenuItem</h1>
-</div>
+<h1 class="display-4 text-center">MenuItem</h1>
+<partial name="_ErrorMessage" />
 
 <form method="get">
-	<label for="menuId">Card (Menu):</label>
-	<select name="menuId" id="menuId">
-		<option value="">All</option>
-		<option value="1">Lunch Menu</option>
-		<option value="2">Dinner Menu</option>
-		<option value="3">Drink Menu</option>
-	</select>
+    <label for="menuId">Card (Menu):</label>
+    <select name="menuId" id="menuId">
+        <option value="">All</option>
+        <option value="1">Lunch Menu</option>
+        <option value="2">Dinner Menu</option>
+        <option value="3">Drink Menu</option>
+    </select>
 
-	<label for="categoryId">Category:</label>
-	<select name="categoryId" id="categoryId">
-		<option value="">All</option>
-		<option value="1">Starters</option>
-		<option value="2">Mains</option>
-		<option value="3">Desserts</option>
-	</select>
+    <label for="categoryId">Category:</label>
+    <select name="categoryId" id="categoryId">
+        <option value="">All</option>
+        <option value="1">Starters</option>
+        <option value="2">Mains</option>
+        <option value="3">Desserts</option>
+    </select>
 
-	<button type="submit">filter</button>
+    <button type="submit">filter</button>
 </form>
 <a href="/MenuItem/Add" class="btn btn-primary">Add</a>
 <table class="table table-dark table-hover">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Price</th>
-			<th>Stock</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		@{
-			foreach (var menuItem in Model)
-			{
-				<tr>
-					<td>@menuItem.ItemName</td>
-					<td>@menuItem.PriceIncludingVAT</td>
-					<td>
-						@menuItem.Stock
-						<partial name="_StockMessage" model="menuItem"/>
-					</td>
-					<td>
-						@if (menuItem.IsActive)
-						{
-							<a href="/MenuItem/Edit/@menuItem.MenuItemId" class="btn btn-sm btn-warning me-1">Edit</a>
-							<a href="/MenuItem/Deactivate/@menuItem.MenuItemId" class="btn btn-success">Deactivate</a>
-						}
-						else
-						{
-							<a href="/MenuItem/Activate/@menuItem.MenuItemId" class="btn btn-outline-success">Activate</a>
-						}
-					</td>
-				</tr>
-			}
-		}
-	</tbody>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price (Excl. VAT)</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (MenuItem menuItem in Model)
+            {
+                <tr>
+                    <td>@menuItem.ItemName</td>
+                    <td>@menuItem.PriceExcludingVAT</td>
+                    <td>
+                        @menuItem.Stock
+                        <partial name="_StockMessage" model="menuItem" />
+                    </td>
+                    <td>
+                        @if (menuItem.IsActive)
+                        {
+                            <a href="/MenuItem/Edit/@menuItem.MenuItemId" class="btn btn-sm btn-warning me-1">Edit</a>
+                            <a href="/MenuItem/Deactivate/@menuItem.MenuItemId" class="btn btn-success">Deactivate</a>
+                        }
+                        else
+                        {
+                            <a href="/MenuItem/Activate/@menuItem.MenuItemId" class="btn btn-outline-success">Activate</a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
 </table>
