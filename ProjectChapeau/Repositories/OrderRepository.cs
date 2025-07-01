@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Hosting;
 using ProjectChapeau.Models;
 using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Repositories.Interfaces;
@@ -6,94 +7,265 @@ using ProjectChapeau.Services;
 
 namespace ProjectChapeau.Repositories
 {
-    public class OrderRepository : ConnectionDatabase,  IOrderRepository
+    public class OrderRepository : BaseRepository, IOrderRepository
     {
-
-        public OrderRepository(IConfiguration configuration) : base(configuration) { }
-
-        public List<Order> GetAllOrders()
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly ITableRepository _tableRepository;
+        private readonly IOrderLineRepository _orderLineRepository;
+        public OrderRepository(IConfiguration configuration, IEmployeeRepository employeeRepository, ITableRepository tableRepository, IOrderLineRepository orderLineRepository) : base(configuration)
         {
-            List<Order> orders = new List<Order>();
+            _employeeRepository = employeeRepository;
+            _tableRepository = tableRepository;
+            _orderLineRepository = orderLineRepository;
+        }
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+        // ReadOrder creates an individual Order object, but without any OrderLines! Please use ReadOrderLines() below
+        private Order ReadOrder(SqlDataReader reader)
+        {
+            int orderId = (int)reader["order_id"];
+            int employeeNumber = (int)reader["employee_number"];
+            int tableNumber = (int)reader["table_number"];
+            DateTime orderDateTime = (DateTime)reader["order_datetime"];
+
+            if (!Enum.TryParse<OrderStatus>(reader["order_status"].ToString(), out OrderStatus orderStatus))
             {
-                string query = @" SELECT 
-                o.order_id,
-                o.order_datetime,
-                o.order_status,
-                o.payment_status,
-                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
-                rt.table_number, rt.is_occupied
-                FROM Orders o
-                JOIN Employees e ON o.employee_number = e.employee_number
-                JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number;";
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    Order order = ReadOrder(reader);
-
-                    orders.Add(order);
-                }
-                reader.Close();
+                throw new ArgumentException($"Invalid order status value {reader["order_line_status"]} found in the database.");
             }
 
+            bool isPaid = (bool)reader["is_paid"];
+            decimal? tipAmount = (decimal)reader["tip_amount"];
+
+            var employee = _employeeRepository.GetEmployeeByNumber(employeeNumber);
+            var table = _tableRepository.GetTableByNumber(tableNumber);
+
+            if (employee == null)
+            {
+                throw new Exception($"Employee with number {employeeNumber} does not exist");
+            }
+
+            if (table == null)
+            {
+
+                throw new Exception($"Table with number {tableNumber} does not exist");
+            }
+            return new Order(orderId, employee, table, new(), orderDateTime, orderStatus, isPaid, tipAmount);
+        }
+
+        private static List<OrderLine> ReadOrderLines(SqlDataReader reader)
+        {
+            List<OrderLine> orderLines = new();
+
+            while (reader.Read())
+            {
+                if (reader["menu_item_id"] != DBNull.Value)
+                {
+                    OrderLine orderLine = ReadOrderLine(reader);
+                    orderLines.Add(orderLine);
+                }
+            }
+
+            return orderLines;
+        }
+
+        private List<Order> ReadOrders(SqlDataReader reader)
+        {
+            List<Order> orders = new();
+            Order? currentOrder = null;
+            List<OrderLine> currentOrderLines = new();
+
+            while (reader.Read())
+            {
+                // Check if we are encoutering a new order by comparing the order_id
+                int currentOrderId = (int)reader["order_id"];
+                if (currentOrder == null || currentOrder.OrderId != currentOrderId)
+                {
+                    // Order_id is different from the previous row
+                    if (currentOrder != null)
+                    {
+                        currentOrder.OrderLines = currentOrderLines;
+                        orders.Add(currentOrder);
+                    }
+
+                    // Read the new order and initialize the order lines
+                    currentOrder = ReadOrder(reader);
+                    currentOrderLines = new List<OrderLine>();
+                }
+                // Add the order_line if it exists
+                if (reader["menu_item_id"] != DBNull.Value)
+                {
+                    OrderLine orderLine = ReadOrderLine(reader);
+                    currentOrderLines.Add(orderLine);
+                }
+            }
+
+            // Add the last order to the list after the loop
+            if (currentOrder != null)
+            {
+                currentOrder.OrderLines = currentOrderLines;
+                orders.Add(currentOrder);
+            }
             return orders;
         }
 
-        public Order GetOrder(int id)
+        public List<Order> GetAllOrders()
         {
-            throw new NotImplementedException();
+            List<Order> orders = new();
+
+            using (SqlConnection connection = CreateConnection())
+            {
+                string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
+                                     OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM [Order] O
+                                 LEFT JOIN Order_Line OL on O.order_id = OL.order_id
+                                 LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
+                                 LEFT JOIN Category C on MI.category_id = C.category_id
+                                 ORDER BY O.order_datetime DESC, O.order_id, C.category_id, MI.menu_item_id;";
+
+                SqlCommand command = new(query, connection);
+                command.Connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    orders = ReadOrders(reader);
+                }
+            }
+            return orders;
+        }
+
+        public Order? GetOrderById(int orderId)
+        {
+            Order? order = null;
+            List<OrderLine> orderLines = new();
+
+            using (SqlConnection connection = CreateConnection())
+            {
+                string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
+                                     OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM [Order] O
+                                 LEFT JOIN Order_Line OL on O.order_id = OL.order_id
+                                 LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
+                                 LEFT JOIN Category C on MI.category_id = C.category_id
+                                 WHERE O.order_id = @OrderId
+                                 ORDER BY C.category_id, MI.menu_item_id;";
+
+                SqlCommand command = new(query, connection);
+                command.Parameters.AddWithValue("@OrderId", orderId);
+
+                command.Connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        order = ReadOrder(reader);
+                        orderLines = ReadOrderLines(reader);
+                    }
+                }
+            }
+            if (order != null)
+            {
+                order.OrderLines = orderLines;
+            }
+            return order;
+        }
+
+        public Order? GetLatestOrderForTable(int tableNumber)
+        {
+            Order? order = null;
+            List<OrderLine> orderLines = new();
+
+            using (SqlConnection connection = CreateConnection())
+            {
+                string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
+                                     OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM [Order] O
+                                 LEFT JOIN Order_Line OL ON O.order_id = OL.order_id
+                                 LEFT JOIN Menu_Item MI ON OL.menu_item_id = MI.menu_item_id
+                                 LEFT JOIN Category C ON MI.category_id = C.category_id
+                                 WHERE O.order_id = (SELECT TOP 1 order_id
+                                     FROM [Order]
+                                     WHERE table_number = @TableNumber
+                                     ORDER BY order_datetime DESC)
+                                 ORDER BY C.category_id, MI.menu_item_id;";
+
+                SqlCommand command = new(query, connection);
+                command.Parameters.AddWithValue("@TableNumber", tableNumber);
+
+                command.Connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        order = ReadOrder(reader);
+                        orderLines = ReadOrderLines(reader);
+                    }
+                }
+            }
+            if (order != null)
+            {
+                order.OrderLines = orderLines;
+            }
+            return order;
+        }
+        public void AddOrder(Order order)
+        {
+            using (SqlConnection connection = new(_connectionString))
+            {
+                string query = @"INSERT INTO Orders (employee_number, table_number, order_datetime, order_status, is_paid, tip_amount)
+                                 VALUES (@EmployeeNumber, @TableNumber, @OrderDateTime, @OrderStatus, @IsPaid, @TipAmount);
+                                 SELECT SCOPE_IDENTITY();";
+
+                SqlCommand command = new(query, connection);
+
+                command.Parameters.AddWithValue("@EmployeeNumber", order.Employee.employeeId);
+                command.Parameters.AddWithValue("@TableNumber", order.Table.TableNumber);
+                command.Parameters.AddWithValue("@OrderDateTime", order.OrderDateTime);
+                command.Parameters.AddWithValue("@OrderStatus", order.OrderStatus);
+                command.Parameters.AddWithValue("@IsPaid", order.IsPaid);
+                command.Parameters.AddWithValue("@TipAmount", order.TipAmount);
+
+                command.Connection.Open();
+                order.OrderId = Convert.ToInt32(command.ExecuteScalar());
+            }
         }
 
         public List<Order> GetRunningOrders()
         {
-            List<Order> orders = new List<Order>();
+            List<Order> orders = new();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                string query = @" SELECT 
-                o.order_id,
-                o.order_datetime,
-                o.order_status,
-                o.payment_status,
-                o.income_amount,
-                o.tip_amount,
-                e.employee_number, e.firstname, e.lastname, e.username, e.password, e.salt, e.is_active, e.role,
-                rt.table_number, rt.is_occupied
-                FROM Orders o
-                JOIN Employees e ON o.employee_number = e.employee_number
-                JOIN RESTAURANT_TABLE rt ON o.table_number = rt.table_number
-    
-                WHERE o.order_status = 'BeingPrepared'
-                ORDER BY o.order_datetime ASC;";
-                SqlCommand command = new SqlCommand(query, connection);
+                string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
+                                     OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM [Order] O
+                                 LEFT JOIN Order_Line OL on O.order_id = OL.order_id
+                                 LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
+                                 LEFT JOIN Category C on MI.category_id = C.category_id
+                                 WHERE O.order_status IN ('Ordered', 'BeingPrepared', 'ReadyToBeServed', 'Served')
+                                 ORDER BY O.order_datetime ASC, O.order_id, C.category_id, MI.menu_item_id;";
 
+                SqlCommand command = new(query, connection);
                 command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
 
-                while (reader.Read())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    Order order = ReadOrder(reader);
-                    orders.Add(order);
+                    orders = ReadOrders(reader);
                 }
-                reader.Close();
             }
-
             return orders;
         }
 
         public void UpdateOrderStatus(int? orderId, OrderStatus? newStatus)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                string query = "UPDATE Orders SET order_status = @OrderStatus " +
-                               "WHERE order_id = @OrderId";
+                string query = @"UPDATE [Order]SET order_status = @OrderStatus
+                                 WHERE order_id = @OrderId;";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@OrderId", orderId);
                 command.Parameters.AddWithValue("@OrderStatus", newStatus.ToString());
 
@@ -104,95 +276,32 @@ namespace ProjectChapeau.Repositories
             }
         }
 
-        private Employee ReadEmployee(SqlDataReader reader)
-        {
-            int id = (int)reader["employee_number"];
-            string firstname = (string)reader["firstname"];
-            string lastname = (string)reader["lastname"];
-            string username = (string)reader["username"];
-            string password = (string)reader["password"];
-            string salt = (string)reader["salt"];
-            bool isActive = (bool)reader["is_active"];
-            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
-
-            return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
-        }
-
-        private RestaurantTable ReadTables(SqlDataReader reader)
-        {
-            int id = (int)reader["table_number"];
-            bool IsOccupoed = (bool)reader["is_occupied"];
-
-            return new RestaurantTable(id, IsOccupoed);
-        }
-
-        private OrderItem ReadOrderItem(SqlDataReader reader)
-        {
-            int orderId = (int)reader["order_id"];
-            int menuItemId = (int)reader["menu_item_id"];
-            string orderLineStatus = (string)reader["order_line_status"];
-            string comment = (string)reader["comment"];
-            int amount = (int)reader["amount"];
-
-            return new OrderItem(menuItemId, orderId, amount, orderLineStatus, comment);
-        }
-
-        private Order ReadOrder(SqlDataReader reader)
-        {
-            int orderId = (int)reader["order_id"];
-            RestaurantTable table = ReadTables(reader);
-            Employee employee = ReadEmployee(reader);
-            List<OrderItem>? OrderItems = new List<OrderItem>();
-            DateTime dateTime = (DateTime)reader["order_datetime"];
-            OrderStatus orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString());
-            paymentStatus paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString());
-            decimal IncomeAmount = (decimal)reader["income_amount"];
-            decimal tipAmount = (decimal)reader["tip_amount"];
-            decimal SalesAmount = IncomeAmount + tipAmount;
-
-            return new Order(orderId, employee, table, OrderItems, dateTime, orderStatus, paymentStatus, SalesAmount, IncomeAmount, tipAmount);
-
-        }
-
         public List<Order> GetOrderByPeriod(DateTime startDate, DateTime endDate)
         {
-            List<Order> orders = new List<Order>();
+            List<Order> orders = [];
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT o.order_id, o.order_datetime, o.order_status, o.payment_status, oi.amount, o.tip_amount,
-                                 mi.menu_item_id, mi.price
-                                 m.menu_name AS item_category, 
-                                 (mi.price * oi.amount) AS sales_amount,
-                                 ((mi.price * oi.amount) + o.tip_amount) AS income_amount
-                                 FROM Orders o
-                                 JOIN order_item oi ON o.order_id = oi.order_id
-                                 JOIN Menu_Item mi ON oi.menu_item_id = mi.menu_item_id
-                                 JOIN Menu_Contains_Item mci ON mi.menu_item_id = mci.menu_item_id
-                                 JOIN Menu m ON mci.menu_id = m.menu_id
-                                 WHERE o.order_datetime >= @StartDate AND o.order_datetime <= @EndDate 
-                                 AND o.payment_status = 'Paid'";
+                string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
+                                     OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                 FROM [Order] O
+                                 LEFT JOIN Order_Line OL on O.order_id = OL.order_id
+                                 LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
+                                 LEFT JOIN Category C on MI.category_id = C.category_id
+                                 WHERE O.order_datetime >= @StartDate AND O.order_datetime <= @EndDate 
+                                 AND O.is_paid = 1
+                                 ORDER BY O.order_datetime ASC, O.order_id, C.category_id, MI.menu_item_id;";
 
-                SqlCommand command = new SqlCommand(query, connection); 
-                command.Parameters.AddWithValue("@StartDate",startDate);
+                SqlCommand command = new(query, connection);
+                command.Parameters.AddWithValue("@StartDate", startDate);
                 command.Parameters.AddWithValue("@EndDate", endDate);
 
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    orders.Add(new Order
-                    {
-                        orderId = (int)reader["order_id"],
-                        datetime = (DateTime)reader["order_datetime"],
-                        orderStatus = Enum.Parse<OrderStatus>(reader["order_status"].ToString()),
-                        paymentStatus = Enum.Parse<paymentStatus>(reader["payment_status"].ToString()),
-                        SalesAmount = (decimal)reader["sales_amount"],
-                        IncomeAmount = (decimal)reader["income_amount"],
-                        TipAmount = (decimal)reader["tip_amount"],
-                        Category = reader["item_category"].ToString()
+                command.Connection.Open();
 
-                    });
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    orders = ReadOrders(reader);
                 }
             }
             return orders;

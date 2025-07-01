@@ -1,0 +1,13 @@
+﻿@model Order
+
+@{
+    ViewData["Title"] = "Change Table";
+}
+<h1>@ViewData["Title"]</h1>
+<partial name="_ErrorMessage" />
+<p>To which table do you want to change your order to?</p>
+<form method="post" asp-controller="Order" asp-action="ChangeTable" >
+    <input type="number" class="form-control" id="number" name="number" min="1" max="10" value="@Model.Table.TableNumber" />
+    <button type="submit" class="btn btn-primary mb-3">Change Table</button>
+</form>
+<a class="btn btn-outline-primary" href="CurrentOrder">Return to Order Overview</a>

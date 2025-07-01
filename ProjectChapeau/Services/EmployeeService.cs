@@ -37,7 +37,10 @@ namespace ProjectChapeau.Services
         {
             return _employeeRepository.GetEmployees();
         }
-
+        public Employee? GetEmployeeByNumber(int employeeNumber)
+        {
+            return _employeeRepository.GetEmployeeByNumber(employeeNumber); 
+        }
         public Employee? GetEmployeeByLoginCredentials(string Username, string password)
         {
             Employee? employee = _employeeRepository.GetEmployees(username: Username).FirstOrDefault();
@@ -55,10 +58,6 @@ namespace ProjectChapeau.Services
             return null;
         }
 
-        public Employee? GetEmployeeById(int id)
-        {
-            return _employeeRepository.GetEmployees(employeeNumber: id).FirstOrDefault(); 
-        } 
 
         public void UpdateEmployee(Employee employee)
         {

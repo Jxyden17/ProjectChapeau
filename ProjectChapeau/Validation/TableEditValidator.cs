@@ -12,19 +12,19 @@ namespace ProjectChapeau.Validation
             if (CurrentTableOrder == null)
                 return new TableValidationResult(false, "Table or Order not found. Try again.", false, false);
 
-            // If no active order, only table status can be changed
-            if (CurrentTableOrder.currentOrderStatus == null || CurrentTableOrder.currentOrderStatus == OrderStatus.Completed)
+            // If no active order at all
+            if (CurrentTableOrder.Order == null || CurrentTableOrder.Order.OrderStatus == OrderStatus.Completed)
             {
-                bool updateTable = CurrentTableOrder.isOccupied != EditedTableOrder.isOccupied;
+                bool updateTable = CurrentTableOrder.Table.IsOccupied != EditedTableOrder.Table.IsOccupied;
                 if (!updateTable)
                     return new TableValidationResult(false, "No changes detected in table status.", false, false);
                 return new TableValidationResult(true, null, updateTable, false);
             }
 
-            OrderStatus? requestedStatus = EditedTableOrder.currentOrderStatus;
-            OrderStatus currentStatus = CurrentTableOrder.currentOrderStatus.Value;
+            OrderStatus? requestedStatus = EditedTableOrder.Order.OrderStatus;
+            OrderStatus currentStatus = CurrentTableOrder.Order.OrderStatus;
 
-            bool isTableStatusChanging = CurrentTableOrder.isOccupied != EditedTableOrder.isOccupied;
+            bool isTableStatusChanging = CurrentTableOrder.Table.IsOccupied != EditedTableOrder.Table.IsOccupied;
             bool isOrderStatusChanging = currentStatus != requestedStatus;
 
             if (isTableStatusChanging)

@@ -29,14 +29,24 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 
-            builder.Services.AddSingleton<IOrderItemRepository, OrderItemRepository>();
-            builder.Services.AddSingleton<IOrderItemService, OrderItemService>();
+            builder.Services.AddSingleton<IOrderLineRepository, OrderLineRepository>();
+            builder.Services.AddSingleton<IOrderLineService, OrderLineService>();
+
+            builder.Services.AddSingleton<IMenuRepository, MenuRepository>();
+            builder.Services.AddSingleton<IMenuService, MenuService>();
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+          
+            builder.Services.AddSingleton<ICategoryRepository,CategoryRepository>();
+            builder.Services.AddSingleton<ICategoryService,CategoryService>();
+          
             builder.Services.AddSingleton<IFinancialService, FinancialService>();
 
             builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
+
+            builder.Services.AddSession();
+            builder.Services.AddDistributedMemoryCache();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -67,6 +77,7 @@ namespace ProjectChapeau
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();
