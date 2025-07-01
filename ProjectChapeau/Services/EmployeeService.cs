@@ -35,25 +35,32 @@ namespace ProjectChapeau.Services
 
         public List<Employee> GetAllEmployees()
         {
-            return _employeeRepository.GetAllEmployees();
+            return _employeeRepository.GetEmployees();
+        }
+        public Employee? GetEmployeeByNumber(int employeeNumber)
+        {
+            return _employeeRepository.GetEmployeeByNumber(employeeNumber); 
+        }
+        public Employee? GetEmployeeByLoginCredentials(string Username, string password)
+        {
+            Employee? employee = _employeeRepository.GetEmployees(username: Username).FirstOrDefault();
+
+            if (employee == null)
+                return null;
+
+            string interleavedSaltedPassword = _passwordService.InterleaveSalt(password, employee.salt);
+            string hashedInputPassword = _passwordService.HashPassword(interleavedSaltedPassword);
+
+
+            if (hashedInputPassword == employee.password)
+                return employee;
+
+            return null;
         }
 
-        public Employee? GetEmployeeByLoginCredentials(string userName, string password)
-        {
-
-            return _employeeRepository.GetEmployeeByLoginCredentials(userName, password);
-        }
-
-        public Employee? GetEmployeeById(int id)
-        {
-            return _employeeRepository.GetEmployeeById(id); 
-        } 
 
         public void UpdateEmployee(Employee employee)
         {
-            if (_employeeRepository.UserNameExists(employee.userName))
-                throw new InvalidOperationException("A user with this username already exists");
-
             employee.salt = _passwordService.GenerateSalt();
             string interleavedSaltedPassword = _passwordService.InterleaveSalt(employee.password, employee.salt);
             string hashedPassword = _passwordService.HashPassword(interleavedSaltedPassword);
@@ -82,9 +89,5 @@ namespace ProjectChapeau.Services
             _employeeRepository.ActivateEmployee(employeeId);
         }
 
-        public List<Role> GetAllEmployeeRoles()
-        {
-            return _employeeRepository.GetAllEmployeeRoles();
-        }
     }
 }

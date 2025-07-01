@@ -1,6 +1,7 @@
 ﻿using ProjectChapeau.Models;
 using ProjectChapeau.Models.Enums;
 using ProjectChapeau.Models.ViewModel;
+using ProjectChapeau.Repositories;
 using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Services.Interfaces;
 
@@ -9,58 +10,51 @@ namespace ProjectChapeau.Services
     public class TableService : ITableService
     {
         private readonly ITableRepository _tableRepository;
+        private readonly IOrderRepository _orderRepository;
 
-        public TableService(ITableRepository tableRepository)
+        public TableService(ITableRepository tableRepository, IOrderRepository orderRepository)
         {
             _tableRepository = tableRepository;
+            _orderRepository = orderRepository;
         }
 
         public List<RestaurantTable> GetAllTables()
         {
             return _tableRepository.GetAllTables();
         }
-
-        public List<TableViewModel> GetAllTablesWithLatestOrder()
+        public RestaurantTable? GetTableByNumber(int tableNumber)
         {
-            List<TableOrder> tables = _tableRepository.GetAllTablesWithLatestOrder();
-            List<TableViewModel> tableViewModels = new List<TableViewModel>();
+            return _tableRepository.GetTableByNumber(tableNumber);
+        }
+        public TableEditViewModel GetTableWithLatestOrder(int tableNumber)
+        {
+            RestaurantTable? table = _tableRepository.GetTableByNumber(tableNumber);
+            Order? order = _orderRepository.GetLatestOrderForTable(tableNumber);
+            IEnumerable<OrderStatus> statusOptions = Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>();
 
-            foreach (TableOrder table in tables)
+            return new TableEditViewModel(table, order, statusOptions);
+        }
+        public List<TableWithOrder> GetAllTablesWithLatestOrder()
+        {
+            List<TableWithOrder> tablesWithOrder = new();
+
+            List<RestaurantTable> tables = _tableRepository.GetAllTables();
+
+            foreach (RestaurantTable table in tables)
             {
-                
-                string cardColor = "bg-success text-white";
-                string statusText = "Available";
-
-                if (table.OrderId != null && table.OrderStatus != OrderStatus.Completed)
+                Order? latestOrder = _orderRepository.GetLatestOrderForTable(table.TableNumber);
+                tablesWithOrder.Add(new TableWithOrder
                 {
-                    cardColor = table.IsOccupied ? "bg-danger text-dark" : "bg-warning text-dark";
-                    statusText = $"Order {table.OrderStatus}";
-                }
-                else if (table.IsOccupied)
-                {
-                    cardColor = "bg-warning text-dark";
-                    statusText = "Occupied";
-                }
-
-                tableViewModels.Add(new TableViewModel(table.TableNumber, statusText, cardColor));
+                    Table = table,
+                    Order = latestOrder
+                });
             }
-
-            return tableViewModels;
+            return tablesWithOrder;
         }
 
-        public RestaurantTable GetTableById(int id)
+        public void UpdateTableStatus(int tableNumber, bool isOccupied)
         {
-            return _tableRepository.GetTableById(id);
-        }
-
-        public TableEditViewModel GetTableWithLatestOrderById(int? id)
-        {
-            return _tableRepository.GetTableWithLatestOrderById(id);
-        }
-
-        public void UpdateTableStatus(int tableId, bool isOccupied)
-        {
-            _tableRepository.UpdateTableStatus(tableId, isOccupied);
+            _tableRepository.UpdateTableStatus(tableNumber, isOccupied);
         }
     }
 }

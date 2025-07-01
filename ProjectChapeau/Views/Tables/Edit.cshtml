@@ -10,42 +10,39 @@
 <partial name="_ErrorMessage" />
 
 <form asp-controller="Tables" asp-action="Edit" method="post" class="w-50 mx-auto">
-    <input type="hidden" name="tableID" value="@Model?.tableID" />
-    <input type="hidden" name="orderId" value="@Model?.orderId"/>
+    <input type="hidden" asp-for="Table.TableNumber" />
+    <input type="hidden" asp-for="Order.OrderId" />
 
     <div class="mb-4">
         <label class="form-label d-block fw-semibold mb-2">Is Table Occupied?</label>
 
         <div class="btn-group" role="group" aria-label="Is Table Occupied">
-            <input type="radio" class="btn-check" name="IsOccupied" id="IsOccupiedFalse" autocomplete="off" value="False" @(Model?.isOccupied == false ? "checked" : "") />
-            <label class="btn btn-outline-danger" for="IsOccupiedFalse">False</label>
+            <input type="radio" asp-for="Table.IsOccupied" class="btn-check" id="IsOccupiedFalse" value="false" />
+            <label class="btn btn-outline-success" for="IsOccupiedFalse">Free</label>
 
-            <input type="radio" class="btn-check" name="IsOccupied" id="IsOccupiedTrue" autocomplete="off" value="True" @(Model?.isOccupied == true ? "checked" : "") />
-            <label class="btn btn-outline-success" for="IsOccupiedTrue">True</label>
+            <input type="radio" asp-for="Table.IsOccupied" class="btn-check" id="IsOccupiedTrue" value="true" />
+            <label class="btn btn-outline-danger" for="IsOccupiedTrue">Occupied</label>
         </div>
-
     </div>
+
     <div class="mb-4">
         <label class="form-label d-block fw-semibold mb-2">Order Status</label>
         <div class="btn-group" role="group" aria-label="Order Status">
-            @{
-                if(Model?.currentOrderStatus == null || Model?.currentOrderStatus == OrderStatus.Completed)
+            @if (Model?.Order?.OrderStatus == null || Model?.Order?.OrderStatus == OrderStatus.Completed)
+            {
+                <p>No Active order, please create one first</p>
+            }
+            else
+            {
+                foreach (OrderStatus status in Model.OrderStatusOptions)
                 {
-                    <p>No Active order please make one first</p>
-                }
-                else
-                {
-                    foreach (OrderStatus status in Model.orderStatusOptions)
-                    {
-                        string statusValue = status.ToString();
-                        string isChecked = Model?.currentOrderStatus == status ? "checked" : "";
+                    string statusValue = status.ToString();
+                    string isChecked = Model.Order.OrderStatus == status ? "checked" : "";
 
-                        <input type="radio" class="btn-check" name="currentOrderStatus" id="orderStatus_@statusValue" autocomplete="off" value="@statusValue" @isChecked/>
-                        <label class="btn btn-outline-primary" for="orderStatus_@statusValue">@statusValue</label>
-                    }
+                    <input type="radio" asp-for="Order.OrderStatus" class="btn-check" id="orderStatus_@statusValue" value="@statusValue" />
+                    <label class="btn btn-outline-primary" for="orderStatus_@statusValue">@statusValue</label>
                 }
             }
-
         </div>
     </div>
 

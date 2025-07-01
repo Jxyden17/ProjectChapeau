@@ -5,16 +5,10 @@ namespace ProjectChapeau.Services.Interfaces
 {
     public interface IMenuItemService
     {
-        List<Menu> GetAllMenuItems();
-        List<MenuItem> GetMenuItemsByMenu(int menuId);
-        List<MenuItem> GetMenuItemsWithoutDefinedMenu();
-        MenuItem? GetMenuItemById(int menuItemId);
-
-        List<MenuItem> GetCategory(int categoryId);
-        List<MenuItem> GetMenu(int menuId);
-
+        MenuItem GetMenuItemById(int menuItemId);
+        List<MenuItem> GetMenuItemsByMenuId(int menuId);
+        List<MenuItem> GetMenuItemsWithoutMenuId();
         List<MenuItem> GetFilteredMenuItems(int? menuId, int? categoryId);
-
         void AddMenuItem(MenuItem menuItem);
         void UpdateMenuItem(MenuItem menuItem);
         void DeactivateMenuItem(int menuItemId);

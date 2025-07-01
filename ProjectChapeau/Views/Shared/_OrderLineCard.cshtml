@@ -1,0 +1,23 @@
+﻿@model OrderLine;
+@{
+    MenuItem menuItem = Model.MenuItem;
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row justify-content-end align-items-center py-2">
+            <img src="~/img/menu-item/@menuItem.ImageURL" class="img-fluid col-2 rounded object-fit-cover" alt="@menuItem.ItemName">
+            <div class="col-5">
+                <p><strong>@menuItem.ItemName</strong></p>
+                <button class="btn btn-green btn-sm">Add Comment <i class="bi bi-chat-dots"></i></button>
+            </div>
+            <div class="col-1 text-center">€@menuItem.PriceExcludingVAT</div>
+            <div class="col-1 text-center">€@menuItem.PriceIncludingVAT</div>
+            <div class="col-1 text-center d-flex justify-content-center align-items-center quantity-control">
+                <input type="number" class="form-control" value="@Model.Amount" readonly>
+            </div>
+            <div class="col-1 text-center">€@Model.PriceExcludingVAT</div>
+            <div class="col-1 text-center">€@Model.PriceIncludingVAT</div>
+        </div>
+    </div>
+</div>

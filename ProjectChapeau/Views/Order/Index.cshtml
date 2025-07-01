@@ -22,11 +22,11 @@
     <tbody>
         @foreach (var order in Model)
         {
-            TimeSpan waitingTime = DateTime.Now - order.datetime;
+            TimeSpan waitingTime = DateTime.Now - order.OrderDateTime;
 
             <tr>
-                <td>@order.table.TableNumber</td>
-                <td>@order.datetime.ToString("HH:mm")</td>
+                <td>@order.Table.TableNumber</td>
+                <td>@order.OrderDateTime.ToString("HH:mm")</td>
                 <td>@string.Format("{0:%h}h {0:%m}m", waitingTime)</td>
             </tr>
         }

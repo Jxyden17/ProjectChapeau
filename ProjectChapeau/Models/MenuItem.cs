@@ -7,10 +7,19 @@
         public string ItemName { get; set; }
         public string? ItemDescription { get; set; }
         public bool? IsAlcoholic { get; set; }
-        public decimal Price { get; set; }
+        public decimal PriceExcludingVAT { get; set; }
         public int Stock { get; set; }
         public int? PrepTime { get; set; }
         public bool IsActive { get; set; }
+        public decimal PriceIncludingVAT
+        {
+            get
+            {
+                if (IsAlcoholic == true)
+                    return Math.Round(PriceExcludingVAT * (decimal)1.21, 2);
+                return Math.Round(PriceExcludingVAT * (decimal)1.09, 2);
+            }
+        }
 
         public string ImageURL => MenuItemId switch
         {
@@ -58,7 +67,7 @@
             67 => "cappuccino.webp",
             68 => "espresso.jpg",
             70 => "tea.jpg",
-            _ => "steak-tartare.jpg"
+            _ => "menu-item-default.png"
         };
 
         // An empty constructor is needed when a new MenuItem object is created in the controller!
@@ -67,14 +76,14 @@
             ItemName = string.Empty;
         }
 
-        public MenuItem(int menuItemId, Category? category, string itemName, string? itemDescription, bool? isAlcoholic, decimal price, int stock, int? prepTime, bool isActive)
+        public MenuItem(int menuItemId, Category? category, string itemName, string? itemDescription, bool? isAlcoholic, decimal priceExcludingVAT, int stock, int? prepTime, bool isActive)
         {
             MenuItemId = menuItemId;
             Category = category;
             ItemName = itemName;
             ItemDescription = itemDescription;
             IsAlcoholic = isAlcoholic;
-            Price = price;
+            PriceExcludingVAT = priceExcludingVAT;
             Stock = stock;
             PrepTime = prepTime;
             IsActive = isActive;

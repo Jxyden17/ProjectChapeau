@@ -3,27 +3,68 @@
 @{
     ViewData["Title"] = "Menu Overview";
 }
-
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
+<aside id="menu-filter-bar" class="col-4 col-md-3 col-lg-2 d-md-block bg-primary text-white sidebar position-fixed">
+    @await Component.InvokeAsync("CategoryFilter")
+</aside>
+<main class="offset-4 offset-md-3 offset-lg-2 col-8 col-md-9 col-lg-10 ms-auto">
+    <partial name="_ErrorMessage" />
+    <h1 class="display-4 text-center">@ViewData["Title"]</h1>
+    <ul class="nav nav-tabs justify-content-center mb-4" id="menu-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#" data-menu-filter="all">
+                All Menus
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-menu-filter="lunch menu">
+                Lunch Menu (11–16h)
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-menu-filter="dinner menu">
+                Dinner Menu (17–21h)
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-menu-filter="drink menu">
+                Drink Menu
+            </a>
+        </li>
+    </ul>
     @if (Model.Menus != null)
     {
         foreach (Menu menu in Model.Menus)
         {
-            <h2>@menu.MenuName</h2>
-            <div class="container">
-                <div class="row">
-                    @if (menu.MenuItems != null)
-                    {
-                        foreach (MenuItem menuItem in menu.MenuItems)
+            <div class="menu-section" data-menu-name="@menu.MenuName?.ToLowerInvariant()">
+                <h2>@menu.MenuName</h2>
+                <div class="container">
+                    <div class="row">
+                        @if (menu.MenuItems != null)
                         {
-                            <div class="col-md-3 mb-3" id="@menuItem.MenuItemId">
-                                <partial name="_MenuItemCard" model="menuItem" />
-                            </div>
+                            foreach (MenuItem menuItem in menu.MenuItems)
+                            {
+                                <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3 menu-item"
+                                     data-category-id="@menuItem.Category?.CategoryId"
+                                     data-menu-name="@menu.MenuName?.ToLowerInvariant()"
+                                     id="@menuItem.MenuItemId">
+                                    <partial name="_MenuItemCard" model="menuItem" />
+                                </div>
+                            }
                         }
-                    }
+                    </div>
                 </div>
             </div>
         }
     }
+</main>
+<div class="d-flex justify-content-between align-items-center px-3 py-2 position-fixed bottom-0 start-0 w-100 bottom-buttons">
+    <form method="post" asp-controller="Order" asp-action="DeleteCurrentOrder">
+        <button type="submit" class="btn btn-danger">
+            Delete Order
+        </button>
+    </form>
+    <a class="btn btn-success" href="CurrentOrder">
+        @await Component.InvokeAsync("CurrentOrderButton", new { buttonText = "Go to Order Overview" })
+    </a>
 </div>
+<script src="/js/menuFilters.js"></script>

@@ -6,11 +6,9 @@ namespace ProjectChapeau.Repositories.Interfaces
     public interface ITableRepository
     {
         List<RestaurantTable> GetAllTables();
-        RestaurantTable GetTableById(int id);
+        List<int> GetAllTableNumbers();
+        RestaurantTable? GetTableByNumber(int tableNumber);
         void UpdateTableStatus(int tableId, bool isOccupied);
-        List<TableOrder> GetAllTablesWithLatestOrder();
-
-        TableEditViewModel GetTableWithLatestOrderById(int? id);
     }
 }
  

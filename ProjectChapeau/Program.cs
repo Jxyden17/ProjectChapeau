@@ -4,6 +4,9 @@ using ProjectChapeau.Repositories.Interfaces;
 using ProjectChapeau.Repositories;
 using ProjectChapeau.Validation.Interfaces;
 using ProjectChapeau.Validation;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ProjectChapeau
 {
@@ -26,22 +29,38 @@ namespace ProjectChapeau
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 
-            builder.Services.AddSingleton<IOrderItemRepository, OrderItemRepository>();
-            builder.Services.AddSingleton<IOrderItemService, OrderItemService>();
+            builder.Services.AddSingleton<IOrderLineRepository, OrderLineRepository>();
+            builder.Services.AddSingleton<IOrderLineService, OrderLineService>();
+
+            builder.Services.AddSingleton<IMenuRepository, MenuRepository>();
+            builder.Services.AddSingleton<IMenuService, MenuService>();
 
             builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+          
+            builder.Services.AddSingleton<ICategoryRepository,CategoryRepository>();
+            builder.Services.AddSingleton<ICategoryService,CategoryService>();
+          
             builder.Services.AddSingleton<IFinancialService, FinancialService>();
 
             builder.Services.AddSingleton<ITableEditValidator, TableEditValidator>();
 
+            builder.Services.AddSession();
+            builder.Services.AddDistributedMemoryCache();
 
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Employee/Login";
+                    options.AccessDeniedPath = "/Tables/Index";
+                });
 
-            builder.Services.AddSession(options =>
+            builder.Services.AddControllersWithViews(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
             });
 
             var app = builder.Build();
@@ -60,11 +79,12 @@ namespace ProjectChapeau
             app.UseRouting();
             app.UseSession();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Employee}/{action=Login}/{id?}");
 
             app.Run();
         }

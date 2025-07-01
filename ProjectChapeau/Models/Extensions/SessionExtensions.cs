@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace ProjectChapeau.Models.Extensions
+namespace MvcWhatsUp.Models.Extensions
 {
-    public static class Session
+    public static class SessionExtensions
     {
         public static void SetObject<T>(this ISession session, string key, T value)
         {
