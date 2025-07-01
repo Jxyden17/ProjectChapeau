@@ -51,7 +51,7 @@ namespace ProjectChapeau.Repositories
             return new Order(orderId, employee, table, new(), orderDateTime, orderStatus, isPaid, tipAmount);
         }
 
-        private List<OrderLine> ReadOrderLines(SqlDataReader reader)
+        private static List<OrderLine> ReadOrderLines(SqlDataReader reader)
         {
             List<OrderLine> orderLines = new();
 
@@ -211,13 +211,13 @@ namespace ProjectChapeau.Repositories
         }
         public void AddOrder(Order order)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
                 string query = @"INSERT INTO Orders (employee_number, table_number, order_datetime, order_status, is_paid, tip_amount)
                                  VALUES (@EmployeeNumber, @TableNumber, @OrderDateTime, @OrderStatus, @IsPaid, @TipAmount);
                                  SELECT SCOPE_IDENTITY();";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@EmployeeNumber", order.Employee.employeeId);
                 command.Parameters.AddWithValue("@TableNumber", order.Table.TableNumber);
@@ -288,7 +288,7 @@ namespace ProjectChapeau.Repositories
                                  FROM [Order] O
                                  LEFT JOIN Order_Line OL on O.order_id = OL.order_id
                                  LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
-                                 LEFT JOIN Category C on MI.category_id = C.category
+                                 LEFT JOIN Category C on MI.category_id = C.category_id
                                  WHERE O.order_datetime >= @StartDate AND O.order_datetime <= @EndDate 
                                  AND O.is_paid = 1
                                  ORDER BY O.order_datetime ASC, O.order_id, C.category_id, MI.menu_item_id;";

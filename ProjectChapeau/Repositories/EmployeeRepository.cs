@@ -50,7 +50,7 @@ namespace ProjectChapeau.Repositories
                                "VALUES (@FirstName, @LastName, @Username, @Password, @Salt, @IsActive, @Role); " +
                                "SELECT SCOPE_IDENTITY();";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@FirstName", employee.firstName);
                 command.Parameters.AddWithValue("@LastName", employee.lastName);
@@ -71,7 +71,7 @@ namespace ProjectChapeau.Repositories
                 string query = "UPDATE Employees SET firstname = @FirstName, lastname = @LastName, username = @Username, password = @Password, salt = @Salt, is_active = @IsActive , role = @Role " +
                                 "WHERE employee_number = @Id";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@Id", employee.employeeId);
                 command.Parameters.AddWithValue("@FirstName", employee.firstName);
                 command.Parameters.AddWithValue("@LastName", employee.lastName);
@@ -94,7 +94,7 @@ namespace ProjectChapeau.Repositories
             {
                 string query = $"DELETE FROM Employees WHERE employee_number = @Id";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@Id", employee.employeeId);
 
                 command.Connection.Open();
@@ -106,14 +106,14 @@ namespace ProjectChapeau.Repositories
 
         public List<Employee> GetEmployees(int? employeeNumber = null, string? username = null)
         {
-            List<Employee> employees = new List<Employee>();
+            List<Employee> employees = new();
 
             using (SqlConnection connection = CreateConnection())
             {
                 string query = @"SELECT employee_number, firstname, lastname, username, password, salt, is_active, role
                          FROM Employees";
-                List<string> conditions = new List<string>();
-                SqlCommand command = new SqlCommand();
+                List<string> conditions = new();
+                SqlCommand command = new();
 
                 if (employeeNumber.HasValue)
                 {
@@ -152,12 +152,12 @@ namespace ProjectChapeau.Repositories
             {
                 string query = "SELECT COUNT(*) FROM Employees WHERE username = @UserName";
 
-                SqlCommand cmd = new SqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@UserName", userName);
+                SqlCommand command = new(query, connection);
+                command.Parameters.AddWithValue("@UserName", userName);
 
                 connection.Open();
 
-                int count = (int)cmd.ExecuteScalar();
+                int count = (int)command.ExecuteScalar();
 
                 return count > 0;
             }

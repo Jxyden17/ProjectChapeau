@@ -40,13 +40,13 @@ namespace ProjectChapeau.Repositories
 
         public void AddOrderLine(OrderLine orderLine, int orderId)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new(_connectionString))
             {
-                string query = @"INSERT INTO Order_Item (order_id, menu_item_id, amount, comment, order_line_status)
+                string query = @"INSERT INTO Order_Line (order_id, menu_item_id, amount, comment, order_line_status)
                                  VALUES (@OrderId, @MenuItemId, @Amount, @Comment, @OrderLineStatus);
                                  SELECT SCOPE_IDENTITY();";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@OrderId", orderId);
                 command.Parameters.AddWithValue("@MenuItemId", orderLine.MenuItem.MenuItemId);

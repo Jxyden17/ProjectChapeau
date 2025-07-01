@@ -27,7 +27,10 @@ namespace ProjectChapeau.Repositories
             string password = (string)reader["password"];
             string salt = (string)reader["salt"];
             bool isActive = (bool)reader["is_active"];
-            Roles employeeRole = Enum.Parse<Roles>(reader["role"].ToString());
+            if (!Enum.TryParse<Roles>(reader["role"].ToString(), out Roles employeeRole))
+            {
+                throw new ArgumentException($"Invalid role {reader["order_line_status"]} found in the database.");
+            }
 
             return new Employee(id, firstname, lastname, username, password, isActive, employeeRole, salt);
         }

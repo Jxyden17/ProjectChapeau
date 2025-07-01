@@ -17,9 +17,9 @@ namespace ProjectChapeau.Services
         {
             return _orderLineRepository.GetOrderLinesByOrderId(orderId);
         }
-        public void AddOrderLine(OrderLine orderLine)
+        public void AddOrderLine(OrderLine orderLine, int orderId)
         {
-            _orderLineRepository.AddOrderLine(orderLine);
+            _orderLineRepository.AddOrderLine(orderLine, orderId);
         }
     }
 }

@@ -2,12 +2,9 @@
 
 @{
 	ViewData["Title"] = "Add Menu Item";
-	string? errorMessage = (string)ViewData["ErrorMessage"];
 }
-
-<h4>@errorMessage</h4>
-
 <h2>Add New Menu Item</h2>
+<partial name="_ErrorMessage" />
 
 <form action="/MenuItem/Add" method="POST">
 

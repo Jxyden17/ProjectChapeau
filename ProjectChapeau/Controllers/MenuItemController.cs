@@ -36,7 +36,7 @@ namespace ProjectChapeau.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = $"{menuItem.ItemName} could not be added";
+                TempData["ErrorMessage"] = $"{menuItem.ItemName} could not be added";
                 return View(menuItem);
             }
         }
@@ -65,7 +65,7 @@ namespace ProjectChapeau.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = $"Menu item {menuItem.ItemName} could not be edited";
+                TempData["ErrorMessage"] = $"Menu item {menuItem.ItemName} could not be edited";
                 return View(menuItem);
             }
         }

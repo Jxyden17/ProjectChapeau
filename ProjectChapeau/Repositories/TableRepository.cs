@@ -18,7 +18,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = CreateConnection())
             {
                 string query = "SELECT table_number, is_occupied FROM RESTAURANT_TABLE";
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -39,7 +39,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = CreateConnection())
             {
                 string query = "SELECT DISTINCT table_number FROM RESTAURANT_TABLE ORDER BY table_number";
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -62,7 +62,7 @@ namespace ProjectChapeau.Repositories
                                  FROM RESTAURANT_TABLE
                                  WHERE table_number = @TableNumber;";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@TableNumber", tableNumber);
 
                 connection.Open();
@@ -84,7 +84,7 @@ namespace ProjectChapeau.Repositories
                 string query = "UPDATE RESTAURANT_TABLE SET is_occupied = @isOccupied " +
                                "WHERE table_number = @Id";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@Id", tableId);
                 command.Parameters.AddWithValue("@IsOccupied", isOccupied);
 

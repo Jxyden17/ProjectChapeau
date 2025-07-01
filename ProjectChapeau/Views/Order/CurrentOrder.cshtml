@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Current Order";
-    int tableNumber = Model.Table.TableNumber;
+    int? tableNumber = Model?.Table.TableNumber;
 }
 
 <div class="container-fluid mt-3">
