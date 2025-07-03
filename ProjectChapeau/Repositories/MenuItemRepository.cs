@@ -17,7 +17,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM Menu_Item
                                  LEFT JOIN Category C on MI.catgory_id = C.category_id
                                  ORDER BY MI.item_name";
@@ -38,7 +38,7 @@ namespace ProjectChapeau.Repositories
         {
             using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM Menu_Item MI
                                  LEFT JOIN Category C on MI.category_id = C.category_id
                                  WHERE MI.menu_item_id = @MenuItemId;";
@@ -64,7 +64,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT MCI.menu_id, MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MCI.menu_id, MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM Menu_Item MI
                                  LEFT JOIN Menu_Contains_Item MCI ON MI.menu_item_id = MCI.menu_item_id
                                  LEFT JOIN Category C ON MI.category_id = C.category_id
@@ -92,7 +92,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM Menu_Item MI
                                  LEFT JOIN Menu_Contains_Item MCI ON MI.menu_item_id = MCI.menu_item_id
                                  LEFT JOIN Category C ON MI.category_id = C.category_id
@@ -118,7 +118,7 @@ namespace ProjectChapeau.Repositories
 
             using (SqlConnection connection = CreateConnection())
             {
-                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                string query = @"SELECT MI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
 								FROM Menu_Item MI
                                 LEFT JOIN Menu_Contains_Item MCI ON MI.menu_item_id = MCI.menu_item_id
                                 LEFT JOIN Category C ON C.category_id = MI.category_id
@@ -146,13 +146,13 @@ namespace ProjectChapeau.Repositories
         {
             using (SqlConnection connection = CreateConnection())
             {
-                string query = @"INSERT INTO Menu_Item (item_name, price, stock, is_active)
-                                 VALUES (@ItemName, @Price, @Stock, @IsActive);";
+                string query = @"INSERT INTO Menu_Item (item_name, price_excl_vat, stock, is_active)
+                                 VALUES (@ItemName, @PriceExcludingVAT, @Stock, @IsActive);";
 
                 SqlCommand command = new(query, connection);
 
                 command.Parameters.AddWithValue("@ItemName", menuItem.ItemName);
-                command.Parameters.AddWithValue("@Price", menuItem.PriceExcludingVAT);
+                command.Parameters.AddWithValue("@PriceExcludingVAT", menuItem.PriceExcludingVAT);
                 command.Parameters.AddWithValue("@Stock", menuItem.Stock);
                 command.Parameters.AddWithValue("@IsActive", menuItem.IsActive);
 
@@ -166,13 +166,13 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = CreateConnection())
             {
                 string query = @"UPDATE Menu_Item
-                                 SET item_name = @ItemName, price = @Price, stock = @Stock
+                                 SET item_name = @ItemName, price_excl_vat = @PriceExcludingVAT, stock = @Stock
                                  WHERE menu_item_id = @MenuItemId";
 
                 SqlCommand command = new(query, connection);
                 command.Parameters.AddWithValue("@MenuItemId", menuItem.MenuItemId);
                 command.Parameters.AddWithValue("@ItemName", menuItem.ItemName);
-                command.Parameters.AddWithValue("@Price", menuItem.PriceExcludingVAT);
+                command.Parameters.AddWithValue("@PriceExcludingVAT", menuItem.PriceExcludingVAT);
                 command.Parameters.AddWithValue("@Stock", menuItem.Stock);
 
                 connection.Open();

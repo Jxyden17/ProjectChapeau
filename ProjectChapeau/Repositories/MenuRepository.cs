@@ -38,7 +38,7 @@ namespace ProjectChapeau.Repositories
             using (SqlConnection connection = CreateConnection())
             {
                 string query = @"SELECT MCI.menu_id, M.menu_name,
-                                     MCI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                     MCI.menu_item_id, MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM Menu_Contains_Item MCI
                                  JOIN Menu M ON MCI.menu_id = M.menu_id
                                  JOIN Menu_Item MI ON MCI.menu_item_id = MI.menu_item_id

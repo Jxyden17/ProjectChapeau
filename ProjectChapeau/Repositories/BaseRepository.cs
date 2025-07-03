@@ -65,12 +65,12 @@ namespace ProjectChapeau.Repositories
             string itemName = (string)reader["item_name"];
             string? itemDescription = reader["item_description"] == DBNull.Value ? null : (string)reader["item_description"];
             bool? isAlcoholic = reader["is_alcoholic"] == DBNull.Value ? null : (bool)reader["is_alcoholic"];
-            decimal price = (decimal)reader["price"];
+            decimal priceExcludingVAT = (decimal)reader["price_excl_vat"];
             int stock = (int)reader["stock"];
             int? prepTime = reader["prep_time"] == DBNull.Value ? null : (int)reader["prep_time"];
             bool isActive = (bool)reader["is_active"];
 
-            return new MenuItem(menuItemId, category, itemName, itemDescription, isAlcoholic, price, stock, prepTime, isActive);
+            return new MenuItem(menuItemId, category, itemName, itemDescription, isAlcoholic, priceExcludingVAT, stock, prepTime, isActive);
         }
 
         protected static OrderLine ReadOrderLine(SqlDataReader reader)
