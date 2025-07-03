@@ -115,7 +115,7 @@ namespace ProjectChapeau.Repositories
             {
                 string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
                                      OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
-                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM [Order] O
                                  LEFT JOIN Order_Line OL on O.order_id = OL.order_id
                                  LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
@@ -142,7 +142,7 @@ namespace ProjectChapeau.Repositories
             {
                 string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
                                      OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
-                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM [Order] O
                                  LEFT JOIN Order_Line OL on O.order_id = OL.order_id
                                  LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
@@ -179,7 +179,7 @@ namespace ProjectChapeau.Repositories
             {
                 string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
                                      OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
-                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM [Order] O
                                  LEFT JOIN Order_Line OL ON O.order_id = OL.order_id
                                  LEFT JOIN Menu_Item MI ON OL.menu_item_id = MI.menu_item_id
@@ -239,7 +239,7 @@ namespace ProjectChapeau.Repositories
             {
                 string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
                                      OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
-                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM [Order] O
                                  LEFT JOIN Order_Line OL on O.order_id = OL.order_id
                                  LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
@@ -284,7 +284,7 @@ namespace ProjectChapeau.Repositories
             {
                 string query = @"SELECT O.order_id, O.employee_number, O.table_number, O.order_datetime, O.order_status, O.is_paid, O.tip_amount,
                                      OL.menu_item_id, OL.amount, OL.comment, OL.order_line_status,
-                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price, MI.stock, MI.prep_time, MI.is_active
+                                     MI.category_id, C.category_name, MI.item_name, MI.item_description, MI.is_alcoholic, MI.price_excl_vat, MI.stock, MI.prep_time, MI.is_active
                                  FROM [Order] O
                                  LEFT JOIN Order_Line OL on O.order_id = OL.order_id
                                  LEFT JOIN Menu_Item MI on OL.menu_item_id = MI.menu_item_id
